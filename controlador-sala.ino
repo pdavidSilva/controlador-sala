@@ -1,9 +1,16 @@
-void setup() {
-  // put your setup code here, to run once:
+#include "Config.h"
 
+Controller controller;
+
+void setup() {
+  
+  Serial.begin(115200);
+  delay(4000);
+
+  controller.start();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+   
+  
 }

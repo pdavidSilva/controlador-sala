@@ -1,19 +1,16 @@
 #include "Config.h"
 #include "Controller.h"
-
+ 
+Controller::Controller(){}
 HTTPService __http;
 
-Controller::Controller(){}
-
-bool Controller::start() const 
+bool Controller::start(HardwareRecord &record) const 
 {   
     struct HardwareRecord hardware = {0,"",""};
 
     __http.getInfoHardware(hardware);
     if(hardware.id > 0 ){
-        //this->setId(hardware.id);
-        //this->setUuid(hardware.uuid);
-        //this->setToken(hardware.token);
+        record = hardware;
 
         return true;
     }else{
@@ -23,13 +20,23 @@ bool Controller::start() const
 
 void Controller::restart() const 
 {
-  
+  Hardware hardware;
+  hardware.restart();
+
+  return ;
 }
 
 
-bool Controller::registerHardware() const
-{
-    return true;
+bool Controller::registerHardware(HardwareRecord hardware) const
+{   
+    bool statusRegister = false;
+
+    statusRegister = __http.registerHardware(hardware);
+    if(statusRegister){
+        return true;
+    }
+    
+    return false;
 }
         
 bool Controller::notificateServer() const
@@ -38,6 +45,11 @@ bool Controller::notificateServer() const
 }
 
 void Controller::initServer()
+{
+  
+}
+
+void Controller::getSensors(HardwareRecord hardware,String *sensors, int &indexSensor)
 {
   
 }

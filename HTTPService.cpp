@@ -11,7 +11,10 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
     Hardware hardware;
     HTTP http;
     
+    if (config.getRoute() == 1)
     String route = "/hardware/";
+    
+    
     String routeService;
     String type = "GET";
     String params = "";
@@ -20,7 +23,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
 
     routeService.concat(route);
     routeService.concat(hardware.getMacAddress());
-    routeService.concat("?api_token=");
+    routeService.concat("?token=");
     routeService.concat(token);
     routeService.concat("&tipo-hardware=");
     routeService.concat(config.getType());
@@ -65,5 +68,74 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
     }
       
     return ; 
+    
+}
+
+bool HTTPService::registerHardware(HardwareRecord hardware){
+
+    //hardware/register
+    
+    Config config;
+    HTTP http;
+    
+    String route = "/hardware/register";
+    String routeService;
+    String type = "POST";
+    String params = "";
+    String response;
+
+    String id               = String(hardware.id);
+    String tipo_hardware_id = String(1);
+
+    params.concat("{");
+    params.concat("\"id\":" + id +  ", ");
+    params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
+    params.concat("\"token\":\"" + hardware.token + "\", ");
+    params.concat("\"tipo_hardware_id\": " + tipo_hardware_id);
+    params.concat("}");
+
+    routeService.concat(route);
+    response = http.request(routeService, type, params);
+
+    return false;
+
+    // if (strstr(response.c_str(), "[ERROR]") == NULL){
+    //     DynamicJsonDocument doc(1024);
+    //     DeserializationError error = deserializeJson(doc, response);
+
+    //     if (error) {      
+    //         if (config.isDebug())
+    //         {
+    //             Serial.println("==================================");
+    //             Serial.println("[HTTPService] Falha no parse JSON.......");
+    //             Serial.println(error.f_str());
+    //         }
+    //         delay(5000);
+            
+    //         return false; 
+    //     }
+        
+    //     if(doc["httpCode"].as<int>() == 200){
+          
+    //         record.id = doc["result"]["id"].as<int>();
+    //         record.token = doc["result"]["token"].as<char*>();
+    //         record.uuid = doc["result"]["uuid"].as<char*>();
+
+    //         return false;
+    //     }else{
+    //         if (config.isDebug())
+    //         {
+    //             Serial.println("==================================");
+    //             Serial.print("[HTTPService] Mensagem: ");
+    //             Serial.println(doc["message"].as<char*>());
+    //         }
+    //         return false; 
+    //     }
+        
+    // }else{
+    //     return false; 
+    // }
+      
+    return false; 
     
 }

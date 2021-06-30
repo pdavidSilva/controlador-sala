@@ -5,7 +5,6 @@ int __id;
 String __uuid;
 String __token;
 
-
 Hardware::Hardware(){}
 
 void Hardware::restart()
@@ -24,6 +23,7 @@ String Hardware::getMacAddress() const
 {
     Config config;
     String mac = WiFi.macAddress();
+    mac.toUpperCase();
     if (config.isDebug())
     {
         Serial.println("[Hardware] MAC: " + mac);

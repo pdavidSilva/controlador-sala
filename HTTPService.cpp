@@ -11,7 +11,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
     Hardware hardware;
     HTTP http;
     
-    String route = "/hardware/";
+    String route = "/hardwaredesala/info/";
     String routeService;
     String type = "GET";
     String params = "";
@@ -20,9 +20,9 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
 
     routeService.concat(route);
     routeService.concat(hardware.getMacAddress());
-    routeService.concat("?api_token=");
+    routeService.concat("?token=");
     routeService.concat(token);
-    routeService.concat("&tipo-hardware=");
+    routeService.concat("&tipoHardware=");
     routeService.concat(config.getType());
     
     response = http.request(routeService, type, params);

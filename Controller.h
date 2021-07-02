@@ -3,17 +3,22 @@
 
 #include "Config.h"
 
+
 class Controller
-{
-    
+{   
     public:
         Controller();
-        bool start() const;
         void restart() const;
-        bool registerHardware() const;
-        bool notificateServer() const;       
 
+        // HTTP
+        bool start(struct HardwareRecord&) const;
+        bool registerHardware(struct HardwareRecord) const;
+        void getSensors(struct HardwareRecord, String *, int&);
+        //void getDevices(String[]&);
+
+        // BLE
         void initServer();    
+        bool notificateServer() const;       
         
 };
 

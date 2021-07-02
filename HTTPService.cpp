@@ -11,7 +11,11 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
     Hardware hardware;
     HTTP http;
     
-    String route = "/hardwaredesala/info/";
+    if (config.getRoute() == 1)
+        String route = "/hardware/";
+    else 
+        String route = "/hardwaredesala/info/";
+    
     String routeService;
     String type = "GET";
     String params = "";
@@ -49,6 +53,151 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
             record.token = doc["result"]["token"].as<char*>();
             record.uuid = doc["result"]["uuid"].as<char*>();
 
+            return ;
+        }else{
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char*>());
+            }
+            return ; 
+        }
+        
+    }else{
+        return ; 
+    }
+      
+    return ; 
+    
+}
+
+bool HTTPService::registerHardware(HardwareRecord hardware){
+
+    //hardware/register
+    
+    Config config;
+    HTTP http;
+    
+      if (config.getRoute() == 1)
+        String route = "/hardware/register"
+    else 
+        String route = "/hardwaredesala/register";
+        
+    String routeService;
+    String type = "POST";
+    String params = "";
+    String response;
+
+    String id               = String(hardware.id);
+    String tipo_hardware_id = String(1);
+
+    params.concat("{");
+    params.concat("\"id\":" + id +  ", ");
+    params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
+    params.concat("\"token\":\"" + hardware.token + "\", ");
+    params.concat("\"tipo_hardware_id\": " + tipo_hardware_id);
+    params.concat("}");
+
+    routeService.concat(route);
+    response = http.request(routeService, type, params);
+
+    return false;
+
+    // if (strstr(response.c_str(), "[ERROR]") == NULL){
+    //     DynamicJsonDocument doc(1024);
+    //     DeserializationError error = deserializeJson(doc, response);
+
+    //     if (error) {      
+    //         if (config.isDebug())
+    //         {
+    //             Serial.println("==================================");
+    //             Serial.println("[HTTPService] Falha no parse JSON.......");
+    //             Serial.println(error.f_str());
+    //         }
+    //         delay(5000);
+            
+    //         return false; 
+    //     }
+        
+    //     if(doc["httpCode"].as<int>() == 200){
+          
+    //         record.id = doc["result"]["id"].as<int>();
+    //         record.token = doc["result"]["token"].as<char*>();
+    //         record.uuid = doc["result"]["uuid"].as<char*>();
+
+    //         return false;
+    //     }else{
+    //         if (config.isDebug())
+    //         {
+    //             Serial.println("==================================");
+    //             Serial.print("[HTTPService] Mensagem: ");
+    //             Serial.println(doc["message"].as<char*>());
+    //         }
+    //         return false; 
+    //     }
+        
+    // }else{
+    //     return false; 
+    // }
+      
+    return false; 
+    
+}
+
+void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor){
+    
+    //hardware/{uuid}/getSensores
+    
+    Config config;
+    HTTP http;
+    
+    if (config.getRoute() == 1)
+        String route = "/hardware/";
+    else 
+        String route = "/hardwaredesala/";
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String response;
+
+    String uuid = String(hardware.uuid);
+
+    routeService.concat(route);
+    routeService.concat(uuid);
+    routeService.concat("/getSensores");
+  
+    response = http.request(routeService, type, params);
+    
+    if (strstr(response.c_str(), "[ERROR]") == NULL){
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error) {      
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+            
+            return ; 
+        }
+        
+        if(doc["httpCode"].as<int>() == 200){
+             
+            JsonArray sensoresObj = doc["result"]["sensores"].as<JsonArray>();
+
+            int i = 0;
+            for (JsonArray::iterator it=sensorsObj.begin(); it!=sensorsObj.end(), i < 6; ++it) {
+                JsonObject repo = *it;
+                sensors[i] = repo["uuid"];
+                i++;
+            }
+            indexSensor = doc["result"]["length"].as<int>();
+           
             return ;
         }else{
             if (config.isDebug())

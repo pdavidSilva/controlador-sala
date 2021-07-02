@@ -44,12 +44,13 @@ String HTTP::request(String resource, String type, String params) const{
             Serial.println("[HTTP] Tipo..: " + type);
             Serial.println("[HTTP] Params: " + params);
         }
-
+    
         http.begin(url.c_str());
         if (type.compareTo("post") == 0){
-            //http.addHeader("Content-Type", "application/x-www-form-urlencoded");
             http.addHeader("Content-Type", "application/json");          
             httpCode = http.POST(params);
+            Serial.println("[HTTP] Code: " + httpCode);
+
         }else if(type.compareTo("get") == 0){
             httpCode = http.GET();
         }

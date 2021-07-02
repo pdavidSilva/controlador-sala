@@ -23,18 +23,19 @@ class Config
         int    __basetime;
         bool   __debug;
         int    __type;
-
+        int    __route;
     public : 
         
         Config();
         
-        String getUrl() const;
-        String getSSID() const;
-        String getPassword() const;
-        int    getType() const;
-        int    getBaseTime() const;
-        int    getLedStatus() const;
-        bool   isDebug() const;
+        String getUrl();
+        String getSSID();
+        String getPassword();
+        int    getType();
+        int    getBaseTime();
+        int    getLedStatus();
+        bool   isDebug();
+        int    getRoute();
 };
 
 #endif

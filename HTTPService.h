@@ -8,8 +8,9 @@ class HTTPService
     public:
         HTTPService();
         void getInfoHardware(struct HardwareRecord&);
-        
-        
+        bool registerHardware(struct HardwareRecord);
+        void getSensors(struct HardwareRecord, String [], int &);
+            
 };
 
 #endif

@@ -10,11 +10,12 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
     Config config;
     Hardware hardware;
     HTTP http;
-    
+    String route;
+
     if (config.getRoute() == 1)
-        String route = "/hardware/";
+        route = "/hardware/";
     else 
-        String route = "/hardwaredesala/info/";
+        route = "/hardwaredesala/info/";
     
     String routeService;
     String type = "GET";
@@ -26,7 +27,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record){
     routeService.concat(hardware.getMacAddress());
     routeService.concat("?token=");
     routeService.concat(token);
-    routeService.concat("&tipoHardware=");
+    routeService.concat("&tipo-hardware=");
     routeService.concat(config.getType());
     
     response = http.request(routeService, type, params);
@@ -78,11 +79,13 @@ bool HTTPService::registerHardware(HardwareRecord hardware){
     
     Config config;
     HTTP http;
+    String route;
+
     
-      if (config.getRoute() == 1)
-        String route = "/hardware/register"
+    if (config.getRoute() == 1)
+        route = "/hardware/register";
     else 
-        String route = "/hardwaredesala/register";
+        route = "/hardwaredesala/register";
         
     String routeService;
     String type = "POST";
@@ -102,7 +105,7 @@ bool HTTPService::registerHardware(HardwareRecord hardware){
     routeService.concat(route);
     response = http.request(routeService, type, params);
 
-    return false;
+    return true;
 
     // if (strstr(response.c_str(), "[ERROR]") == NULL){
     //     DynamicJsonDocument doc(1024);
@@ -145,17 +148,18 @@ bool HTTPService::registerHardware(HardwareRecord hardware){
     
 }
 
-void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor){
+void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors){
     
-    //hardware/{uuid}/getSensores
+    //hardware/{uuid}/get-sensors
     
     Config config;
     HTTP http;
+    String route;
     
     if (config.getRoute() == 1)
-        String route = "/hardware/";
+        route = "/hardware/";
     else 
-        String route = "/hardwaredesala/";
+        route = "/hardwaredesala/";
 
     String routeService;
     String type = "GET";
@@ -163,10 +167,14 @@ void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &ind
     String response;
 
     String uuid = String(hardware.uuid);
+    String token = hardware.token;
 
     routeService.concat(route);
     routeService.concat(uuid);
-    routeService.concat("/getSensores");
+    routeService.concat("/get-sensors");
+    routeService.concat("?token=");
+    routeService.concat(token);
+
   
     response = http.request(routeService, type, params);
     
@@ -186,18 +194,18 @@ void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &ind
             return ; 
         }
         
-        if(doc["httpCode"].as<int>() == 200){
+        if( doc["httpCode"].as<int>() == 200 ){
              
-            JsonArray sensoresObj = doc["result"]["sensores"].as<JsonArray>();
-
+            JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
+            
             int i = 0;
-            for (JsonArray::iterator it=sensorsObj.begin(); it!=sensorsObj.end(), i < 6; ++it) {
-                JsonObject repo = *it;
-                sensors[i] = repo["uuid"];
+            for ( JsonVariant sensor : jsonSensors ) {
+                sensors[i] = sensor["uuid"].as<char*>();
                 i++;
             }
-            indexSensor = doc["result"]["length"].as<int>();
-           
+            
+            indexSensors = doc["result"]["length"].as<int>();
+            
             return ;
         }else{
             if (config.isDebug())
@@ -215,4 +223,8 @@ void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &ind
       
     return ; 
     
+}
+
+void HTTPService::getDevices(HardwareRecord hardware, String devices[], int &indexDevices){
+
 }

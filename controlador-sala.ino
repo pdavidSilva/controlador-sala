@@ -4,37 +4,43 @@ HardwareRecord hardware;
 Controller controller;
 String sensors[6];
 String devices[6];
-int indexSensor;
+int indexSensors;
 int indexDevices;
 
 void setup() {
+	
 	Serial.begin(115200);
 	bool init = false;
 
-	indexSensor = 0;
+	indexSensors = 0;
 	indexDevices = 0;
 
 	do {
-		
-		if (controller.start(hardware)){
-			if (controller.registerHardware(hardware)){
-				controller.getSensors(hardware, sensors, indexSensor);
-				controller.getDevices(hardware, devices, indexDevices);
+		if ( controller.start(hardware) ) {
+			if ( controller.registerHardware(hardware) ) {
+				controller.getSensors(hardware, sensors, indexSensors);
+        Serial.print("Sensors: ");
+        Serial.println(indexSensors);
+				//controller.getDevices(hardware, devices, indexDevices);
+    
+				//if( indexSensors > 0 && indexDevices > 0 ) {				
+					//controller.startServer();
+					// if (controller.scan()) {
+					// 	init = true;
+					// }
+				//}
 			}
 		}
+	} while( !init );
 
-	}while(!init);
-
-	controller.startBle();
-
+	//controller.startMonitoring(); 
 }
 
 void loop() {
-   
 
-	sensors()
-	dispositivo()
-
+	//sensors()
+	//dispositivo()
+	
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
 

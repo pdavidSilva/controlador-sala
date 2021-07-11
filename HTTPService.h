@@ -5,11 +5,12 @@
 
 class HTTPService
 {
-    public:
+    public :
         HTTPService();
         void getInfoHardware(struct HardwareRecord&);
         bool registerHardware(struct HardwareRecord);
         void getSensors(struct HardwareRecord, String [], int &);
+        void getDevices(struct HardwareRecord, String [], int &);
             
 };
 

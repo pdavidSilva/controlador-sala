@@ -11,7 +11,8 @@ class HTTPService
         bool registerHardware(struct HardwareRecord);
         void getSensors(struct HardwareRecord, String [], int &);
         void getDevices(struct HardwareRecord, String [], int &);
-            
+        bool getMaster(struct HardwareRecord, String &);
+  
 };
 
 #endif

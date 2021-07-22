@@ -54,3 +54,9 @@ void Controller::getSensors(HardwareRecord hardware, String sensors[], int &inde
     __http.getSensors(hardware, sensors, indexSensor);
     return;
 }
+
+bool Controller::getMaster(HardwareRecord hardware, String &master)
+{
+    __http.getMaster(hardware, master);
+    return !master.equals("") ? true : false;
+}

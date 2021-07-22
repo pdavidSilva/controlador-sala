@@ -15,6 +15,7 @@ class Controller
         bool registerHardware(struct HardwareRecord) const;
         void getSensors(struct HardwareRecord, String *, int&);
         //void getDevices(String[]&);
+        bool getMaster(struct HardwareRecord, String &);
 
         // BLE
         void initServer();    

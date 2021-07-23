@@ -286,6 +286,8 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
 
             return false;
         }
+
+        if (doc["httpCode"].as<int>() == 200)
         {
             master = doc["result"]["uuid"].as<char *>();
 

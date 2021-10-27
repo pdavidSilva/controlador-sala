@@ -1,6 +1,6 @@
 #include "Config.h"
 
-HardwareRecord hardware;
+/*HardwareRecord hardware;
 Controller controller;
 String master = "";
 
@@ -32,4 +32,4 @@ void loop() {
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
 
-}
+}*/

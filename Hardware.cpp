@@ -4,6 +4,10 @@
 int __id;
 String __uuid;
 String __token;
+int __typeDisp;
+String __characteristic;
+BLEAdvertisedDevice* __bleAdvertisedDevice;
+
 
 Hardware::Hardware(){}
 
@@ -46,6 +50,20 @@ void Hardware::setToken(String token)
 {
   __token = token;
 }
+void Hardware::setTypeDisp(int type)
+{
+    __typeDisp = type;
+}
+
+void Hardware::setCharacteristic(String characteristic)
+{
+    __characteristic = characteristic;
+}
+
+void Hardware::setBLEAdvertisedDevice(BLEAdvertisedDevice *bleAdvertisedDevice)
+{
+    __bleAdvertisedDevice = bleAdvertisedDevice;
+}
 
 int    Hardware::getId() const 
 {
@@ -60,4 +78,24 @@ String Hardware::getUuid() const
 String Hardware::getToken() const 
 {
   return __token;
+}
+
+int Hardware::getTypeDisp()
+{
+    return __typeDisp;
+}
+
+String Hardware::getCharacteristic()
+{
+    return __characteristic;
+}
+
+BLEAddress Hardware::getMacAddressAdvertisedDevice()
+{
+  return Hardware::getBLEAdvertisedDevice()->getAddress();
+}
+
+BLEAdvertisedDevice* Hardware::getBLEAdvertisedDevice()
+{
+    return __bleAdvertisedDevice;
 }

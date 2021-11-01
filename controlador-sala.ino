@@ -1,7 +1,7 @@
 #include "Config.h"
 #include "BLEServerService.h"
-#include "BLESensorService.h"
 
+BLEServerService* bleConfig; 
 HardwareRecord hardware;
 Controller controller;
 String sensors[6];
@@ -9,32 +9,12 @@ String devices[6];
 int indexSensors;
 int indexDevices;
 
-BLEServerService* bleConfig; 
-
 void setup() {
 	
 	Serial.begin(115200);
 	bool init = false;
-
-  /*bleConfig = new BLEServerService();
-  bleConfig->addSensor("4fafc201-1fb5-459e-8fcc-c5c9c3319222");
-  bleConfig->addSensor("4fafc201-1fb5-459e-8fcc-c5c9c3319111");
-  bleConfig->addSensor("4fafc201-1fb5-459e-8fcc-c5c9c3319333");
-
-  bleConfig->addActuator("4fafc201-1fb5-459e-8fcc-c5c9c3319444");
-  bleConfig->addActuator("4fafc201-1fb5-459e-8fcc-c5c9c3319555");
-  bleConfig->addActuator("4fafc201-1fb5-459e-8fcc-c5c9c3319666");
-  
-  bleConfig->initBLE();  
-  bleConfig->scanDevices();
-  bleConfig->populateMap();
-
-  delay(2000);
-  bleConfig->startTask();*/
-
-  initBLE();
-
-	/*indexSensors = 0;
+ 
+	indexSensors = 0;
 	indexDevices = 0;
 
 	do {
@@ -53,23 +33,29 @@ void setup() {
 				//}
 			}
 		}
-	} while( !init );*/
+	} while( !init );
+
+  for(int i = 0; i < indexSensors; i++)
+    bleConfig->addSensor(sensors[i]);
+    
+  for(int i = 0; i < indexDevices; i++)
+    bleConfig->addActuator(devices[i]);
+  
+  bleConfig->initBLE();  
+  bleConfig->scanDevices();
+  bleConfig->populateMap();
+  
+  delay(2000);
+  bleConfig->startTask();
 
 	//controller.startMonitoring(); 
 }
 
 void loop() {
 
-  sendDataOfMonitoring();
 	//sensors()
 	//dispositivo()
 	
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
-
-  /*bleConfig->setReceivedRequest(false);
-  delay(4000);
-  
-  bleConfig->setReceivedRequest(true);
-  delay(4000);*/
 }

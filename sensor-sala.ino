@@ -1,6 +1,7 @@
 #include "Config.h"
+#include "BLESensorService.h"
 
-/*HardwareRecord hardware;
+HardwareRecord hardware;
 Controller controller;
 String master = "";
 
@@ -22,14 +23,19 @@ void setup() {
 			}
 		}
 	} while( !init );
+
+  bleUuid = hardware.getUuid();
+  initBLE();
 }
 
 void loop() {
 	Serial.println("loop");
+
+   sendDataOfMonitoring();
 	//sensors()
 	//dispositivo()
 	
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
 
-}*/
+}

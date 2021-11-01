@@ -17,13 +17,14 @@ static BLECharacteristic* pCharacteristicSensor;
 static bool deviceConnected;
 static BLEServer* pServer;
 static bool sendData;
+static String bleUuid = "";
 
 class MyServerCallbacks: 
     public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
 
       digitalWrite(LED, HIGH);
-      pCharacteristicSensor->setValue("4fafc201-1fb5-459e-8fcc-c5c9c3319222");
+      pCharacteristicSensor->setValue(bleUuid.c_str());
       pCharacteristicSensor->notify();
       
       deviceConnected = true;
@@ -96,7 +97,7 @@ void sendDataOfMonitoring()
   {
       if(sendData)
       {
-        String data = "Meus disp 111";
+        String data = "dados do monitoramento Meus disp 111";
         pCharacteristicSensor->setValue(data.c_str());
         pCharacteristicSensor->notify();
         delay(1500); 

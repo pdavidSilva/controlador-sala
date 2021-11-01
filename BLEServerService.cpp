@@ -429,5 +429,5 @@ void BLEServerService::startTaskImpl(void* _this)
 
 void BLEServerService::startTask()
 {
-    xTaskCreate(this->startTaskImpl, "Task", 2048, this, 5, NULL);
+    xTaskCreate(this->startTaskImpl, "Task", 4096, this, 5, NULL);
 }

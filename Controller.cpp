@@ -1,6 +1,6 @@
 #include "Config.h"
 #include "Controller.h"
- 
+
 Controller::Controller(){}
 HTTPService __http;
 
@@ -59,4 +59,18 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 {
     __http.getMaster(hardware, master);
     return !master.equals("") ? true : false;
+
+
 }
+
+ void sendDataOfMonitoring(MonitoringRecord monitoringRecord)
+{
+    DynamicJsonDocument doc(1024);
+    String data;
+    doc['temperature'] = monitoringRecord.temperature;
+    doc['hasPresent'] = monitoringRecord.hasPresent;
+
+    serializeJson(doc, data);
+    sendDataBle(data);
+    delay(3000);
+  }

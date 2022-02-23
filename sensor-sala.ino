@@ -1,4 +1,4 @@
-#include "Config.h"
+/*#include "Config.h"
 #include "BLESensorService.h"
 
 HardwareRecord hardware;
@@ -38,4 +38,4 @@ void loop() {
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
 
-}
+}*/

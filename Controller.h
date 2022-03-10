@@ -1,8 +1,6 @@
 #ifndef Controller_h
 #define Controller_h
-
 #include "Config.h"
-#include "BLESensorService.h"
 
 class Controller
 {   

@@ -1,4 +1,5 @@
 #include "Config.h"
+
 HardwareRecord hardware;
 MonitoringRecord monitoringRecord;
 Controller controller;
@@ -7,6 +8,8 @@ String master = "";
 DHT dht(4, DHT11);
 int temperature; 
 const int portaPresenca = GPIO_NUM_12;
+
+void initBLE(); 
 
 void setup() {
 	

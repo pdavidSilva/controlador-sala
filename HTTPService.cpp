@@ -307,3 +307,77 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
 
     return false;
 }
+
+
+/*
+ * <descricao> Atualiza a tabela Monitoramento do banco de dados com as atualizacoes feitas nos equipamentos pelo ESP  <descricao/>
+ * <parametros> luzes: indica o ultimo estado das luzes (ligado/desligado) <parametros/>
+ * <parametros> condicionador: indica o ultimo estado do ar condicionado (ligado/desligado) <parametros/>
+ * <retorno> string com nome do dispotivo recebido na requisicao ou os codigos IR <retorno/>
+ */
+bool enviarMonitoramento(bool luzes, bool condicionador) {
+
+  bool atualizacaoMonitoramento = false;
+  struct Monitoramento monitoramento = obterMonitoramentoByIdSala();
+  if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
+
+    HTTPClient http;
+
+    http.begin("http://italabs-002-site2.ctempurl.com/api/monitoramento"); //Specify the URL
+    http.addHeader("Content-Type", "application/json");
+
+    String id               = String(monitoramento.id);
+    String luzesLiagadas    = String(luzes ? "true" : "false");
+    String arCondicionado   = String(condicionador ? "true" : "false");
+    String salaId           = String(monitoramento.salaId);
+
+    String monitoramentoJson = "{ ";
+          monitoramentoJson += "\"id\": "               + id             + ", ";
+          monitoramentoJson += "\"luzes\": "            + luzesLiagadas  + ", ";
+          monitoramentoJson += "\"arCondicionado\": "   + arCondicionado + ", ";
+          monitoramentoJson += "\"salaId\": "           + salaId         + ", ";
+          monitoramentoJson += " }";
+
+    int httpResponseCode = http.PUT(monitoramentoJson);
+
+    if (httpResponseCode == 200) 
+      atualizacaoMonitoramento = true;
+    else
+      atualizacaoMonitoramento = false;
+
+    http.end();
+  }
+
+  return atualizacaoMonitoramento;
+}
+
+/*
+ * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
+ */
+void obterHorariosDaSemana() {
+
+  if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
+
+    HTTPClient http;
+
+    http.begin("http://italabs-002-site2.ctempurl.com/api/horariosala/ReservasDaSemana/" + id_sala); //Specify the URL
+    int httpCode = http.GET(); //Make the request
+
+    //Serial.println(String(httpCode));
+
+    if (httpCode == 200) { //Check for the returning code
+
+      // Obtendo corpo da mensagem
+      String payload = http.getString();
+
+      // Excluindo arquivo com dados desatualizados
+      excluirArquivo(SPIFFS);
+
+      // Percorrendo lista de onjetos json e gravando no arquivo
+      percorreListaDeObjetos(payload);
+    } else
+      Serial.println("Error on HTTP request");
+
+    http.end(); //Free the resources
+  }
+}

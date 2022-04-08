@@ -1,3 +1,19 @@
+#include "EquipmentService.h"
+
+ bool __lightOn;
+
+EquipmentService::EquipmentService() {}
+
+
+
+bool getLightOn(){
+    return __lightOn;
+}
+  
+void setLightOn(bool light){
+  __lightOn = light;
+}
+
 
 /*
  * <descricao> Obtem nome do dispositivo ou os codigos IR neviados na requisicao do servidor  <descricao/>
@@ -6,7 +22,7 @@
  * <parametros> index: identificar que diz se quem chama quer receber o nome do dispositivo ou os codigos IR <parametros/>
  * <retorno> string com nome do dispotivo recebido na requisicao ou os codigos IR <retorno/>
  */
-String ClientSocketService::SplitGetIndex(String data, char separator, int index) {
+String EquipmentService::SplitGetIndex(String data, char separator, int index) {
   int found = 0;
   int strIndex[] = {
     0,
@@ -31,7 +47,7 @@ String ClientSocketService::SplitGetIndex(String data, char separator, int index
  * <parametros> data: codigos IR recebidos na requisicao do servidor <parametros/>
  * <retorno>  <retorno/>
  */
-Vector <int> ClientSocketService::SplitIrComands(String data) {
+Vector<int> EquipmentService::SplitIrComands(String data) {
     
     int storage_array[200]; // uso do vetor tem que declarar um valor max
     Vector <int> codigo;
@@ -66,7 +82,7 @@ Vector <int> ClientSocketService::SplitIrComands(String data) {
  * <parametros> data: codigos IR recebidos na requisicao do servidor <parametros/>
  * <retorno>  <retorno/>
  */
-void ClientSocketService::SendIrComand(Vector <int> codigo) {
+void EquipmentService::SendIrComand(Vector<int> codigo) {
     
     int k = 0;
     uint16_t rawData[codigo.size()];
@@ -86,7 +102,7 @@ void ClientSocketService::SendIrComand(Vector <int> codigo) {
  * <parametros> data: codigos IR recebidos na requisicao do servidor <parametros/>
  * <retorno>  <retorno/>
  */
-void ClientSocketService::checkIrms() {
+void EquipmentService::checkIrms() {
     
     double Irms = SCT013.calcIrms(1480); // Calcula o valor da Corrente
     potencia = Irms * tensao; // Calcula o valor da Potencia Instantanea  
@@ -101,7 +117,7 @@ void ClientSocketService::checkIrms() {
 /*
  * <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void ClientSocketService::checkOperationLights(String msg){
+void EquipmentService::checkOperationLights(String msg){
     
     String operationTurnOnOff = SplitGetIndex(msg, ';', 1);
     
@@ -114,13 +130,13 @@ void ClientSocketService::checkOperationLights(String msg){
 /*
  * <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void ClientSocketService::turnOnLights(){
+void EquipmentService::turnOnLights(){
   /*
    * Ligando luzes
    */
   Serial.println("LIGANDO");
 
-  luzesLigadas = true;
+  __lightOn = true;
   digitalWrite(RELE, HIGH);
 
   //String logMonitoramento = "Ligando luzes no horario: " + horaAtualSistema;
@@ -130,13 +146,13 @@ void ClientSocketService::turnOnLights(){
 /*
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void ClientSocketService::turnOffLights(){
+void EquipmentService::turnOffLights(){
   /*
    * Desligando luzes
    */
   Serial.println("DESLIGANDO");
 
-  luzesLigadas = false;
+  __lightOn = false;
   digitalWrite(RELE, LOW);
 
   //String logMonitoramento = "Desligando luzes no horario: " + horaAtualSistema;

@@ -1,3 +1,4 @@
+#include "ClientSocketService.h"
 
 WiFiClient __client;
 bool __messageReturned;
@@ -148,7 +149,6 @@ String ClientSocketService::SplitGetIndex(String data, char separator, int index
 void ClientSocketService::awaitsReturn(){
   
   unsigned long tempoLimite = millis() + 15000;
-  while(millis() <= tempoLimite && !__messageReturned){
-
-  }
+  while(millis() <= tempoLimite && !__messageReturned){ }
+  
 }

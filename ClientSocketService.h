@@ -1,9 +1,14 @@
 #ifndef ClientSocketService_h
 #define ClientSocketService_h
 
+#include <IRsend.h>
+#include <WiFi.h>
+
 #define CONDICIONADOR  "CONDICIONADOR"
 #define LUZES "LUZES"
 #define ATUALIZAR "atualizarHorarios;"
+
+WiFiServer server(8088);
 
 class ClientSocketService 
 {
@@ -15,10 +20,11 @@ class ClientSocketService
     int tratarMsgRecebida(String msg);
     String SplitGetIndex(String data, char separator, int index);
 
-    void ClientSocketService::awaitsReturn();
+    void awaitsReturn();
 
 
   public: 
+    ClientSocketService();
 
     WiFiClient getClient();
     void setClient(WiFiClient client);
@@ -26,11 +32,10 @@ class ClientSocketService
     String getMessage();
     void setMessage(String message);
 
-    bool getMessageReturned() ;
+    bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
     void recebeComandosDoServidor(void *arg);
-
 
 }
 

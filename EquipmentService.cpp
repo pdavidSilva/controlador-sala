@@ -1,19 +1,25 @@
 #include "EquipmentService.h"
 
- bool __lightOn;
+bool __lightOn;
+EnergyMonitor __sct13;
 
 EquipmentService::EquipmentService() {}
 
-
-
-bool getLightOn(){
+bool EquipmentService::getLightOn(){
     return __lightOn;
 }
   
-void setLightOn(bool light){
+void EquipmentService::setLightOn(bool light){
   __lightOn = light;
 }
 
+EnergyMonitor EquipmentService::geSct(){
+  return __sct13;
+}
+
+void EquipmentService::setSct(EnergyMonitor sct){
+  __sct13 = sct;
+}
 
 /*
  * <descricao> Obtem nome do dispositivo ou os codigos IR neviados na requisicao do servidor  <descricao/>
@@ -53,7 +59,7 @@ Vector<int> EquipmentService::SplitIrComands(String data) {
     Vector <int> codigo;
     codigo.setStorage(storage_array);
 
-    String codigoString = SplitGetIndex(msg, ';', 1);
+    String codigoString = SplitGetIndex(data, ';', 1);
 	
     String temp = "";
     for (int i = 0; i < codigoString.length(); i++) 
@@ -102,10 +108,10 @@ void EquipmentService::SendIrComand(Vector<int> codigo) {
  * <parametros> data: codigos IR recebidos na requisicao do servidor <parametros/>
  * <retorno>  <retorno/>
  */
-void EquipmentService::checkIrms() {
+bool EquipmentService::checkIrms() {
     
     double Irms = SCT013.calcIrms(1480); // Calcula o valor da Corrente
-    potencia = Irms * tensao; // Calcula o valor da Potencia Instantanea  
+    int potencia = Irms * tensao; // Calcula o valor da Potencia Instantanea  
     
     if (Irms > 2) // se a corrente for maior que (valor de Ampere considerado ligado, é enviado a resposta para aplicação que o sensor está ligado
        return true;

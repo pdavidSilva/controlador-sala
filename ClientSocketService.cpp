@@ -41,17 +41,17 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
       /* 
        * ouvindo o cliente 
        */
-      client = server.available();
+      __client = server.available();
   
-      if (client) {
+      if (__client) {
   
         /*
          * Checando se o cliente está conectando ao server
          */
-        while (client.connected()) {
+        while (__client.connected()) {
   
-          if (client.available()) {
-            String && msg = client.readStringUntil('\n');
+          if (__client.available()) {
+            String && msg = __client.readStringUntil('\n');
             Serial.print("cliente enviou: ");
             Serial.println(msg);
 
@@ -63,11 +63,11 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
                   awaitsReturn();
                   
                   if(__messageReturned)   
-                    client.println(__message);                     
+                    __client.println(__message);                     
 
             }  else if(tipoMensagem == (-3)) {
 
-                  client.println("OK");
+                  __client.println("OK");
             
             }
           }  

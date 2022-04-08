@@ -7,10 +7,10 @@
 #include "EmonLib.h"
 
 #define RELE 23
-#define kIrLed 12
-#define pinSCT 14 //Pino analógico conectado ao SCT-013
+#define pinSCT 14 
 #define tensao 127
 
+const uint16_t kIrLed = 12;
 IRsend irsend(kIrLed);
 
 class EquipmentService 
@@ -35,6 +35,6 @@ class EquipmentService
     void checkOperationLights(String msg);
     void turnOnLights();
     void turnOffLights();
-}
+};
 
 #endif

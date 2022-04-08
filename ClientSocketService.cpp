@@ -1,7 +1,7 @@
 #include "ClientSocketService.h"
 
-WiFiClient __client;
 bool __messageReturned;
+WiFiClient __client;
 String __message;
 
 ClientSocketService::ClientSocketService() {}

@@ -315,7 +315,7 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
  * <parametros> condicionador: indica o ultimo estado do ar condicionado (ligado/desligado) <parametros/>
  * <retorno> string com nome do dispotivo recebido na requisicao ou os codigos IR <retorno/>
  */
-bool enviarMonitoramento(bool luzes, bool condicionador) {
+/*bool enviarMonitoramento(bool luzes, bool condicionador) {
 
   bool atualizacaoMonitoramento = false;
   struct Monitoramento monitoramento = obterMonitoramentoByIdSala();
@@ -349,12 +349,12 @@ bool enviarMonitoramento(bool luzes, bool condicionador) {
   }
 
   return atualizacaoMonitoramento;
-}
+}*/
 
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-void obterHorariosDaSemana() {
+/*void obterHorariosDaSemana() {
 
   if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
 
@@ -380,4 +380,4 @@ void obterHorariosDaSemana() {
 
     http.end(); //Free the resources
   }
-}
+}*/

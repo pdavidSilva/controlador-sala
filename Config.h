@@ -12,6 +12,7 @@
 #include "Structs.h"
 #include "HTTPService.h"
 #include "Hardware.h"
+#include "ClientSocketService.h"
 
 class Config 
 {

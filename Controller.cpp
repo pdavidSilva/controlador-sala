@@ -3,6 +3,7 @@
  
 Controller::Controller(){}
 HTTPService __http;
+ClientSocketService __clientSocketService;
 
 bool Controller::start(HardwareRecord &record) const 
 {   
@@ -59,4 +60,20 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 {
     __http.getMaster(hardware, master);
     return !master.equals("") ? true : false;
+}
+
+void Controller::initServerSocket()
+{
+  __clientSocketService.initServer();
+}
+
+void Controller::startTaskWebSocket()
+{  
+  xTaskCreatePinnedToCore(__clientSocketService.recebeComandosDoServidor, 
+                        "ClientSocketService.recebeComandosDoServidor", 
+                        10000, 
+                        NULL, 
+                        8, 
+                        NULL, 
+                        tskNO_AFFINITY);
 }

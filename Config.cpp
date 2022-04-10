@@ -12,8 +12,8 @@ bool   __debug;
 Config::Config(){
     __url       = "https://manager.homolog.space/api/admin/v1";
     __debug     = true;
-    __ssid      = "AP_2G";
-    __password  = "itabaiana";
+    __ssid      = "VIVOFIBRA-5F70";
+    __password  = "F03C999054";
     __basetime  = 180000;
     __ledStatus = 2;
     __type  = 1;

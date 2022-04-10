@@ -25,14 +25,18 @@ void WiFiService::connect()
             Serial.println("[WiFiService] Password: " + config.getPassword());
         }
     }
-     digitalWrite(config.getLedStatus(), HIGH);
+
+    digitalWrite(config.getLedStatus(), HIGH);
+    
     if (WiFi.status() == WL_CONNECTED && config.isDebug())
     {
+        IPAddress ip = WiFi.localIP();
         Serial.println("==================================");
         Serial.println("[WiFiService] Conectado a rede: " + config.getSSID());
+        Serial.print("\n[WiFiService] Ip: ");
+        Serial.println(ip);
     }
    
-    
     return;
 }
 

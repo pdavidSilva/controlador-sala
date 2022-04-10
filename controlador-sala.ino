@@ -4,6 +4,10 @@
 BLEServerService* bleConfig; 
 HardwareRecord hardware;
 Controller controller;
+WiFiService WiFiService;
+
+ClientSocketService ClientSocketService;
+
 String sensors[6];
 String devices[6];
 int indexSensors;
@@ -17,7 +21,9 @@ void setup() {
 	indexSensors = 0;
 	indexDevices = 0;
 
-	do {
+	WiFiService.connect();
+
+	/*do {
 		if ( controller.start(hardware) ) {
 			if ( controller.registerHardware(hardware) ) {
 				controller.getSensors(hardware, sensors, indexSensors);
@@ -33,9 +39,9 @@ void setup() {
 				//}
 			}
 		}
-	} while( !init );
+	} while( !init );*/
 
-  for(int i = 0; i < indexSensors; i++)
+  /*for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
     
   for(int i = 0; i < indexDevices; i++)
@@ -46,9 +52,12 @@ void setup() {
   bleConfig->populateMap();
   
   delay(2000);
-  bleConfig->startTask();
+  bleConfig->startTask();*/
 
-	//controller.startMonitoring(); 
+  //controller.startMonitoring(); 
+
+  controller.initServerSocket();    
+  controller.startTaskWebSocket(); 
 }
 
 void loop() {

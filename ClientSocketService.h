@@ -1,26 +1,25 @@
 #ifndef ClientSocketService_h
 #define ClientSocketService_h
 
+#include "Config.h"
 #include <IRsend.h>
-#include <WiFi.h>
 
 #define CONDICIONADOR  "CONDICIONADOR"
 #define LUZES "LUZES"
 #define ATUALIZAR "atualizarHorarios;"
 
-WiFiServer server(8088);
 
 class ClientSocketService 
 {
   private: 
-    bool __messageReturned;
-    WiFiClient __client;
-    String __message;
+    static bool __messageReturned;
+    static String __message;
+    static WiFiServer __server;
 
-    int tratarMsgRecebida(String msg);
-    String SplitGetIndex(String data, char separator, int index);
+    static int tratarMsgRecebida(String msg);
+    static String SplitGetIndex(String data, char separator, int index);
 
-    void awaitsReturn();
+    static void awaitsReturn();
 
 
   public: 
@@ -35,8 +34,10 @@ class ClientSocketService
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
-    void recebeComandosDoServidor(void *arg);
+    void initServer();
 
-}
+    static void recebeComandosDoServidor(void *arg);
+
+};
 
 #endif

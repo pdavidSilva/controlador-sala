@@ -1,8 +1,6 @@
 #ifndef Controller_h
 #define Controller_h
-
 #include "Config.h"
-
 
 class Controller
 {   
@@ -20,7 +18,9 @@ class Controller
         // BLE
         void initServer();    
         bool notificateServer() const;       
-        
+
+        //send Data Monitoring
+        void sendDataOfMonitoring(struct MonitoringRecord);
 };
 
 #endif

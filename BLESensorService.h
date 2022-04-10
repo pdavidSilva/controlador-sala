@@ -91,13 +91,12 @@ void initBLE()
   Serial.println("Waiting a client connection to notify...");
 }
 
-void sendDataOfMonitoring()
+void sendDataBle(String data)
 {
   if (deviceConnected) 
   {
       if(sendData)
       {
-        String data = "dados do monitoramento Meus disp 111";
         pCharacteristicSensor->setValue(data.c_str());
         pCharacteristicSensor->notify();
         delay(1500); 

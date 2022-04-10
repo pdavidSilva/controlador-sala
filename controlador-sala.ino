@@ -4,9 +4,7 @@
 BLEServerService* bleConfig; 
 HardwareRecord hardware;
 Controller controller;
-WiFiService WiFiService;
-
-ClientSocketService ClientSocketService;
+WiFiService wiFiService;
 
 String sensors[6];
 String devices[6];
@@ -21,7 +19,7 @@ void setup() {
 	indexSensors = 0;
 	indexDevices = 0;
 
-	WiFiService.connect();
+	wiFiService.connect();
 
 	/*do {
 		if ( controller.start(hardware) ) {

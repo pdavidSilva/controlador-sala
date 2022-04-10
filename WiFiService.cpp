@@ -33,7 +33,7 @@ void WiFiService::connect()
         IPAddress ip = WiFi.localIP();
         Serial.println("==================================");
         Serial.println("[WiFiService] Conectado a rede: " + config.getSSID());
-        Serial.print("\n[WiFiService] Ip: ");
+        Serial.print("[WiFiService] Ip: ");
         Serial.println(ip);
     }
    

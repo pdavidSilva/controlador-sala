@@ -11,6 +11,13 @@ struct HardwareRecord
     String uuid; 
 };
 
+// Hardware
+struct MonitoringRecord
+{
+    bool hasPresent;
+    int temperature; 
+};
+
 typedef struct BLEDeviceConnect
 {
   BLEClient* pClient;

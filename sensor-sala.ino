@@ -1,9 +1,15 @@
-/*#include "Config.h"
-#include "BLESensorService.h"
+#include "Config.h"
 
 HardwareRecord hardware;
+MonitoringRecord monitoringRecord;
 Controller controller;
 String master = "";
+
+DHT dht(4, DHT11);
+int temperature; 
+const int portaPresenca = GPIO_NUM_12;
+
+void initBLE(); 
 
 void setup() {
 	
@@ -24,18 +30,23 @@ void setup() {
 		}
 	} while( !init );
 
-  bleUuid = hardware.getUuid();
+  //bleUuid = hardware.getUuid();
   initBLE();
 }
 
 void loop() {
 	Serial.println("loop");
 
-   sendDataOfMonitoring();
+	bool leitura = digitalRead(portaPresenca);
+	temperature = (int)dht.readTemperature();
+	monitoringRecord.hasPresent = leitura;          
+	monitoringRecord.temperature = temperature;
+
+	controller.sendDataOfMonitoring(monitoringRecord);
 	//sensors()
 	//dispositivo()
 	
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
 
-}*/
+}

@@ -1,3 +1,4 @@
+
 #ifndef Config_h
 #define Config_h
 
@@ -12,6 +13,7 @@
 #include "Structs.h"
 #include "HTTPService.h"
 #include "Hardware.h"
+#include "DHT.h"
 #include "ClientSocketService.h"
 
 class Config 

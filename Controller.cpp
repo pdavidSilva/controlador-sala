@@ -5,6 +5,7 @@
 Controller::Controller(){}
 HTTPService __http;
 ClientSocketService __clientSocketService;
+BLEServerService* __bleConfig; 
 
 bool Controller::start(HardwareRecord &record) const 
 {   
@@ -46,9 +47,17 @@ bool Controller::notificateServer() const
     return true;
 }
 
-void Controller::initServer()
+void Controller::initBleTaskServer()
 {
-  
+    delay(2000);
+    __bleConfig->startTask();
+}
+
+void Controller::configureServer()
+{
+    __bleConfig->initBLE();  
+    __bleConfig->scanDevices();
+    __bleConfig->populateMap();
 }
 
 void Controller::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor)

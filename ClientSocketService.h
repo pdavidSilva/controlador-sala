@@ -34,6 +34,8 @@ class ClientSocketService
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
+    bool connectToActuator(); 
+
     void initServer();
 
     static void recebeComandosDoServidor(void *arg);

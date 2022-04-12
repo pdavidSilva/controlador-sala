@@ -1,5 +1,5 @@
 #include "Config.h"
-#include "BLEServerService.h"
+//#include "BLEServerService.h"
 
 BLEServerService* bleConfig; 
 HardwareRecord hardware;
@@ -21,7 +21,7 @@ void setup() {
 
 	wiFiService.connect();
 
-	/*do {
+	/* do {
 		if ( controller.start(hardware) ) {
 			if ( controller.registerHardware(hardware) ) {
 				controller.getSensors(hardware, sensors, indexSensors);
@@ -37,25 +37,31 @@ void setup() {
 				//}
 			}
 		}
-	} while( !init );*/
+	} while( !init ); */
 
-  /*for(int i = 0; i < indexSensors; i++)
+  for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
     
   for(int i = 0; i < indexDevices; i++)
     bleConfig->addActuator(devices[i]);
+
+  controller.configureServer(); 
+  controller.initBleTaskServer();
   
-  bleConfig->initBLE();  
+  /*bleConfig->initBLE();  
   bleConfig->scanDevices();
   bleConfig->populateMap();
   
   delay(2000);
   bleConfig->startTask();*/
 
+  controller.configureServer();
+  controller.initBleTaskServer();	
+
   //controller.startMonitoring(); 
 
-  controller.initServerSocket();    
-  controller.startTaskWebSocket(); 
+  //controller.initServerSocket();    
+  //controller.startTaskWebSocket(); 
 }
 
 void loop() {

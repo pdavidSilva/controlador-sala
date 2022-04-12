@@ -2,6 +2,7 @@
 #include "ClientSocketService.h"
 
 Config configuration;
+BLEServerService* __bleConfiguration; 
 ClientSocketService::ClientSocketService() {}
 
 bool ClientSocketService::__messageReturned = false;
@@ -60,10 +61,17 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
 
             int tipoMensagem = tratarMsgRecebida(msg);
             delay(1000);
+            
+            __bleConfiguration->setReceivedRequest(true);
+
+            if(connectToActuator())
+              __bleConfiguration->sendMessageToActuator(msg);
+
+            awaitsReturn();
+
+            __bleConfiguration->disconnectToActuator();
            
             if (tipoMensagem == (-1) || tipoMensagem == (-2)) { 
-                  
-                  awaitsReturn();
                   
                   if(__messageReturned)   
                     client.println(__message);
@@ -93,6 +101,21 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
       delay(500);
     }
 }
+
+bool ClientSocketService::connectToActuator() 
+{
+  bool connected = false;
+  int i = 0, cont = 3;
+            
+  while(i < cont || !connected)
+  { 
+    connected = __bleConfiguration.connectToActuator(msg);
+    i++;
+  }
+
+  return connected;
+}
+
 
 /*
  * <descricao> Esse metodo retorna o codigo IR e por referencia atribui o nome do dispositivo <descricao/>

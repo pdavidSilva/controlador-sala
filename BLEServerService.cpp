@@ -1,13 +1,16 @@
 #include "BLEServerService.h"
 
-int __countTypeSensor;
-int __countTypeActuator;
-vector<String> __sensors;
-vector<String> __actuators;
-bool __receivedRequest;
-BLEScan* __pBLEScan;
-vector<BLEAdvertisedDevice*> __filteredDevices;
-unordered_map<string, Hardware> __devicesMapped;
+
+int BLEServerService::__countTypeSensor = 0;
+int BLEServerService::__countTypeActuator = 0;
+vector<String> BLEServerService::__sensors;
+vector<String> BLEServerService::__actuators;
+bool BLEServerService::__receivedRequest = false;
+BLEScan* BLEServerService::__pBLEScan;
+vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
+unordered_map<string, Hardware> BLEServerService::__devicesMapped;
+BLEDeviceConnect* BLEServerService::__actuatorConnected;
+ClientSocketService __clientSocketService;
 
 BLEServerService::BLEServerService()
 {
@@ -21,13 +24,20 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
 {
     if (isNotify) 
     {
-      Serial.print("Notify callback for characteristic: ");
+       Serial.print("Notify callback for characteristic: ");
       Serial.println(pBLERemoteCharacteristic->getUUID().toString().c_str());
       Serial.print(" of data length ");
       Serial.println(length);
       Serial.print("data: ");
       String data = String(((char*)pData));
       Serial.println(data.substring(0, length));
+      
+      if(__receivedRequest)
+      { 
+        __clientSocketService.setMessageReturned(true);
+        __clientSocketService.setMessage(data.substring(0, length));
+      }
+      
     }
 }
   
@@ -245,26 +255,45 @@ bool BLEServerService::connectMyDisp(BLEAdvertisedDevice* device)
     }
 }
   
-void BLEServerService::sendMessageToActuator(String data, String device) 
+void BLEServerService::sendMessageToActuator(String data) 
+{        
+    if(__actuatorConnected->pClient->isConnected())
+          __actuatorConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
+}
+
+void BLEServerService::disconnectToActuator() 
+{    
+    delay(5000);
+    
+    if(__actuatorConnected->pClient->isConnected())
+      __actuatorConnected->pClient->disconnect();
+    
+    delete __actuatorConnected;
+}
+
+bool BLEServerService::connectToActuator(String uuidDevice) 
 {    
     //Dispositivo disp;
     Hardware disp;
-    BLEDeviceConnect *deviceConnected;
-  
+    bool connected = false;
+
     for (auto item : __devicesMapped) 
     {
       disp = item.second;
-      if (device.equals(disp.getMacAddressAdvertisedDevice().toString().c_str())) 
+      if (uuidDevice.equals(disp.getUuid().c_str())) 
       {
         deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
-        if(deviceConnected->pClient->isConnected())
-          deviceConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
         
-        delay(5000);
-        deviceConnected->pClient->disconnect();
-        delete deviceConnected;
+        if(__actuatorConnected->pClient->isConnected())
+        {
+          __actuatorConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
+          connected = true;
+          break;
+        }
       }
     }
+
+    return connected;
 }
   
   

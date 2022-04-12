@@ -14,6 +14,7 @@
 #include "HTTPService.h"
 #include "Hardware.h"
 #include "DHT.h"
+#include "BLEServerService.h"
 #include "ClientSocketService.h"
 
 class Config 

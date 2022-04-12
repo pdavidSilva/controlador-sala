@@ -1,6 +1,6 @@
 #include "Config.h"
 
-HardwareRecord hardware;
+/*HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
 Controller controller;
 String master = "";
@@ -17,9 +17,9 @@ void setup() {
 	bool init = false;
 
 	do {
-		if ( controller.start(hardware) ) {
-			if ( controller.registerHardware(hardware) ) {
-				if(controller.getMaster(hardware, master))
+		if ( controller.start(hardwareSensor) ) {
+			if ( controller.registerHardware(hardwareSensor) ) {
+				if(controller.getMaster(hardwareSensor, master))
 				{
 					Serial.print("master: ");
 					Serial.println(master);
@@ -49,4 +49,4 @@ void loop() {
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
 
-}
+}*/

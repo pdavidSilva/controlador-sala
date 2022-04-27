@@ -17,7 +17,7 @@ static BLECharacteristic* pCharacteristicSensor;
 static bool deviceConnected;
 static BLEServer* pServer;
 static bool sendData;
-static String bleUuid = "";
+static String bleUuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
 
 class MyServerCallbacks: 
     public BLEServerCallbacks {
@@ -57,7 +57,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
   }
 };
 
-void initBLE()
+void initBLEClient()
 {
   pinMode(LED, OUTPUT);
 
@@ -91,7 +91,7 @@ void initBLE()
   Serial.println("Waiting a client connection to notify...");
 }
 
-void sendDataBle(String data)
+void sendDataToServer(String data)
 {
   if (deviceConnected) 
   {

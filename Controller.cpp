@@ -60,6 +60,11 @@ void Controller::configureServer()
     __bleConfig->populateMap();
 }
 
+void Controller::configureClient()
+{
+   initBLEClient();  
+}
+
 void Controller::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor)
 {
     __http.getSensors(hardware, sensors, indexSensor);
@@ -82,7 +87,7 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
     doc['hasPresent'] = monitoringRecord.hasPresent;
 
     serializeJson(doc, data);
-    sendDataBle(data);
+    sendDataToServer(data);
     delay(3000);
   }
 

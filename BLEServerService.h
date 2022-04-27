@@ -45,7 +45,6 @@ class BLEServerService
     bool isSensor(String uuid);
     bool isAtuador(String uuid);
     bool connectMyDisp(BLEAdvertisedDevice* device); 
-    void sendMessageToActuator(String data, String device);
     int getCountDispsTypeSensor();
     void timer(); 
     bool connectToActuator(String uuidDevice);

@@ -10,14 +10,13 @@ BLEScan* BLEServerService::__pBLEScan;
 vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
 unordered_map<string, Hardware> BLEServerService::__devicesMapped;
 BLEDeviceConnect* BLEServerService::__actuatorConnected;
-ClientSocketService __clientSocketService;
+ClientSocketService __clientWebSocketService;
 
 BLEServerService::BLEServerService()
 {
     __countTypeSensor = 0;
     __countTypeActuator = 0;
     __receivedRequest = false;
-    __pBLEScan = BLEDevice::getScan();
 }
 
 void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) 
@@ -34,10 +33,10 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
       
       if(__receivedRequest)
       { 
-        __clientSocketService.setMessageReturned(true);
-        __clientSocketService.setMessage(data.substring(0, length));
+        __clientWebSocketService.setMessageReturned(true);
+        __clientWebSocketService.setMessage(data.substring(0, length));
       }
-      
+
     }
 }
   
@@ -143,11 +142,18 @@ BLEDeviceConnect* BLEServerService::connectToDevice(BLEAdvertisedDevice* myDevic
   
 void BLEServerService::initBLE() 
 {
-    Serial.println("[BLEServerSettings] Iniciando configuracoes BLE");
-    BLEDevice::init("ESP32_CONTROLLER");
+    Serial.println("================================================");
+    Serial.println("[BLEServerService] Iniciando configuracoes BLE");
+    BLEDevice::init("ESP32_CONTROLLER");    
+    Serial.println("[BLEServerService] Init device");
+    __pBLEScan = BLEDevice::getScan();
+    Serial.println("[BLEServerService] new Scan");
     __pBLEScan->setInterval(1349);
+    Serial.println("[BLEServerService] Set interval");
     __pBLEScan->setWindow(449);
+    Serial.println("[BLEServerService] Set window");
     __pBLEScan->setActiveScan(true);
+    Serial.println("[BLEServerService] Active scan");
 }
   
 void BLEServerService::scanDevices() 
@@ -282,11 +288,10 @@ bool BLEServerService::connectToActuator(String uuidDevice)
       disp = item.second;
       if (uuidDevice.equals(disp.getUuid().c_str())) 
       {
-        deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
+        connected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
         
         if(__actuatorConnected->pClient->isConnected())
         {
-          __actuatorConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
           connected = true;
           break;
         }

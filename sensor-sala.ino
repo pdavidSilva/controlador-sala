@@ -1,6 +1,6 @@
 #include "Config.h"
 
-/*HardwareRecord hardwareSensor;
+HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
 Controller controller;
 String master = "";
@@ -9,14 +9,14 @@ DHT dht(4, DHT11);
 int temperature; 
 const int portaPresenca = GPIO_NUM_12;
 
-void initBLE(); 
+//void initBLE(); 
 
 void setup() {
 	
 	Serial.begin(115200);
 	bool init = false;
 
-	do {
+	/*do {
 		if ( controller.start(hardwareSensor) ) {
 			if ( controller.registerHardware(hardwareSensor) ) {
 				if(controller.getMaster(hardwareSensor, master))
@@ -28,10 +28,10 @@ void setup() {
 				};
 			}
 		}
-	} while( !init );
+	} while( !init );*/
 
   //bleUuid = hardware.getUuid();
-  initBLE();
+  controller.configureClient();  
 }
 
 void loop() {
@@ -49,4 +49,4 @@ void loop() {
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
 
-}*/
+}

@@ -16,6 +16,7 @@ class Controller
         bool getMaster(struct HardwareRecord, String &);
 
         // BLE
+        void configureClient();   
         void configureServer();   
         void initBleTaskServer();    
         bool notificateServer() const;       
@@ -29,4 +30,3 @@ class Controller
 };
 
 #endif
-

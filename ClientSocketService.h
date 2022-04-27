@@ -2,6 +2,7 @@
 #define ClientSocketService_h
 
 #include "Config.h"
+#include "ArduinoJson.h"
 #include <IRsend.h>
 
 #define CONDICIONADOR  "CONDICIONADOR"
@@ -15,12 +16,8 @@ class ClientSocketService
     static bool __messageReturned;
     static String __message;
     static WiFiServer __server;
-
-    static int tratarMsgRecebida(String msg);
-    static String SplitGetIndex(String data, char separator, int index);
-
     static void awaitsReturn();
-
+    static MonitoringRequest deserealizeObject(String payload);
 
   public: 
     ClientSocketService();
@@ -34,12 +31,11 @@ class ClientSocketService
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
-    bool connectToActuator(); 
+    static bool connectToActuator(String uuidDevice); 
 
     void initServer();
 
     static void recebeComandosDoServidor(void *arg);
-
 };
 
 #endif

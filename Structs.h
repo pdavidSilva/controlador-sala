@@ -27,4 +27,11 @@ typedef struct BLEDeviceConnect
   bool deviceFound = true;
 };
 
+typedef struct MonitoringRequest
+{
+  String type;
+  String code;
+  String uuid;
+};
+
 #endif

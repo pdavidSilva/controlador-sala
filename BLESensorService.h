@@ -17,7 +17,7 @@ static BLECharacteristic* pCharacteristicSensor;
 static bool deviceConnected;
 static BLEServer* pServer;
 static bool sendData;
-static String bleUuid = "60406218-0c38-403f-844b-82f02f1ff066";
+static String bleUuid = "36938872-c3ca-11ec-9d64-0242ac120002";
 
 
 void sendDataToServer(String data)
@@ -38,7 +38,6 @@ class MyServerCallbacks:
     void onConnect(BLEServer* pServer) {
 
       digitalWrite(LED, HIGH);
-      Serial.println("SENT: " + bleUuid);
       pCharacteristicSensor->setValue(bleUuid.c_str());
       pCharacteristicSensor->notify();
       
@@ -63,16 +62,14 @@ class MyServerCallbacks:
 class MyCallbacks: public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic * pCharacteristic) {
 
-    Serial.println("RECEBEU DADO");
     std::string sensoriamento = pCharacteristic->getValue();
     Serial.println(sensoriamento.c_str());
 
     // testando comunicação
-    delay(1500); 
-    
+    /*delay(1500); 
     sendData = true;
     sendDataToServer("AC-ON");
-    sendData = false;
+    sendData = false;*/
 
     if(String(GETDATA).equals(sensoriamento.c_str()))
     {

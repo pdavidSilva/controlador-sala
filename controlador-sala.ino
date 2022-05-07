@@ -17,8 +17,7 @@ void setup() {
 	bool init = false;
 
    sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-   sensors[1] = "60406218-0c38-403f-844b-82f02f1ff066";
-   indexSensors = 2;
+   indexSensors = 1;
 
    devices[0] = "36938872-c3ca-11ec-9d64-0242ac120002";
    indexDevices = 1;

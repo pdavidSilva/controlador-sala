@@ -54,32 +54,42 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
             
             if (configuration.isDebug())
             {
-                Serial.println("==================================");
+                Serial.println("=======================================");
                 Serial.println("[ClientSocketService] mensagem recebida");
                 Serial.println("[ClientSocketService] mensagem: " + msg);
             }
 
             MonitoringRequest request = deserealizeObject(msg);
-           
+            
+            if (configuration.isDebug())
+            {
+                Serial.println("=======================================");
+                Serial.println("[ClientSocketService] type: " + request.type);
+                Serial.println("[ClientSocketService] code: " + request.code);
+                Serial.println("[ClientSocketService] uuid: " + request.uuid);
+            }
+            
             if (request.type == CONDICIONADOR || request.type == LUZES) { 
-
+              
                 __bleConfiguration->setReceivedRequest(true);
 
-                if(connectToActuator(request.uuid))
+                bool dispConnected = connectToActuator(request.uuid);
+                
+                if(dispConnected)
+                {
                   __bleConfiguration->sendMessageToActuator(request.code);
 
-                awaitsReturn();
+                  awaitsReturn();
 
-                __bleConfiguration->disconnectToActuator();
+                  __bleConfiguration->disconnectToActuator();
+                }
+                
                 __bleConfiguration->setReceivedRequest(false);
 
                 if(__messageReturned)   
                   client.println(__message);
                 else
                   client.println("NOT-AVALIABLE");
-
-                __messageReturned = false;
-                __message = "";  
 
                 if (configuration.isDebug())
                 {
@@ -88,6 +98,9 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
                   Serial.println("[ClientSocketService] recebeu retorno: " + __messageReturned);
                   Serial.println("[ClientSocketService] mensagem: " + __message);
                 }
+
+                __messageReturned = false;
+                __message = "";  
 
                 //enviarMonitoramento(luzesLigadas, arLigado);
         
@@ -126,16 +139,31 @@ MonitoringRequest ClientSocketService::deserealizeObject(String payload)
 
 bool ClientSocketService::connectToActuator(String uuidDevice) 
 {
-  bool connected = false;
-  int i = 0, cont = 3;
+  bool deviceConnected = false;
+  int i = 0;
+  int count = 5;
             
-  while(i < cont || !connected)
+  do
   { 
-    connected = __bleConfiguration->connectToActuator(uuidDevice);
     i++;
-  }
+    
+    if (configuration.isDebug())
+    {
+      Serial.print("[ClientSocketService]: attempt number: ");
+      Serial.println(i);
+    }
+    
+    deviceConnected = __bleConfiguration->connectToActuator(uuidDevice);
+    
+    if(deviceConnected)
+      break;
+      
+  } while(i < count);
 
-  return connected;
+  if( i >= count && !deviceConnected)
+      Serial.println("[ClientSocketService]: device not found");
+
+  return deviceConnected;
 }
 
 
@@ -144,6 +172,13 @@ void ClientSocketService::awaitsReturn()
 {
   
   unsigned long tempoLimite = millis() + 15000;
-  while(millis() <= tempoLimite && !__messageReturned){ }
-  
+  while(millis() <= tempoLimite && !__messageReturned)
+  { 
+      delay(1000);
+      if (configuration.isDebug())
+      {
+        Serial.print("[ClientSocketService] TIME AWAITS: ");
+        Serial.println(millis());
+      }
+  }
 }

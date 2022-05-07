@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 //#include "BLEServerService.h"
 
 BLEServerService* bleConfig; 
@@ -41,15 +41,12 @@ void setup() {
 		}
 	} while( !init ); */
 
-  /*for(int i = 0; i < indexSensors; i++)
+  for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
     
   for(int i = 0; i < indexDevices; i++)
     bleConfig->addActuator(devices[i]);
 
-  controller.configureServer(); 
-  controller.initBleTaskServer();
-  
   /*bleConfig->initBLE();  
   bleConfig->scanDevices();
   bleConfig->populateMap();
@@ -57,7 +54,7 @@ void setup() {
   delay(2000);
   bleConfig->startTask();*/
 
-  /*controller.configureServer();
+  controller.configureServer();
   controller.initBleTaskServer();	
 
   //controller.startMonitoring(); 
@@ -73,4 +70,4 @@ void loop() {
 	
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
-}*/
+}

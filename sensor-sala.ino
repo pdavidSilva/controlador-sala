@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -14,7 +14,7 @@ const int portaPresenca = GPIO_NUM_12;
 void setup() {
 	
 	Serial.begin(115200);
-	bool init = false;*/
+	bool init = false;
 
 	/*do {
 		if ( controller.start(hardwareSensor) ) {
@@ -31,7 +31,7 @@ void setup() {
 	} while( !init );*/
 
   //bleUuid = hardware.getUuid();
-/*  controller.configureClient();  
+  controller.configureClient();  
 }
 
 void loop() {
@@ -46,7 +46,7 @@ void loop() {
 	//sensors()
 	//dispositivo()
 	
-  //Mestre -> Sensor de Presenca ()
-  //Sensor de Presenca () -> Mestre
+    //Mestre -> Sensor de Presenca ()
+    //Sensor de Presenca () -> Mestre
 
-}*/
+}

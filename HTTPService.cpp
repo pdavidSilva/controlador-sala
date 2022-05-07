@@ -355,15 +355,72 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
 /*void obterHorariosDaSemana() {
+    
+    Config config;
+    HTTP http;
+    String route;
 
-  if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
+    if (config.getRoute() == 1)
+        route = "/hardware/";
+    else
+        route = "/horariosala/ReservasDaSemana/";
 
-    HTTPClient http;
 
-    http.begin("http://italabs-002-site2.ctempurl.com/api/horariosala/ReservasDaSemana/" + id_sala); //Specify the URL
-    int httpCode = http.GET(); //Make the request
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String response;
+    string id_sala = "1";
 
-    //Serial.println(String(httpCode));
+    routeService.concat(route);
+    routeService.concat(id_sala);
+
+
+    response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+
+            return;
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+
+            record.id = doc["result"]["id"].as<int>();
+            record.token = doc["result"]["token"].as<char *>();
+            record.uuid = doc["result"]["uuid"].as<char *>();
+
+            return;
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+            return;
+        }
+    }
+    else
+    {
+        return;
+    }
+
 
     if (httpCode == 200) { //Check for the returning code
 
@@ -379,5 +436,4 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
       Serial.println("Error on HTTP request");
 
     http.end(); //Free the resources
-  }
 }*/

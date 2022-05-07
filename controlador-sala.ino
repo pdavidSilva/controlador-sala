@@ -1,4 +1,4 @@
-#include "Config.h"
+/*#include "Config.h"
 //#include "BLEServerService.h"
 
 BLEServerService* bleConfig; 
@@ -16,12 +16,14 @@ void setup() {
 	Serial.begin(115200);
 	bool init = false;
 
-  sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-	indexSensors = 1;
-  devices[0] = "36938872-c3ca-11ec-9d64-0242ac120002";
-	indexDevices = 1;
+   sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+   sensors[1] = "60406218-0c38-403f-844b-82f02f1ff066";
+   indexSensors = 2;
 
-	wiFiService.connect();
+   devices[0] = "36938872-c3ca-11ec-9d64-0242ac120002";
+   indexDevices = 1;
+
+   wiFiService.connect();
 
 	/* do {
 		if ( controller.start(hardware) ) {
@@ -41,7 +43,7 @@ void setup() {
 		}
 	} while( !init ); */
 
-  for(int i = 0; i < indexSensors; i++)
+  /*for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
     
   for(int i = 0; i < indexDevices; i++)
@@ -54,7 +56,7 @@ void setup() {
   delay(2000);
   bleConfig->startTask();*/
 
-  controller.configureServer();
+  /*controller.configureServer();
   controller.initBleTaskServer();	
 
   //controller.startMonitoring(); 
@@ -70,4 +72,4 @@ void loop() {
 	
   //Mestre -> Sensor de Presenca ()
   //Sensor de Presenca () -> Mestre
-}
+}*/

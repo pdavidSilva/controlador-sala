@@ -70,7 +70,7 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
             }
             
             if (request.type == CONDICIONADOR || request.type == LUZES) { 
-              
+
                 __bleConfiguration->setReceivedRequest(true);
 
                 bool dispConnected = connectToActuator(request.uuid);
@@ -176,9 +176,9 @@ void ClientSocketService::awaitsReturn()
   { 
       delay(1000);
       if (configuration.isDebug())
-      {
+      {    
         Serial.print("[ClientSocketService] TIME AWAITS: ");
         Serial.println(millis());
       }
-  }
+  }    
 }

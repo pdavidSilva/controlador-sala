@@ -7,7 +7,7 @@
 
 #define CONDICIONADOR  "CONDICIONADOR"
 #define LUZES "LUZES"
-#define ATUALIZAR "atualizarHorarios;"
+#define ATUALIZAR "ATUALIZAR_HORARIOS"
 
 
 class ClientSocketService 

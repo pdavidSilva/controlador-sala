@@ -17,7 +17,7 @@ static BLECharacteristic* pCharacteristicSensor;
 static bool deviceConnected;
 static BLEServer* pServer;
 static bool sendData;
-static String bleUuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+static String bleUuid = "60406218-0c38-403f-844b-82f02f1ff066";
 
 
 void sendDataToServer(String data)

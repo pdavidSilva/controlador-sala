@@ -1,4 +1,3 @@
-
 #ifndef Config_h
 #define Config_h
 
@@ -14,8 +13,6 @@
 #include "HTTPService.h"
 #include "Hardware.h"
 #include "DHT.h"
-#include "BLEServerService.h"
-#include "ClientSocketService.h"
 
 class Config 
 {
@@ -28,8 +25,6 @@ class Config
         bool   __debug;
         int    __type;
         int    __route;
-        static std::vector<struct Reserva> __reservations; 
-
     public : 
         
         Config();
@@ -42,9 +37,6 @@ class Config
         int    getLedStatus();
         bool   isDebug();
         int    getRoute();
-        std::vector<struct Reserva> getReservations();
-        void   setReservations(std::vector<struct Reserva> reservations);
-
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include <BLEDevice.h>
 #include "Structs.h"
 
+
 #define TYPE_SENSOR  0
 #define TYPE_ACTUATOR  1
 #define TIME_CONNECTION  10000 
@@ -22,19 +23,16 @@ class BLEServerService
 {
   private:
    
-   
+    int __countTypeSensor;
+    int __countTypeActuator;
+    vector<String> __sensors;
+    vector<String> __actuators;
+    bool __receivedRequest;
+    BLEScan* __pBLEScan;
+    vector<BLEAdvertisedDevice*> __filteredDevices;
+    unordered_map<string, Hardware> __devicesMapped;
     
   public:
-    static int __countTypeSensor;
-    static int __countTypeActuator;
-    static vector<String> __sensors;
-    static vector<String> __actuators;
-    static bool __receivedRequest;
-    static BLEScan* __pBLEScan;
-    static vector<BLEAdvertisedDevice*> __filteredDevices;
-    static unordered_map<string, Hardware> __devicesMapped;
-    static BLEDeviceConnect* __actuatorConnected;
-    
     BLEServerService();
     
     static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify); 
@@ -45,11 +43,9 @@ class BLEServerService
     bool isSensor(String uuid);
     bool isAtuador(String uuid);
     bool connectMyDisp(BLEAdvertisedDevice* device); 
+    void sendMessageToActuator(String data, String device);
     int getCountDispsTypeSensor();
     void timer(); 
-    bool connectToActuator(String uuidDevice);
-    void disconnectToActuator();
-    void sendMessageToActuator(String data);
 
     // getters and setters
     vector<String> getSensors();

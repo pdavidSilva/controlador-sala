@@ -3,6 +3,7 @@
 
 Config configuration;
 BLEServerService* __bleConfiguration; 
+HTTPService __httpService;
 ClientSocketService::ClientSocketService() {}
 
 bool ClientSocketService::__messageReturned = false;
@@ -102,17 +103,11 @@ void ClientSocketService::recebeComandosDoServidor(void *arg) {
                 __messageReturned = false;
                 __message = "";  
 
-                //enviarMonitoramento(luzesLigadas, arLigado);
-        
-                //String logMonitoramento = arLigado ? "Ligando luzes no horario: " + horaAtualSistema :  "Desligando luzes no horario: " + horaAtualSistema;
-                //gravarLinhaEmArquivo(SPIFFS, logMonitoramento, pathLogMonitoramento);                      
-
             }  else if(request.type == ATUALIZAR) {
                   
-                  //obterHorariosDaSemana();
-                  //carregarHorariosDeHojeDoArquivo(SPIFFS, obterDataServidor("GETDATE"));
+                configuration.setReservations(__httpService.GetReservationsWeek());
 
-                  client.println("OK");
+                client.println("OK");
             }
           }  
           delay(100);

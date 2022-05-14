@@ -1,6 +1,8 @@
 #include "Config.h"
 #include "HTTPService.h"
 
+const size_t CAPACITY = JSON_ARRAY_SIZE(12);
+
 HTTPService::HTTPService() {}
 
 void HTTPService::getInfoHardware(HardwareRecord &record)
@@ -354,29 +356,28 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-/*void obterHorariosDaSemana() {
+std::vector< struct Reserva> HTTPService::GetReservationsWeek() {
     
     Config config;
     HTTP http;
     String route;
+    std::vector<struct Reserva> reservas;
 
     if (config.getRoute() == 1)
-        route = "/hardware/";
+        route = "/horariosala/ReservasDeHoje/";
     else
-        route = "/horariosala/ReservasDaSemana/";
+        route = "/horariosala/ReservasDeHoje/";
 
 
     String routeService;
     String type = "GET";
     String params = "";
-    String response;
-    string id_sala = "1";
+    String id_sala = "1";
 
     routeService.concat(route);
     routeService.concat(id_sala);
 
-
-    response = http.request(routeService, type, params);
+    String response = http.request(routeService, type, params);
 
     if (strstr(response.c_str(), "[ERROR]") == NULL)
     {
@@ -392,18 +393,16 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
                 Serial.println(error.f_str());
             }
             delay(5000);
-
-            return;
         }
 
         if (doc["httpCode"].as<int>() == 200)
         {
+            JsonArray jsonSensors = doc["result"].as<JsonArray>();
 
-            record.id = doc["result"]["id"].as<int>();
-            record.token = doc["result"]["token"].as<char *>();
-            record.uuid = doc["result"]["uuid"].as<char *>();
-
-            return;
+            for (JsonVariant object : jsonSensors)
+            {
+                reservas.push_back(deserializeReserve(object));
+            }
         }
         else
         {
@@ -413,27 +412,46 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
                 Serial.print("[HTTPService] Mensagem: ");
                 Serial.println(doc["message"].as<char *>());
             }
-            return;
         }
     }
-    else
+
+    if (config.isDebug())
     {
-        return;
+        Serial.println("==================================");
+        Serial.print("[HTTPService] count reservations: ");
+        Serial.println(reservas.size());
     }
+    
+    return reservas;
+}
 
 
-    if (httpCode == 200) { //Check for the returning code
+/*
+ * <descricao>   <descricao/>
+ * <parametros>  <parametros/>
+ */
+struct Reserva HTTPService::deserializeReserve(JsonVariant reserve) {
+   
+   struct Reserva res;
 
-      // Obtendo corpo da mensagem
-      String payload = http.getString();
+   res.id = reserve["id"].as<int>();
+   res.usuarioId = reserve["usuarioId"].as<int>();
+   res.salaId = reserve["salaId"].as<int>();
+   res.planejamento = reserve["planejamento"].as<int>();
+   res.date = reserve["data"].as<String>();
+   res.horarioInicio = reserve["horarioInicio"].as<String>();
+   res.horarioFim = reserve["horarioFim"].as<String>();
+   res.situacao = reserve["situacao"].as<String>();
+   res.objetivo = reserve["objetivo"].as<String>();  
 
-      // Excluindo arquivo com dados desatualizados
-      excluirArquivo(SPIFFS);
+   //if (config.isDebug())
+   //{
+        Serial.println("==================================");
+        Serial.print("[HTTPService] horarioInicio: ");
+        Serial.println(res.horarioInicio);
+        Serial.print("[HTTPService] horarioFim: ");
+        Serial.println(res.horarioFim);
+   //}
 
-      // Percorrendo lista de onjetos json e gravando no arquivo
-      percorreListaDeObjetos(payload);
-    } else
-      Serial.println("Error on HTTP request");
-
-    http.end(); //Free the resources
-}*/
+   return res;
+}

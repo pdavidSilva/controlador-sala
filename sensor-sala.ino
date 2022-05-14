@@ -1,4 +1,4 @@
-#include "Config.h"
+/*#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -31,7 +31,7 @@ void setup() {
 	} while( !init );*/
 
   //bleUuid = hardware.getUuid();
-  controller.configureClient();  
+ /* controller.configureClient();  
 }
 
 void loop() {
@@ -49,4 +49,4 @@ void loop() {
     //Mestre -> Sensor de Presenca ()
     //Sensor de Presenca () -> Mestre
 
-}
+}*/

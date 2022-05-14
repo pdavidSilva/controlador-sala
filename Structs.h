@@ -34,4 +34,21 @@ typedef struct MonitoringRequest
   String uuid;
 };
 
+
+/*
+ * Estrutura usada para guardar dados da reserva da sala
+ */
+typedef struct Reserva {
+  int id;
+  String  date;
+  String  horarioInicio;
+  String  horarioFim;
+  String  situacao;
+  String  objetivo;
+  int usuarioId;
+  int salaId;
+  int planejamento;
+};
+
+
 #endif

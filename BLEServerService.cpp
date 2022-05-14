@@ -340,7 +340,7 @@ void BLEServerService::continuousConnectionTask()
     //Dispositivo disp;
     Hardware disp;
     int count = 0;
-  
+
     while (true)
     {
         Serial.println();

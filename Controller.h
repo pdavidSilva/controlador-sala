@@ -16,11 +16,17 @@ class Controller
         bool getMaster(struct HardwareRecord, String &);
 
         // BLE
-        void initServer();    
+        void configureClient();   
+        void configureServer();   
+        void initBleTaskServer();    
         bool notificateServer() const;       
 
         //send Data Monitoring
         void sendDataOfMonitoring(struct MonitoringRecord);
+
+         // WEB SOCKET
+        void initServerSocket();    
+        void startTaskWebSocket(); 
 };
 
 #endif

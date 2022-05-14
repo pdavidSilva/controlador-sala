@@ -1,6 +1,8 @@
 #include "Config.h"
 #include "HTTPService.h"
 
+const size_t CAPACITY = JSON_ARRAY_SIZE(12);
+
 HTTPService::HTTPService() {}
 
 void HTTPService::getInfoHardware(HardwareRecord &record)
@@ -306,4 +308,150 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
     }
 
     return false;
+}
+
+
+/*
+ * <descricao> Atualiza a tabela Monitoramento do banco de dados com as atualizacoes feitas nos equipamentos pelo ESP  <descricao/>
+ * <parametros> luzes: indica o ultimo estado das luzes (ligado/desligado) <parametros/>
+ * <parametros> condicionador: indica o ultimo estado do ar condicionado (ligado/desligado) <parametros/>
+ * <retorno> string com nome do dispotivo recebido na requisicao ou os codigos IR <retorno/>
+ */
+/*bool enviarMonitoramento(bool luzes, bool condicionador) {
+
+  bool atualizacaoMonitoramento = false;
+  struct Monitoramento monitoramento = obterMonitoramentoByIdSala();
+  if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
+
+    HTTPClient http;
+
+    http.begin("http://italabs-002-site2.ctempurl.com/api/monitoramento"); //Specify the URL
+    http.addHeader("Content-Type", "application/json");
+
+    String id               = String(monitoramento.id);
+    String luzesLiagadas    = String(luzes ? "true" : "false");
+    String arCondicionado   = String(condicionador ? "true" : "false");
+    String salaId           = String(monitoramento.salaId);
+
+    String monitoramentoJson = "{ ";
+          monitoramentoJson += "\"id\": "               + id             + ", ";
+          monitoramentoJson += "\"luzes\": "            + luzesLiagadas  + ", ";
+          monitoramentoJson += "\"arCondicionado\": "   + arCondicionado + ", ";
+          monitoramentoJson += "\"salaId\": "           + salaId         + ", ";
+          monitoramentoJson += " }";
+
+    int httpResponseCode = http.PUT(monitoramentoJson);
+
+    if (httpResponseCode == 200) 
+      atualizacaoMonitoramento = true;
+    else
+      atualizacaoMonitoramento = false;
+
+    http.end();
+  }
+
+  return atualizacaoMonitoramento;
+}*/
+
+/*
+ * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
+ */
+std::vector< struct Reserva> HTTPService::GetReservationsWeek() {
+    
+    Config config;
+    HTTP http;
+    String route;
+    std::vector<struct Reserva> reservas;
+
+    if (config.getRoute() == 1)
+        route = "/horariosala/ReservasDeHoje/";
+    else
+        route = "/horariosala/ReservasDeHoje/";
+
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String id_sala = "1";
+
+    routeService.concat(route);
+    routeService.concat(id_sala);
+
+    String response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+            JsonArray jsonSensors = doc["result"].as<JsonArray>();
+
+            for (JsonVariant object : jsonSensors)
+            {
+                reservas.push_back(deserializeReserve(object));
+            }
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    if (config.isDebug())
+    {
+        Serial.println("==================================");
+        Serial.print("[HTTPService] count reservations: ");
+        Serial.println(reservas.size());
+    }
+    
+    return reservas;
+}
+
+
+/*
+ * <descricao>   <descricao/>
+ * <parametros>  <parametros/>
+ */
+struct Reserva HTTPService::deserializeReserve(JsonVariant reserve) {
+   
+   struct Reserva res;
+
+   res.id = reserve["id"].as<int>();
+   res.usuarioId = reserve["usuarioId"].as<int>();
+   res.salaId = reserve["salaId"].as<int>();
+   res.planejamento = reserve["planejamento"].as<int>();
+   res.date = reserve["data"].as<String>();
+   res.horarioInicio = reserve["horarioInicio"].as<String>();
+   res.horarioFim = reserve["horarioFim"].as<String>();
+   res.situacao = reserve["situacao"].as<String>();
+   res.objetivo = reserve["objetivo"].as<String>();  
+
+   //if (config.isDebug())
+   //{
+        Serial.println("==================================");
+        Serial.print("[HTTPService] horarioInicio: ");
+        Serial.println(res.horarioInicio);
+        Serial.print("[HTTPService] horarioFim: ");
+        Serial.println(res.horarioFim);
+   //}
+
+   return res;
 }

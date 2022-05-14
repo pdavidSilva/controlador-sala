@@ -4,6 +4,8 @@
 
 Controller::Controller(){}
 HTTPService __http;
+ClientSocketService __clientSocketService;
+BLEServerService* __bleConfig; 
 
 bool Controller::start(HardwareRecord &record) const 
 {   
@@ -45,9 +47,22 @@ bool Controller::notificateServer() const
     return true;
 }
 
-void Controller::initServer()
+void Controller::initBleTaskServer()
 {
-  
+    delay(2000);
+    __bleConfig->startTask();
+}
+
+void Controller::configureServer()
+{
+    __bleConfig->initBLE();  
+    __bleConfig->scanDevices();
+    __bleConfig->populateMap();
+}
+
+void Controller::configureClient()
+{
+   initBLEClient();  
 }
 
 void Controller::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor)
@@ -72,6 +87,22 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
     doc['hasPresent'] = monitoringRecord.hasPresent;
 
     serializeJson(doc, data);
-    sendDataBle(data);
+    sendDataToServer(data);
     delay(3000);
   }
+
+void Controller::initServerSocket()
+{
+  __clientSocketService.initServer();
+}
+
+void Controller::startTaskWebSocket()
+{  
+  xTaskCreatePinnedToCore(__clientSocketService.recebeComandosDoServidor, 
+                        "ClientSocketService.recebeComandosDoServidor", 
+                        10000, 
+                        NULL, 
+                        8, 
+                        NULL, 
+                        tskNO_AFFINITY);
+}

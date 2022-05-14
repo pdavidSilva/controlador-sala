@@ -17,7 +17,21 @@ static BLECharacteristic* pCharacteristicSensor;
 static bool deviceConnected;
 static BLEServer* pServer;
 static bool sendData;
-static String bleUuid = "";
+static String bleUuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+
+
+void sendDataToServer(String data)
+{
+  if (deviceConnected) 
+  {
+      if(sendData)
+      {
+        pCharacteristicSensor->setValue(data.c_str());
+        pCharacteristicSensor->notify();
+        delay(1500); 
+      }
+  }
+}
 
 class MyServerCallbacks: 
     public BLEServerCallbacks {
@@ -48,16 +62,23 @@ class MyServerCallbacks:
 class MyCallbacks: public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic * pCharacteristic) {
 
-    Serial.println("RECEBEU DADO");
     std::string sensoriamento = pCharacteristic->getValue();
     Serial.println(sensoriamento.c_str());
 
+    // testando comunicação
+    /*delay(1500); 
+    sendData = true;
+    sendDataToServer("AC-ON");
+    sendData = false;*/
+
     if(String(GETDATA).equals(sensoriamento.c_str()))
+    {
        sendData = true;       
+    }
   }
 };
 
-void initBLE()
+void initBLEClient()
 {
   pinMode(LED, OUTPUT);
 
@@ -91,17 +112,6 @@ void initBLE()
   Serial.println("Waiting a client connection to notify...");
 }
 
-void sendDataBle(String data)
-{
-  if (deviceConnected) 
-  {
-      if(sendData)
-      {
-        pCharacteristicSensor->setValue(data.c_str());
-        pCharacteristicSensor->notify();
-        delay(1500); 
-      }
-  }
-}
+
     
 #endif

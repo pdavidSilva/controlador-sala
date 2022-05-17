@@ -20,10 +20,6 @@ using namespace std;
 
 class BLEServerService 
 {
-  private:
-   
-   
-    
   public:
     static int __countTypeSensor;
     static int __countTypeActuator;
@@ -66,8 +62,8 @@ class BLEServerService
 
     // metods task
     void continuousConnectionTask();
-    static void startTaskImpl(void*);
-    void startTask();
+    static void startTaskBLEImpl(void*);
+    void startTaskBLE();
   
 };
 

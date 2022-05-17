@@ -34,8 +34,11 @@ class ClientSocketService
     static bool connectToActuator(String uuidDevice); 
 
     void initServer();
-
-    static void recebeComandosDoServidor(void *arg);
+    
+    //Task
+    void serverListener();
+    static void startTaskWebSocketImpl(void* _this);
+    void startTaskWebSocket();
 };
 
 #endif

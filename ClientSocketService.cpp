@@ -33,7 +33,7 @@ void ClientSocketService::setMessageReturned(bool messageReturned) {
 /*
  * <descricao> Ouve requisicoes do cliente conecta via socket <descricao/>
  */
-void ClientSocketService::recebeComandosDoServidor(void *arg) {
+void ClientSocketService::serverListener() {
 
     WiFiClient client;    
     
@@ -161,8 +161,6 @@ bool ClientSocketService::connectToActuator(String uuidDevice)
   return deviceConnected;
 }
 
-
-
 void ClientSocketService::awaitsReturn()
 {
   
@@ -176,4 +174,15 @@ void ClientSocketService::awaitsReturn()
         Serial.println(millis());
       }
   }    
+}
+
+void ClientSocketService::startTaskWebSocketImpl(void* _this)
+{
+    ClientSocketService* socketService = (ClientSocketService*)_this;
+    socketService->serverListener();
+}
+
+void ClientSocketService::startTaskWebSocket()
+{
+  xTaskCreate(this->startTaskWebSocketImpl, "serverListener", 8192, this, 5, NULL);
 }

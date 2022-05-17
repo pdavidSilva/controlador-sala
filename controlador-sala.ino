@@ -1,5 +1,4 @@
 #include "Config.h"
-//#include "BLEServerService.h"
 
 BLEServerService* bleConfig; 
 HardwareRecord hardware;
@@ -16,23 +15,25 @@ void setup() {
 	Serial.begin(115200);
 	bool init = false;
 
-   /*sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-   //indexSensors = 1;
+  // mocks
+  hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+  controller.setHardwareConfig(hardware);
 
-   sensors[1] = "36938872-c3ca-11ec-9d64-0242ac120002";
-   indexSensors = 2;*/
+  sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+  indexSensors = 1;
    
-   /*devices[0] = "36938872-c3ca-11ec-9d64-0242ac120002";
-   indexDevices = 1;*/
+  devices[0] = "36938872-c3ca-11ec-9d64-0242ac120002";
+  indexDevices = 1;
 
-   wiFiService.connect();
+  wiFiService.connect();
 
-	/* do {
+	 /*do {
 		if ( controller.start(hardware) ) {
 			if ( controller.registerHardware(hardware) ) {
 				controller.getSensors(hardware, sensors, indexSensors);
         Serial.print("Sensors: ");
         Serial.println(indexSensors);
+        controller.setHardware(hardware);
 				//controller.getDevices(hardware, devices, indexDevices);
     
 				//if( indexSensors > 0 && indexDevices > 0 ) {				
@@ -43,8 +44,8 @@ void setup() {
 				//}
 			}
 		}
-	} while( !init ); */
-
+	} while( !init );*/ 
+  
   for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
     

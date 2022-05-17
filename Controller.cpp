@@ -6,6 +6,7 @@ Controller::Controller(){}
 HTTPService __http;
 ClientSocketService __clientSocketService;
 BLEServerService* __bleConfig; 
+Config __config; 
 
 bool Controller::start(HardwareRecord &record) const 
 {   
@@ -50,7 +51,7 @@ bool Controller::notificateServer() const
 void Controller::initBleTaskServer()
 {
     delay(2000);
-    __bleConfig->startTask();
+    __bleConfig->startTaskBLE();
 }
 
 void Controller::configureServer()
@@ -98,11 +99,15 @@ void Controller::initServerSocket()
 
 void Controller::startTaskWebSocket()
 {  
-  xTaskCreatePinnedToCore(__clientSocketService.recebeComandosDoServidor, 
-                        "ClientSocketService.recebeComandosDoServidor", 
-                        10000, 
-                        NULL, 
-                        8, 
-                        NULL, 
-                        tskNO_AFFINITY);
+    __clientSocketService.startTaskWebSocket();
+}
+
+HardwareRecord Controller::getHardwareConfig()
+{
+    return __config.getHardware();
+}
+
+void Controller::setHardwareConfig(HardwareRecord hardware)
+{
+    __config.setHardware(hardware);
 }

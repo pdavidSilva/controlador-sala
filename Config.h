@@ -29,6 +29,7 @@ class Config
         int    __type;
         int    __route;
         static std::vector<struct Reserva> __reservations; 
+        static HardwareRecord __hardware; 
 
     public : 
         
@@ -44,6 +45,8 @@ class Config
         int    getRoute();
         std::vector<struct Reserva> getReservations();
         void   setReservations(std::vector<struct Reserva> reservations);
+        HardwareRecord getHardware();
+        void setHardware(HardwareRecord hardware);
 
 };
 

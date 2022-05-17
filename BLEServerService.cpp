@@ -486,13 +486,13 @@ void BLEServerService::timer()
    };
 }
 
-void BLEServerService::startTaskImpl(void* _this)
+void BLEServerService::startTaskBLEImpl(void* _this)
 {
     BLEServerService* bleSettings = (BLEServerService*)_this;
     bleSettings->continuousConnectionTask();
 }
 
-void BLEServerService::startTask()
+void BLEServerService::startTaskBLE()
 {
-    xTaskCreate(this->startTaskImpl, "Task", 8192, this, 5, NULL);
+    xTaskCreate(this->startTaskBLEImpl, "Task", 8192, this, 5, NULL);
 }

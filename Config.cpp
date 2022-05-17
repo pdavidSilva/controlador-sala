@@ -9,7 +9,7 @@ int    __type;
 int    __route;
 bool   __debug;
 vector<struct Reserva> Config::__reservations; 
-
+HardwareRecord Config::__hardware; 
 
 Config::Config(){
     __url       = "http://italabs-002-site2.ctempurl.com/api";
@@ -19,7 +19,7 @@ Config::Config(){
     __basetime  = 180000;
     __ledStatus = 2;
     __type  = 1;
-    __route = 1;
+    __route = 2;
     
     pinMode(__ledStatus, OUTPUT);
 }
@@ -49,7 +49,6 @@ int	Config::getType()
 	return __type;
 }
 
-
 int	Config::getLedStatus() 
 {
 	return __ledStatus;
@@ -75,3 +74,13 @@ void Config::setReservations(std::vector<struct Reserva> reservations)
     __reservations = reservations;
 }
 
+
+HardwareRecord Config::getHardware()
+{
+    return __hardware;
+}
+
+void Config::setHardware(HardwareRecord hardware)
+{
+    __hardware = hardware;
+}

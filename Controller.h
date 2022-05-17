@@ -27,6 +27,9 @@ class Controller
          // WEB SOCKET
         void initServerSocket();    
         void startTaskWebSocket(); 
+
+        HardwareRecord getHardwareConfig();
+        void setHardwareConfig(HardwareRecord hardware);
 };
 
 #endif

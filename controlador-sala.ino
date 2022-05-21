@@ -3,6 +3,7 @@
 BLEServerService* bleConfig; 
 HardwareRecord hardware;
 Controller controller;
+EnvironmentVariablesService environment;
 WiFiService wiFiService;
 
 String sensors[6];
@@ -17,7 +18,7 @@ void setup() {
 
   // mocks
   hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
-  controller.setHardwareConfig(hardware);
+  environment.setHardwareConfig(hardware);
 
   sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
   indexSensors = 1;

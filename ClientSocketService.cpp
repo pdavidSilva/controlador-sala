@@ -4,6 +4,7 @@
 Config configuration;
 BLEServerService* __bleConfiguration; 
 HTTPService __httpService;
+EnvironmentVariablesService __environment;
 ClientSocketService::ClientSocketService() {}
 
 bool ClientSocketService::__messageReturned = false;
@@ -105,7 +106,7 @@ void ClientSocketService::serverListener() {
 
             }  else if(request.type == ATUALIZAR) {
                   
-                configuration.setReservations(__httpService.GetReservationsWeek());
+                __environment.setReservations(__httpService.GetReservationsWeek());
 
                 client.println("OK");
             }

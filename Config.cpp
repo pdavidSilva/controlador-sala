@@ -8,8 +8,6 @@ int    __basetime;
 int    __type;
 int    __route;
 bool   __debug;
-vector<struct Reserva> Config::__reservations; 
-HardwareRecord Config::__hardware; 
 
 Config::Config(){
     __url       = "http://italabs-002-site2.ctempurl.com/api";
@@ -62,25 +60,4 @@ int Config::getRoute()
 bool Config::isDebug() 
 {
 	return __debug;
-}
-
-std::vector<struct Reserva> Config::getReservations()
-{
-    return __reservations;
-}
-
-void Config::setReservations(std::vector<struct Reserva> reservations)
-{
-    __reservations = reservations;
-}
-
-
-HardwareRecord Config::getHardware()
-{
-    return __hardware;
-}
-
-void Config::setHardware(HardwareRecord hardware)
-{
-    __hardware = hardware;
 }

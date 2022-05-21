@@ -17,7 +17,7 @@ String HTTP::request(String resource, String type, String params) const{
     type.trim();
     type.toLowerCase();
   
-    if ( !(type.compareTo("post") == 0) && !(type.compareTo("get") == 0)){
+    if ( !(type.compareTo("put") == 0) && !(type.compareTo("post") == 0) && !(type.compareTo("get") == 0)){
         if(config.isDebug()){
           Serial.println("==================================");  
           Serial.println("[HTTP] Tipo de requisição [" + type + "] inválido");
@@ -47,10 +47,17 @@ String HTTP::request(String resource, String type, String params) const{
     
         http.begin(url.c_str());
         if (type.compareTo("post") == 0){
+
             http.addHeader("Content-Type", "application/json");          
             httpCode = http.POST(params);
             Serial.println("[HTTP] Code: " + httpCode);
 
+        }else if(type.compareTo("put") == 0){
+
+            http.addHeader("Content-Type", "application/json");          
+            httpCode = http.PUT(params);
+            Serial.println("[HTTP] Code: " + httpCode);        
+        
         }else if(type.compareTo("get") == 0){
             httpCode = http.GET();
         }

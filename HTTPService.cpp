@@ -59,6 +59,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record)
             record.id = doc["result"]["id"].as<int>();
             record.token = doc["result"]["token"].as<char *>();
             record.uuid = doc["result"]["uuid"].as<char *>();
+            record.salaId = doc["result"]["salaId"].as<char *>();
 
             return;
         }
@@ -319,6 +320,7 @@ std::vector< struct Reserva> HTTPService::GetReservationsWeek() {
     HTTP http;
     String route;
     Config config;
+    EnvironmentVariablesService environment;
     std::vector<struct Reserva> reservas;
         
     if (config.getRoute() == 1)
@@ -329,7 +331,7 @@ std::vector< struct Reserva> HTTPService::GetReservationsWeek() {
     String routeService;
     String type = "GET";
     String params = "";
-    String uuid = config.getHardware().uuid;
+    String uuid = environment.getHardware().uuid;
 
     routeService.concat(route);
     routeService.concat(uuid);
@@ -410,4 +412,203 @@ struct Reserva HTTPService::deserializeReserve(JsonVariant reserve) {
    //}
 
    return res;
+}
+
+/*
+ * <descricao> Obtem o estado atual do monitoramento da sala  <descricao/>
+ * <retorno> Struct Monitoramento com os dados do monitoramento de acordo com o banco <retorno/>
+ */
+struct Monitoramento HTTPService::getMonitoringByUuid() {
+
+    HTTP http;
+    String route;
+    Config config;
+    struct Monitoramento monitoramento;
+    EnvironmentVariablesService environment;
+        
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/Monitoramento/ObterMonitoramentoPorUuid/";
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String uuid = environment.getHardware().uuid;
+
+    routeService.concat(route);
+    routeService.concat(uuid);
+
+    String response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+            JsonArray jsonSensors = doc["result"].as<JsonArray>();
+            monitoramento.id = object["id"].as<int>();
+            monitoramento.luzes = object["luzes"].as<bool>();
+            monitoramento.arCondicionado = object["arCondicionado"].as<bool>();
+            monitoramento.salaId = object["salaId"].as<int>();
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    if (config.isDebug())
+    {
+        Serial.println("==================================");
+        Serial.print("[HTTPService] count reservations: ");
+        Serial.println(reservas.size());
+    }
+    
+    return monitoramento;
+}
+
+
+/*
+ * <descricao> Atualiza a tabela Monitoramento do banco de dados com as atualizacoes feitas nos equipamentos pelo ESP  <descricao/>
+ * <parametros> luzes: indica o ultimo estado das luzes (ligado/desligado) <parametros/>
+ * <parametros> condicionador: indica o ultimo estado do ar condicionado (ligado/desligado) <parametros/>
+ * <retorno> string com nome do dispotivo recebido na requisicao ou os codigos IR <retorno/>
+ */
+bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
+
+    Config config;
+    HTTP http;
+    String route;
+    EnvironmentVariablesService environment;
+
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/monitoramento";
+
+    String routeService;
+    String type = "PUT";
+    String params = "";
+    String response;
+
+    String id               = String(environment.getMonitoring().id);
+    String luzesLiagadas    = String(monitoring.light ? "true" : "false");
+    String arCondicionado   = String(monitoring.conditioner ? "true" : "false");
+    String salaId           = String(environment.getMonitoring().salaId);
+
+    params.concat("{ ");
+    params.concat("\"id\": "               + id             + ", ");
+    params.concat("\"luzes\": "            + luzesLiagadas  + ", ");
+    params.concat("\"arCondicionado\": "   + arCondicionado + ", ");
+    params.concat("\"salaId\": "           + salaId         + ", ");
+    paramS.concat("}");
+
+    routeService.concat(route);
+    response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+                if (config.isDebug())
+                {
+                    Serial.println("==================================");
+                    Serial.println("[HTTPService] Falha no parse JSON.......");
+                    Serial.println(error.f_str());
+                }
+                delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+            return true;
+    }
+
+    return false;
+}
+
+/*
+ * <descricao> Obtem do servidor os codigos IR para ligar/desligar o arcondicionado <descricao/>
+ * <parametros> operacao: operacao que deve ser consultados os codigos IR (ligar/desligar) <parametros/>
+ * <retorno> lista de inteiros com os codigos IR solicitados <retorno/>
+ */
+String HTTPService::getComandosIrByIdSalaAndOperacao(String operacao) {
+
+    Config config;
+    HTTP http;
+    String route;
+    String codigo = "";
+    EnvironmentVariablesService environment;
+
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/infravermelho/CodigosPorSala/";
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String salaId = environment.getHardware().SalaId;  
+
+    routeService.concat(route);
+    routeService.concat(salaId);
+    routeService.concat("/");
+    routeService.concat(operacao);  
+  
+    String response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+            JsonArray jsonSensors = doc["result"].as<JsonArray>();
+            codigo = object["codigo"].as<String>();
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    return codigo;
 }

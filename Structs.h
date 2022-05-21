@@ -9,6 +9,7 @@ struct HardwareRecord
     int id;
     String token;
     String uuid; 
+    int salaId; 
 };
 
 // Hardware
@@ -34,7 +35,6 @@ typedef struct MonitoringRequest
   String uuid;
 };
 
-
 /*
  * Estrutura usada para guardar dados da reserva da sala
  */
@@ -50,5 +50,14 @@ typedef struct Reserva {
   int planejamento;
 };
 
+/*
+ * Estrutura usada para guardar dados do monitoramento da sala
+ */
+typedef struct Monitoramento {
+  int id;
+  bool light;
+  bool conditioner;
+  int salaId;
+};
 
 #endif

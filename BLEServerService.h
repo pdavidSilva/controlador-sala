@@ -23,8 +23,8 @@ class BLEServerService
   public:
     static int __countTypeSensor;
     static int __countTypeActuator;
-    static vector<String> __sensors;
-    static vector<String> __actuators;
+    static vector<string> __sensors;
+    static vector<struct HardwareRecord> __actuators;
     static bool __receivedRequest;
     static BLEScan* __pBLEScan;
     static vector<BLEAdvertisedDevice*> __filteredDevices;
@@ -49,7 +49,7 @@ class BLEServerService
 
     // getters and setters
     vector<String> getSensors();
-    vector<String> getActuators();
+    vector<struct HardwareRecord> getActuators();
     void addSensor(String uuid);
     void addActuator(String uuid);
     void setReceivedRequest(bool receivedRequest);

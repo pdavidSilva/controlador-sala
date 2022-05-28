@@ -3,8 +3,8 @@
 
 int BLEServerService::__countTypeSensor = 0;
 int BLEServerService::__countTypeActuator = 0;
-vector<String> BLEServerService::__sensors;
-vector<String> BLEServerService::__actuators;
+vector<struct Actuator> BLEServerService::__sensors;
+vector<struct Actuator> BLEServerService::__actuators;
 bool BLEServerService::__receivedRequest = false;
 BLEScan* BLEServerService::__pBLEScan;
 vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
@@ -416,12 +416,12 @@ void BLEServerService::continuousConnectionTask()
     }
 }
 
-vector<String> BLEServerService::getSensors()
+vector<string> BLEServerService::getSensors()
 {
   return __sensors;
 }
 
-vector<String> BLEServerService::getActuators()
+vector<struct HardwareRecord> BLEServerService::getActuators()
 {
   return __actuators;
 }
@@ -456,14 +456,14 @@ int BLEServerService::getCounttypeActuator()
   return __countTypeActuator;
 }
 
-void BLEServerService::addSensor(String uuid)
+void BLEServerService::addSensor(struct Actuator actuator)
 {
-  __sensors.push_back(uuid);
+  __sensors.push_back(actuator);
 }
 
-void BLEServerService::addActuator(String uuid)
+void BLEServerService::addActuator(struct Actuator sensor)
 {
-  __actuators.push_back(uuid);
+  __actuators.push_back(sensor);
 }
   
 void BLEServerService::timer()

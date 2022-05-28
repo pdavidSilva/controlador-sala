@@ -9,7 +9,9 @@ struct HardwareRecord
     int id;
     String token;
     String uuid; 
-    int salaId; 
+    int salaId;
+    int typeHardwareId;
+    int typeEquipment;  
 };
 
 // Hardware

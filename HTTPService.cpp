@@ -156,6 +156,88 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
     return false;
 }
 
+std::vector<struct Actuator> HTTPService::getHardwares(HardwareRecord hardware)
+{
+    Config config;
+    HTTP http;
+    String route;
+    std::vector<struct Actuator> actuators;
+
+    if (config.getRoute() == 1)
+        route = "/hardware/";
+    else
+        route = "/hardwaredesala/";
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String response;
+
+    String uuid = String(hardware.uuid);
+    String token = hardware.token;
+
+    routeService.concat(route);
+    routeService.concat(uuid);
+    routeService.concat("/get-sensors");
+    routeService.concat("?token=");
+    routeService.concat(token);
+
+    response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+
+            return actuators;
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+
+            JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
+
+            for (JsonVariant sensor : jsonSensors)
+                actuators.push_back(deserializeActuator(sensor));
+
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    return actuators;
+}
+
+/*
+ * <descricao> Deserealiza objeto json e converte para a struct que armazena as reservas  <descricao/>
+ */
+struct Actuator HTTPService::deserializeActuator(JsonVariant sensor) {
+   
+   struct Actuator disp;
+
+   disp.uuid = sensor["uuid"].as<String>();
+   disp.typeHardwareId = sensor["TipoHardwareId"].as<int>();
+
+   return disp;
+}
+
 void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
 {
 
@@ -553,7 +635,7 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
  * <parametros> operacao: operacao que deve ser consultados os codigos IR (ligar/desligar) <parametros/>
  * <retorno> lista de inteiros com os codigos IR solicitados <retorno/>
  */
-String HTTPService::getComandosIrByIdSalaAndOperacao(String operacao) {
+String HTTPService::getComandosIrByIdSalaAndOperacao() {
 
     Config config;
     HTTP http;
@@ -564,17 +646,15 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String operacao) {
     if (config.getRoute() == 1)
         route = "";
     else
-        route = "/infravermelho/CodigosPorSala/";
+        route = "/infravermelho/CodigosPorUuid/";
 
     String routeService;
     String type = "GET";
     String params = "";
-    String salaId = environment.getHardware().SalaId;  
+    String uuid = environment.getHardware().getUuid();  
 
     routeService.concat(route);
     routeService.concat(salaId);
-    routeService.concat("/");
-    routeService.concat(operacao);  
   
     String response = http.request(routeService, type, params);
 
@@ -597,7 +677,11 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String operacao) {
         if (doc["httpCode"].as<int>() == 200)
         {
             JsonArray jsonSensors = doc["result"].as<JsonArray>();
-            codigo = object["codigo"].as<String>();
+
+            for (JsonVariant object : jsonSensors)
+            {
+                codigo = object["codigo"].as<String>();
+            }
         }
         else
         {

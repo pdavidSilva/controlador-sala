@@ -64,13 +64,11 @@ void ligarDispositivosGerenciaveis() {
 
       if (!__monitoring.conditioner) {
 
-        vector < int > listaCodigos = obterComandosIrByIdSalaAndOperacao(operacao_ligar);
-        
-        //enviarComandosIr(listaCodigos);
-        //enviarMonitoramento(lightStatus, __monitoring.conditioner);
+        String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
+      
+        senDataToActuator(2, codigos);
 
         __monitoring.conditioner = true;
-        //digitalWrite(LED, HIGH);
 
         Serial.println("Ligando ar condicionado");
         Serial.print("Hora: ");
@@ -112,15 +110,15 @@ void EnvironmentVariablesService::desligarDispositivosGerenciaveis() {
   if (notInClass) {
     if (__monitoring.conditioner) {
 
-      vector<int> listaCodigos = obterComandosIrByIdSalaAndOperacao(operacao_desligar);
-      //enviarComandosIr(listaCodigos);
+      String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
 
-      //enviarMonitoramento(lightStatus, conditionerStatus);
+      senDataToActuator(2, codigos);
 
       Serial.println("Desligando ar condicionado");
       Serial.print("Hora: ");
       Serial.println(__currentTime);
 
+    
       __monitoring.conditioner = false;
       //digitalWrite(LED, LOW);
 
@@ -144,7 +142,7 @@ void EnvironmentVariablesService::ligarLuzes(bool enviarDadosMonitoramento){
   __monitoring.light = true;
 
   // ----------------------------------------------------------
-  senDataToActuator(__monitoring);  
+  senDataToActuator(1,"true");  
   // ----------------------------------------------------------
 
   _httpService.putMonitoring(__monitoring);
@@ -160,22 +158,22 @@ void EnvironmentVariablesService::desligarLuzes(bool enviarDadosMonitoramento){
   __monitoring.light = false;
   
   // ----------------------------------------------------------
-  senDataToActuator(__monitoring);  
+  senDataToActuator("",__monitoring);  
   // ----------------------------------------------------------
 
   _httpService.putMonitoring(__monitoring);
 }
 
 
-bool EnvironmentVariablesService::senDataToActuator(struct Monitoramento monitoring)
+bool EnvironmentVariablesService::senDataToActuator(String uuid, String message)
 {
   __bleConfiguration->setReceivedRequest(true);
 
-  bool dispConnected = connectToActuator(request.uuid);
+  bool dispConnected = connectToActuator(uuid);
                 
   if(dispConnected)
   {
-      __bleConfiguration->sendMessageToActuator(request.code);
+      __bleConfiguration->sendMessageToActuator(message);
 
       awaitsReturn();
 
@@ -184,7 +182,6 @@ bool EnvironmentVariablesService::senDataToActuator(struct Monitoramento monitor
                 
   __bleConfiguration->setReceivedRequest(false);
 } 
-
 
 void EnvironmentVariablesService::awaitsReturn()
 {
@@ -199,4 +196,15 @@ void EnvironmentVariablesService::awaitsReturn()
         Serial.println(millis());
       }
   }    
+}
+
+void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
+{
+  for(struct Actuator a : __bleConfiguration.getActuators())
+  {
+    if(a.typeEquipment == typeEquipment)
+    {
+      senDataToActuator(a.uuid, codigos);
+    }
+  }
 }

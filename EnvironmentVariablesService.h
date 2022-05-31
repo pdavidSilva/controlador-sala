@@ -1,6 +1,11 @@
 #ifndef EnvironmentVariablesService_h
 #define EnvironmentVariablesService_h
 
+#include <NTPClient.h>
+
+#define TYPE_LIGHT  0
+#define TYPE_CONDITIONER  1 
+
 class EnvironmentVariablesService 
 {
   private: 
@@ -8,8 +13,15 @@ class EnvironmentVariablesService
     struct Monitoramento monitoring;
     static vector<struct Reserva> EnvironmentVariablesService::__reservations; 
     static HardwareRecord EnvironmentVariablesService::__hardware; 
+    String EnvironmentVariablesService::__startTimeLoadReservations;
+    String EnvironmentVariablesService::__endTimeLoadReservations;
+    bool EnvironmentVariablesService::__uploadedToday;
+    NTPClient EnvironmentVariablesService::__ntp;
+    WiFiUDP EnvironmentVariablesService::__udp;
 
   public: 
+   void EnvironmentVariablesService()
+
     String getCurrentTime();
     String setCurrentTime(String currentTime);
 
@@ -23,7 +35,20 @@ class EnvironmentVariablesService
     HardwareRecord getHardware();
     void setHardware(HardwareRecord hardware);
 
-    bool senDataToActuator(struct Monitoramento monitoring);
+    void turnOnManagedDevices();
+    void turnOffManagedDevices();
+
+    bool sendDataToActuator(String uuid, String message);
+    void sendDataToActuator(int typeEquipment, String message);
+
+    void turnOfLight();
+    void turnOnLight();
+
+    void turnOnConditioner();
+    void turnOfConditioner();
+
+    void continuousValidation();
+    void checkTimeToLoadReservations();
 
     void awaitsReturn();
 };

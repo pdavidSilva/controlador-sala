@@ -397,7 +397,7 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-std::vector< struct Reserva> HTTPService::GetReservationsWeek() {
+std::vector<struct Reserva> HTTPService::GetReservationsWeek() {
     
     HTTP http;
     String route;

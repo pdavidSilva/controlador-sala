@@ -4,8 +4,24 @@ String __currentTime;
 struct Monitoramento __monitoring;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
 HardwareRecord EnvironmentVariablesService::__hardware; 
+String EnvironmentVariablesService::__startTimeLoadReservations;
+String EnvironmentVariablesService::__endTimeLoadReservations;
+bool EnvironmentVariablesService::__uploadedToday;
+NTPClient EnvironmentVariablesService::__ntp;
+WiFiUDP EnvironmentVariablesService::__udp;
+
 HTTPService _httpService;
 BLEServerService* __bleConfiguration; 
+
+void EnvironmentVariablesService::EnvironmentVariablesService()
+{
+    __startTimeLoadReservations  = "00:05:00";
+    __endTimeLoadReservations    = "00:10:00";
+    __uploadedToday = false;
+    __ntp = new NTPClient(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
+    __ntp.begin();
+    __ntp.forceUpdate();
+}
 
 std::vector<struct Reserva> EnvironmentVariablesService::getReservations()
 {
@@ -51,7 +67,7 @@ void EnvironmentVariablesService::setMonitoring(struct Monitoramento monitoring)
  * <descricao> Verifica se é para ligar os dispostivos (luzes e ar) de acordo com as 
  * infomacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
  */
-void ligarDispositivosGerenciaveis() {
+void turnOnManagedDevices() {
   String horaInicio, horaFim, logMonitoramento;
   
   struct Reserva r;
@@ -62,27 +78,11 @@ void ligarDispositivosGerenciaveis() {
     
     if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim && temGente) {
 
-      if (!__monitoring.conditioner) {
+      if (!__monitoring.conditioner)
+        turnOnConditioner();
 
-        String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
-      
-        senDataToActuator(2, codigos);
-
-        __monitoring.conditioner = true;
-
-        Serial.println("Ligando ar condicionado");
-        Serial.print("Hora: ");
-        Serial.println(__currentTime);
-
-      }
-
-      if (!__monitoring.light) {
-
-        /*
-         * Ligando luzes
-         */
-         ligarLuzes(true);
-      }
+      if (!__monitoring.light)
+        turnOnLight();
     }
   }
 }
@@ -91,7 +91,7 @@ void ligarDispositivosGerenciaveis() {
  * <descricao> Verifica se é para desligar os dispostivos (luzes e ar) de acordo com as 
  * informacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
  */
-void EnvironmentVariablesService::desligarDispositivosGerenciaveis() {
+void EnvironmentVariablesService::turnOffManagedDevices() {
   String horaInicio;
   String horaFim;
   String logMonitoramento;
@@ -108,41 +108,59 @@ void EnvironmentVariablesService::desligarDispositivosGerenciaveis() {
   }
 
   if (notInClass) {
-    if (__monitoring.conditioner) {
+    if (__monitoring.conditioner) 
+      turnOfConditioner(true);
 
-      String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
-
-      senDataToActuator(2, codigos);
-
-      Serial.println("Desligando ar condicionado");
-      Serial.print("Hora: ");
-      Serial.println(__currentTime);
-
-    
-      __monitoring.conditioner = false;
-      //digitalWrite(LED, LOW);
-
-    }
-
-    if (__monitoring.light) {
-
-      desligarLuzes(true);
-
-    }
+    if (__monitoring.light)
+      turnOfLight(true);
   }
 }
 
 /*
  * <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::ligarLuzes(bool enviarDadosMonitoramento){
+void EnvironmentVariablesService::turnOnConditioner(){
 
-  Serial.println("LIGANDO");
+  Serial.println("LIGANDO CONDICIONADOR");
+
+  String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
+      
+  sendDataToActuator(TYPE_CONDITIONER, codigos);
+
+  __monitoring.conditioner = true;
+
+  _httpService.putMonitoring(__monitoring);
+}
+
+/*
+ * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
+ */
+void EnvironmentVariablesService::turnOfConditioner(){
+
+  Serial.println("DESLIGANDO CONDICIONADOR");
+
+  String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
+
+  senDataToActuator(TYPE_CONDITIONER, codigos);
+    
+  __monitoring.conditioner = false;
+  
+  digitalWrite(LED, LOW);
+
+  _httpService.putMonitoring(__monitoring);
+}
+
+/*
+ * <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
+ */
+void EnvironmentVariablesService::turnOnLight(){
+
+  Serial.println("LIGANDO LUZES");
 
   __monitoring.light = true;
 
   // ----------------------------------------------------------
-  senDataToActuator(1,"true");  
+  senDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
   _httpService.putMonitoring(__monitoring);
@@ -151,21 +169,21 @@ void EnvironmentVariablesService::ligarLuzes(bool enviarDadosMonitoramento){
 /*
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::desligarLuzes(bool enviarDadosMonitoramento){
+void EnvironmentVariablesService::turnOfLight(){
 
-  Serial.println("DESLIGANDO");
+  Serial.println("DESLIGANDO LUZES");
 
   __monitoring.light = false;
   
   // ----------------------------------------------------------
-  senDataToActuator("",__monitoring);  
+  sendDataToActuator(TYPE_LIGHT, "false");  
   // ----------------------------------------------------------
 
   _httpService.putMonitoring(__monitoring);
 }
 
 
-bool EnvironmentVariablesService::senDataToActuator(String uuid, String message)
+void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
   __bleConfiguration->setReceivedRequest(true);
 
@@ -183,6 +201,15 @@ bool EnvironmentVariablesService::senDataToActuator(String uuid, String message)
   __bleConfiguration->setReceivedRequest(false);
 } 
 
+void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
+{
+  for(struct Actuator a : __bleConfiguration.getActuators())
+  {
+    if(a.typeEquipment == typeEquipment)
+      sendDataToActuator(a.uuid, codigos);
+  }
+}
+
 void EnvironmentVariablesService::awaitsReturn()
 {
   
@@ -198,13 +225,29 @@ void EnvironmentVariablesService::awaitsReturn()
   }    
 }
 
-void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
+void EnvironmentVariablesService::checkTimeToLoadReservations(){
+  if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations){
+       
+       if(!__uploadedToday){
+           __reservations = _httpService.GetReservationsWeek;
+
+          if(!__uploadedToday)
+            __reservations.clear();
+       }
+
+  } else 
+      __uploadedToday = false; 
+}
+
+void EnvironmentVariablesService::continuousValidation()
 {
-  for(struct Actuator a : __bleConfiguration.getActuators())
+  while(true)
   {
-    if(a.typeEquipment == typeEquipment)
-    {
-      senDataToActuator(a.uuid, codigos);
-    }
+      __currentTime = __ntp.getFormattedTime();
+
+      turnOffManagedDevices();
+      turnOnConditioner();
+
+      checkTimeToLoadReservations();
   }
 }

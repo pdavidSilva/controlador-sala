@@ -12,6 +12,7 @@ vector<struct Reserva> Config::__reservations;
 HardwareRecord Config::__hardware; 
 
 Config::Config(){
+    __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
     __url       = "http://italabs-002-site2.ctempurl.com/api";
     __debug     = true;
     __ssid      = "VIVOFIBRA-5F70";
@@ -22,6 +23,11 @@ Config::Config(){
     __route = 2;
     
     pinMode(__ledStatus, OUTPUT);
+}
+
+String Config::getTokenApp()
+{ 
+	return __tokenApp;
 }
 
 String Config::getUrl()

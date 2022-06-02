@@ -24,7 +24,7 @@ void sendDataToServer(String data)
 {
   if (deviceConnected) 
   {
-      if(data != NULL)
+      if(sendData)
       {
         pCharacteristicSensor->setValue(data.c_str());
         pCharacteristicSensor->notify();

@@ -14,8 +14,8 @@ struct HardwareRecord
 // Hardware
 struct MonitoringRecord
 {
-    bool hasPresent;
-    int temperature; 
+    String hasPresent;
+    float temperature; 
 };
 
 typedef struct BLEDeviceConnect

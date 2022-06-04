@@ -3,20 +3,23 @@
 
 int BLEServerService::__countTypeSensor = 0;
 int BLEServerService::__countTypeActuator = 0;
-vector<struct Actuator> BLEServerService::__sensors;
-vector<struct Actuator> BLEServerService::__actuators;
+std::vector<String> BLEServerService::__sensors;
+std::vector<struct HardwareRecord> BLEServerService::__actuators;
 bool BLEServerService::__receivedRequest = false;
+bool BLEServerService::__environmentSolicitation = false;
 BLEScan* BLEServerService::__pBLEScan;
 vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
 unordered_map<string, Hardware> BLEServerService::__devicesMapped;
 BLEDeviceConnect* BLEServerService::__actuatorConnected;
 ClientSocketService __clientWebSocketService;
+EnvironmentVariablesService __environmentVariables;
 
 BLEServerService::BLEServerService()
 {
     __countTypeSensor = 0;
     __countTypeActuator = 0;
     __receivedRequest = false;
+    __environmentSolicitation = false;
 }
 
 void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) 
@@ -34,10 +37,15 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
       Serial.print("[BLEServerService]: receive request enabled: ");
       Serial.println(__receivedRequest);
 
-      if(__receivedRequest)
-      { 
+      if(__receivedRequest && !__environmentSolicitation)
+      {   
         __clientWebSocketService.setMessageReturned(true);
         __clientWebSocketService.setMessage(data.substring(0, length));
+      }
+      else
+      {
+        __environmentVariables.setReceivedData(true);
+        __environmentVariables.setMessage(data.substring(0, length));  
       }
 
     }
@@ -416,7 +424,7 @@ void BLEServerService::continuousConnectionTask()
     }
 }
 
-vector<string> BLEServerService::getSensors()
+vector<String> BLEServerService::getSensors()
 {
   return __sensors;
 }
@@ -424,6 +432,16 @@ vector<string> BLEServerService::getSensors()
 vector<struct HardwareRecord> BLEServerService::getActuators()
 {
   return __actuators;
+}
+
+void BLEServerService::setEnvironmentSolicitation(bool environmentSolicitation)
+{
+   __environmentSolicitation = environmentSolicitation;
+}
+
+bool BLEServerService::getEnvironmentSolicitation()
+{
+  return __environmentSolicitation;
 }
 
 void BLEServerService::setReceivedRequest(bool receivedRequest)
@@ -456,14 +474,14 @@ int BLEServerService::getCounttypeActuator()
   return __countTypeActuator;
 }
 
-void BLEServerService::addSensor(struct Actuator actuator)
+void BLEServerService::addSensor(String sensor)
 {
-  __sensors.push_back(actuator);
+  __sensors.push_back(sensor);
 }
 
-void BLEServerService::addActuator(struct Actuator sensor)
+void BLEServerService::addActuator(HardwareRecord act)
 {
-  __actuators.push_back(sensor);
+  __actuators.push_back(act);
 }
   
 void BLEServerService::timer()

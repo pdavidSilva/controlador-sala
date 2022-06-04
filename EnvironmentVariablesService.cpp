@@ -4,23 +4,47 @@ String __currentTime;
 struct Monitoramento __monitoring;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
 HardwareRecord EnvironmentVariablesService::__hardware; 
-String EnvironmentVariablesService::__startTimeLoadReservations;
-String EnvironmentVariablesService::__endTimeLoadReservations;
-bool EnvironmentVariablesService::__uploadedToday;
-NTPClient EnvironmentVariablesService::__ntp;
-WiFiUDP EnvironmentVariablesService::__udp;
+String __startTimeLoadReservations;
+String __endTimeLoadReservations;
+bool __uploadedToday;
+bool EnvironmentVariablesService::__receivedData;
+bool EnvironmentVariablesService::__hasMovement;
+String EnvironmentVariablesService::__message;
+WiFiUDP __udp;
+NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 
-HTTPService _httpService;
+BLEServerService* __bleConfig; 
+
+HTTPService __httpService;
 BLEServerService* __bleConfiguration; 
 
-void EnvironmentVariablesService::EnvironmentVariablesService()
+EnvironmentVariablesService::EnvironmentVariablesService()
 {
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
     __uploadedToday = false;
-    __ntp = new NTPClient(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
     __ntp.begin();
     __ntp.forceUpdate();
+}
+
+String EnvironmentVariablesService::getMessage() 
+{
+    return __message;
+}
+
+void EnvironmentVariablesService::setMessage(String message) 
+{
+    __message = message;
+}
+
+bool EnvironmentVariablesService::getReceivedData() 
+{
+    return __receivedData;
+}
+
+void EnvironmentVariablesService::setReceivedData(bool receivedData) 
+{
+    __receivedData = receivedData;
 }
 
 std::vector<struct Reserva> EnvironmentVariablesService::getReservations()
@@ -33,7 +57,7 @@ void EnvironmentVariablesService::setReservations(std::vector<struct Reserva> re
     __reservations = reservations;
 }
 
-HardwareRecord EnvironmentVariablesService::getHardware()
+struct HardwareRecord EnvironmentVariablesService::getHardware()
 {
     return __hardware;
 }
@@ -53,7 +77,7 @@ String EnvironmentVariablesService::setCurrentTime(String currentTime)
   __currentTime = currentTime;
 }
 
-struct EnvironmentVariablesService::getMonitoring()
+struct Monitoramento EnvironmentVariablesService::getMonitoring()
 {
   return __monitoring;
 }
@@ -63,11 +87,40 @@ void EnvironmentVariablesService::setMonitoring(struct Monitoramento monitoring)
   __monitoring = monitoring;
 }
 
+void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
+{
+  __bleConfiguration->setReceivedRequest(true);
+  __bleConfiguration->setEnvironmentSolicitation(true);
+
+  bool dispConnected = __bleConfig->connectToActuator(uuid);
+                
+  if(dispConnected)
+  {
+      __bleConfiguration->sendMessageToActuator(message);
+
+      awaitsReturn();
+
+      __bleConfiguration->disconnectToActuator();
+  }
+                
+  __bleConfiguration->setEnvironmentSolicitation(false);
+  __bleConfiguration->setReceivedRequest(false);
+} 
+
+void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
+{
+  for(struct HardwareRecord r : __bleConfiguration->getActuators())
+  {
+    if(r.typeEquipment == typeEquipment)
+      sendDataToActuator(r.uuid, message);
+  }
+}
+
 /*
  * <descricao> Verifica se é para ligar os dispostivos (luzes e ar) de acordo com as 
  * infomacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
  */
-void turnOnManagedDevices() {
+void EnvironmentVariablesService::turnOnManagedDevices() {
   String horaInicio, horaFim, logMonitoramento;
   
   struct Reserva r;
@@ -76,7 +129,7 @@ void turnOnManagedDevices() {
     horaInicio = r.horarioInicio;
     horaFim = r.horarioFim;
     
-    if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim && temGente) {
+    if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim && __hasMovement) {
 
       if (!__monitoring.conditioner)
         turnOnConditioner();
@@ -109,10 +162,10 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
 
   if (notInClass) {
     if (__monitoring.conditioner) 
-      turnOfConditioner(true);
+      turnOfConditioner();
 
     if (__monitoring.light)
-      turnOfLight(true);
+      turnOfLight();
   }
 }
 
@@ -123,13 +176,13 @@ void EnvironmentVariablesService::turnOnConditioner(){
 
   Serial.println("LIGANDO CONDICIONADOR");
 
-  String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpService.getComandosIrByIdSalaAndOperacao();
       
   sendDataToActuator(TYPE_CONDITIONER, codigos);
 
   __monitoring.conditioner = true;
 
-  _httpService.putMonitoring(__monitoring);
+  __httpService.putMonitoring(__monitoring);
 }
 
 /*
@@ -139,15 +192,15 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   Serial.println("DESLIGANDO CONDICIONADOR");
 
-  String codigos = _httpService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpService.getComandosIrByIdSalaAndOperacao();
 
-  senDataToActuator(TYPE_CONDITIONER, codigos);
+  sendDataToActuator(TYPE_CONDITIONER, codigos);
     
   __monitoring.conditioner = false;
   
-  digitalWrite(LED, LOW);
+  //digitalWrite(LED, LOW);
 
-  _httpService.putMonitoring(__monitoring);
+  __httpService.putMonitoring(__monitoring);
 }
 
 /*
@@ -160,10 +213,10 @@ void EnvironmentVariablesService::turnOnLight(){
   __monitoring.light = true;
 
   // ----------------------------------------------------------
-  senDataToActuator(TYPE_LIGHT,"true");  
+  sendDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
-  _httpService.putMonitoring(__monitoring);
+  __httpService.putMonitoring(__monitoring);
 }
 
 /*
@@ -179,57 +232,32 @@ void EnvironmentVariablesService::turnOfLight(){
   sendDataToActuator(TYPE_LIGHT, "false");  
   // ----------------------------------------------------------
 
-  _httpService.putMonitoring(__monitoring);
-}
-
-
-void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
-{
-  __bleConfiguration->setReceivedRequest(true);
-
-  bool dispConnected = connectToActuator(uuid);
-                
-  if(dispConnected)
-  {
-      __bleConfiguration->sendMessageToActuator(message);
-
-      awaitsReturn();
-
-      __bleConfiguration->disconnectToActuator();
-  }
-                
-  __bleConfiguration->setReceivedRequest(false);
-} 
-
-void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
-{
-  for(struct Actuator a : __bleConfiguration.getActuators())
-  {
-    if(a.typeEquipment == typeEquipment)
-      sendDataToActuator(a.uuid, codigos);
-  }
+  __httpService.putMonitoring(__monitoring);
 }
 
 void EnvironmentVariablesService::awaitsReturn()
 {
   
   unsigned long tempoLimite = millis() + 15000;
-  while(millis() <= tempoLimite && !__messageReturned)
+  while(millis() <= tempoLimite && !__receivedData)
   { 
       delay(1000);
-      if (configuration.isDebug())
-      {    
+      //if (configuration.isDebug())
+      //{    
         Serial.print("[ClientSocketService] TIME AWAITS: ");
         Serial.println(millis());
-      }
+      //}
   }    
 }
 
-void EnvironmentVariablesService::checkTimeToLoadReservations(){
-  if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations){
+void EnvironmentVariablesService::checkTimeToLoadReservations()
+{
+  if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations)
+  {
        
-       if(!__uploadedToday){
-           __reservations = _httpService.GetReservationsWeek;
+       if(!__uploadedToday)
+       {
+           __reservations = __httpService.GetReservationsWeek();
 
           if(!__uploadedToday)
             __reservations.clear();
@@ -239,15 +267,30 @@ void EnvironmentVariablesService::checkTimeToLoadReservations(){
       __uploadedToday = false; 
 }
 
+void EnvironmentVariablesService::CheckEnvironmentVariables()
+{
+  if (__receivedData) 
+  {
+    if (__message.equals("S") == 0)
+      __hasMovement = true;
+
+    __message = "";
+    __receivedData = false;
+  }
+}
+
 void EnvironmentVariablesService::continuousValidation()
 {
   while(true)
   {
       __currentTime = __ntp.getFormattedTime();
 
+      checkTimeToLoadReservations();
+
       turnOffManagedDevices();
+      
       turnOnConditioner();
 
-      checkTimeToLoadReservations();
+      delay(2000);
   }
 }

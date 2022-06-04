@@ -59,7 +59,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record)
             record.id = doc["result"]["id"].as<int>();
             record.token = doc["result"]["token"].as<char *>();
             record.uuid = doc["result"]["uuid"].as<char *>();
-            record.salaId = doc["result"]["salaId"].as<char *>();
+            record.salaId = doc["result"]["salaId"].as<int>();
 
             return;
         }
@@ -156,12 +156,12 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
     return false;
 }
 
-std::vector<struct Actuator> HTTPService::getHardwares(HardwareRecord hardware)
+std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareRecord hardware)
 {
     Config config;
     HTTP http;
     String route;
-    std::vector<struct Actuator> actuators;
+    std::vector<struct HardwareRecord> actuators;
 
     if (config.getRoute() == 1)
         route = "/hardware/";
@@ -228,13 +228,13 @@ std::vector<struct Actuator> HTTPService::getHardwares(HardwareRecord hardware)
 /*
  * <descricao> Deserealiza objeto json e converte para a struct que armazena as reservas  <descricao/>
  */
-struct Actuator HTTPService::deserializeActuator(JsonVariant sensor) {
+struct HardwareRecord HTTPService::deserializeActuator(JsonVariant sensor) {
    
-   struct Actuator disp;
+   struct HardwareRecord disp;
 
    disp.uuid = sensor["uuid"].as<String>();
    disp.typeHardwareId = sensor["TipoHardwareId"].as<int>();
-
+   disp.typeEquipment = sensor["TipoEquipamento"].as<int>(); 
    return disp;
 }
 
@@ -325,7 +325,7 @@ void HTTPService::getDevices(HardwareRecord hardware, String devices[], int &ind
 {
 }
 
-bool HTTPService::getMaster(HardwareRecord hardware, String &master)
+bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 {
     //hardware/{uuid}/get-master?token=TOKEN
 
@@ -541,11 +541,10 @@ struct Monitoramento HTTPService::getMonitoringByUuid() {
 
         if (doc["httpCode"].as<int>() == 200)
         {
-            JsonArray jsonSensors = doc["result"].as<JsonArray>();
-            monitoramento.id = object["id"].as<int>();
-            monitoramento.luzes = object["luzes"].as<bool>();
-            monitoramento.arCondicionado = object["arCondicionado"].as<bool>();
-            monitoramento.salaId = object["salaId"].as<int>();
+            monitoramento.id = doc["result"]["id"].as<int>();
+            monitoramento.light = doc["result"]["luzes"].as<bool>();
+            monitoramento.conditioner = doc["result"]["arCondicionado"].as<bool>();
+            monitoramento.salaId = doc["result"]["salaId"].as<int>();
         }
         else
         {
@@ -558,13 +557,6 @@ struct Monitoramento HTTPService::getMonitoringByUuid() {
         }
     }
 
-    if (config.isDebug())
-    {
-        Serial.println("==================================");
-        Serial.print("[HTTPService] count reservations: ");
-        Serial.println(reservas.size());
-    }
-    
     return monitoramento;
 }
 
@@ -602,7 +594,7 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
     params.concat("\"luzes\": "            + luzesLiagadas  + ", ");
     params.concat("\"arCondicionado\": "   + arCondicionado + ", ");
     params.concat("\"salaId\": "           + salaId         + ", ");
-    paramS.concat("}");
+    params.concat("}");
 
     routeService.concat(route);
     response = http.request(routeService, type, params);
@@ -651,10 +643,10 @@ String HTTPService::getComandosIrByIdSalaAndOperacao() {
     String routeService;
     String type = "GET";
     String params = "";
-    String uuid = environment.getHardware().getUuid();  
+    String uuid = environment.getHardware().uuid;  
 
     routeService.concat(route);
-    routeService.concat(salaId);
+    routeService.concat(environment.getHardware().salaId);
   
     String response = http.request(routeService, type, params);
 

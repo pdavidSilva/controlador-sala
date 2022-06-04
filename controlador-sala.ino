@@ -18,7 +18,7 @@ void setup() {
 
   // mocks
   hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
-  environment.setHardwareConfig(hardware);
+  environment.setHardware(hardware);
 
   sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
   indexSensors = 1;
@@ -50,8 +50,8 @@ void setup() {
   for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
     
-  for(int i = 0; i < indexDevices; i++)
-    bleConfig->addActuator(devices[i]);
+  //for(int i = 0; i < indexDevices; i++)
+  //  bleConfig->addActuator(devices[i]);
 
   /*bleConfig->initBLE();  
   bleConfig->scanDevices();

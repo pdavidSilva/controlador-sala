@@ -55,7 +55,7 @@ typedef struct Reserva {
 /*
  * Estrutura usada para guardar dados do monitoramento da sala
  */
-typedef struct Monitoramento {
+struct Monitoramento {
   int id;
   bool light;
   bool conditioner;

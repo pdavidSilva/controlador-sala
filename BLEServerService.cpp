@@ -233,10 +233,13 @@ bool BLEServerService::isSensor(String uuid)
   
 bool BLEServerService::isAtuador(String uuid)
 { 
-  if(std::count(__actuators.begin(), __actuators.end(), uuid))
-      return true;
+   for (auto item : __actuators) 
+   {
+        if(item.uuid.equals(uuid))
+          return true;
+   }
   
-  return false;
+   return false;
 }
   
 bool BLEServerService::connectMyDisp(BLEAdvertisedDevice* device) 

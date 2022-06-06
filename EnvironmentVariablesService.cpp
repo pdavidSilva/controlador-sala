@@ -1,22 +1,23 @@
 #include "EnvironmentVariablesService.h"
 
+#include <NTPClient.h>
+#include <WiFiUDP.h>
+
 String __currentTime;
 struct Monitoramento __monitoring;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
 HardwareRecord EnvironmentVariablesService::__hardware; 
 String __startTimeLoadReservations;
 String __endTimeLoadReservations;
-bool __uploadedToday;
+bool EnvironmentVariablesService::__uploadedToday;
 bool EnvironmentVariablesService::__receivedData;
 bool EnvironmentVariablesService::__hasMovement;
 String EnvironmentVariablesService::__message;
 WiFiUDP __udp;
 NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 
-BLEServerService* __bleConfig; 
-
-HTTPService __httpService;
-BLEServerService* __bleConfiguration; 
+BLEServerService* __bleServerConfig;
+HTTPService __httpRequestService;
 
 EnvironmentVariablesService::EnvironmentVariablesService()
 {
@@ -89,27 +90,27 @@ void EnvironmentVariablesService::setMonitoring(struct Monitoramento monitoring)
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
-  __bleConfiguration->setReceivedRequest(true);
-  __bleConfiguration->setEnvironmentSolicitation(true);
+  __bleServerConfig->setReceivedRequest(true);
+  __bleServerConfig->setEnvironmentSolicitation(true);
 
-  bool dispConnected = __bleConfig->connectToActuator(uuid);
+  bool dispConnected = __bleServerConfig->connectToActuator(uuid);
                 
   if(dispConnected)
   {
-      __bleConfiguration->sendMessageToActuator(message);
+      __bleServerConfig->sendMessageToActuator(message);
 
       awaitsReturn();
 
-      __bleConfiguration->disconnectToActuator();
+      __bleServerConfig->disconnectToActuator();
   }
                 
-  __bleConfiguration->setEnvironmentSolicitation(false);
-  __bleConfiguration->setReceivedRequest(false);
+  __bleServerConfig->setEnvironmentSolicitation(false);
+  __bleServerConfig->setReceivedRequest(false);
 } 
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
 {
-  for(struct HardwareRecord r : __bleConfiguration->getActuators())
+  for(struct HardwareRecord r : __bleServerConfig->getActuators())
   {
     if(r.typeEquipment == typeEquipment)
       sendDataToActuator(r.uuid, message);
@@ -176,13 +177,13 @@ void EnvironmentVariablesService::turnOnConditioner(){
 
   Serial.println("LIGANDO CONDICIONADOR");
 
-  String codigos = __httpService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
       
   sendDataToActuator(TYPE_CONDITIONER, codigos);
 
   __monitoring.conditioner = true;
 
-  __httpService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoring);
 }
 
 /*
@@ -192,7 +193,7 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   Serial.println("DESLIGANDO CONDICIONADOR");
 
-  String codigos = __httpService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
 
   sendDataToActuator(TYPE_CONDITIONER, codigos);
     
@@ -200,7 +201,7 @@ void EnvironmentVariablesService::turnOfConditioner(){
   
   //digitalWrite(LED, LOW);
 
-  __httpService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoring);
 }
 
 /*
@@ -216,7 +217,7 @@ void EnvironmentVariablesService::turnOnLight(){
   sendDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
-  __httpService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoring);
 }
 
 /*
@@ -232,7 +233,7 @@ void EnvironmentVariablesService::turnOfLight(){
   sendDataToActuator(TYPE_LIGHT, "false");  
   // ----------------------------------------------------------
 
-  __httpService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoring);
 }
 
 void EnvironmentVariablesService::awaitsReturn()
@@ -257,7 +258,7 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
        
        if(!__uploadedToday)
        {
-           __reservations = __httpService.GetReservationsWeek();
+           __reservations = __httpRequestService.GetReservationsWeek();
 
           if(!__uploadedToday)
             __reservations.clear();

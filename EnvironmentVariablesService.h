@@ -3,7 +3,7 @@
 
 #include "Config.h"
 #include <NTPClient.h>
-#include <WiFi.h>
+#include <WiFiUDP.h>
 
 using namespace std;
 
@@ -23,8 +23,6 @@ class EnvironmentVariablesService
     String __endTimeLoadReservations;
     static bool __uploadedToday;
     static bool __hasMovement;
-    WiFiUDP __udp;
-    NTPClient __ntp;
 
   public: 
     EnvironmentVariablesService();

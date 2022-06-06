@@ -178,8 +178,11 @@ void EnvironmentVariablesService::turnOnConditioner(){
   Serial.println("LIGANDO CONDICIONADOR");
 
   String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
-      
-  sendDataToActuator(TYPE_CONDITIONER, codigos);
+
+  //------------------------------------------------------    
+  String payload = mountPayload("AC", "ON", codigos);
+  sendDataToActuator(TYPE_CONDITIONER, payload);
+  //------------------------------------------------------
 
   __monitoring.conditioner = true;
 
@@ -195,8 +198,11 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
 
+  //------------------------------------------------------    
+  String payload = mountPayload("AC", "OFF", codigos);
   sendDataToActuator(TYPE_CONDITIONER, codigos);
-    
+  //------------------------------------------------------    
+
   __monitoring.conditioner = false;
   
   //digitalWrite(LED, LOW);
@@ -214,6 +220,7 @@ void EnvironmentVariablesService::turnOnLight(){
   __monitoring.light = true;
 
   // ----------------------------------------------------------
+  String payload = mountPayload("LZ", "ON", "null");
   sendDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
@@ -230,7 +237,8 @@ void EnvironmentVariablesService::turnOfLight(){
   __monitoring.light = false;
   
   // ----------------------------------------------------------
-  sendDataToActuator(TYPE_LIGHT, "false");  
+  String payload = mountPayload("LZ", "OFF", "null");
+  sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
   __httpRequestService.putMonitoring(__monitoring);
@@ -294,4 +302,17 @@ void EnvironmentVariablesService::continuousValidation()
 
       delay(2000);
   }
+}
+
+
+String EnvironmentVariablesService::mountPayload(String deviceType, String state, String command)
+{
+    String payload;
+    payload.concat("{");
+    payload.concat("\"device_type\":" + deviceType + ", ");
+    payload.concat("\"state\":\"" + state + "\", ");
+    payload.concat("\"command\":\"" + command + "\", ");
+    payload.concat("}");
+
+    return payload;
 }

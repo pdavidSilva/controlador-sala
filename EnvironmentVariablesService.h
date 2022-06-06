@@ -62,6 +62,8 @@ class EnvironmentVariablesService
     void checkTimeToLoadReservations();
     void CheckEnvironmentVariables();
 
+    String mountPayload(String deviceType, String state, String command);
+
     void awaitsReturn();
 };
 

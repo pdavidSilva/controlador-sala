@@ -469,7 +469,7 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
     if (config.getRoute() == 1)
         route = "";
     else
-        route = "/obter-por-sala-tipo-equipamento/";
+        route = "/Monitoramento/obter-por-sala-tipo-equipamento/";
 
     String routeService;
     String type = "GET";

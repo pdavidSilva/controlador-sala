@@ -14,7 +14,8 @@ class EnvironmentVariablesService
 {
   private: 
     String __currentTime;
-    struct Monitoramento __monitoring;
+    struct Monitoramento __monitoringConditioner;
+    struct Monitoramento __monitoringLight;
     static vector<struct Reserva> __reservations; 
     static struct HardwareRecord __hardware; 
     static bool __receivedData;
@@ -30,8 +31,11 @@ class EnvironmentVariablesService
     String getCurrentTime();
     String setCurrentTime(String currentTime);
 
-    struct Monitoramento getMonitoring();
-    void setMonitoring(struct Monitoramento monitoramento);
+    struct Monitoramento getMonitoringLight();
+    void setMonitoringLight(struct Monitoramento monitoramento);
+
+    struct Monitoramento getMonitoringConditioner();
+    void setMonitoringConditioner(struct Monitoramento monitoramento);
 
     String getNtpFormatedTime();
 

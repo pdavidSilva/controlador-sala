@@ -57,9 +57,8 @@ typedef struct Reserva {
  */
 struct Monitoramento {
   int id;
-  bool light;
-  bool conditioner;
-  int salaId;
+  bool estado;
+  int equipamentoId;
 };
 
 #endif

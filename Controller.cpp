@@ -69,7 +69,7 @@ void Controller::configureClient()
 
 void Controller::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor)
 {
-    __http.getSensors(hardware, sensors, indexSensor);
+    //__http.getSensors(hardware, sensors, indexSensor);
     return;
 }
 

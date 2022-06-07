@@ -115,45 +115,6 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
     response = http.request(routeService, type, params);
 
     return true;
-
-    // if (strstr(response.c_str(), "[ERROR]") == NULL){
-    //     DynamicJsonDocument doc(1024);
-    //     DeserializationError error = deserializeJson(doc, response);
-
-    //     if (error) {
-    //         if (config.isDebug())
-    //         {
-    //             Serial.println("==================================");
-    //             Serial.println("[HTTPService] Falha no parse JSON.......");
-    //             Serial.println(error.f_str());
-    //         }
-    //         delay(5000);
-
-    //         return false;
-    //     }
-
-    //     if(doc["httpCode"].as<int>() == 200){
-
-    //         record.id = doc["result"]["id"].as<int>();
-    //         record.token = doc["result"]["token"].as<char*>();
-    //         record.uuid = doc["result"]["uuid"].as<char*>();
-
-    //         return false;
-    //     }else{
-    //         if (config.isDebug())
-    //         {
-    //             Serial.println("==================================");
-    //             Serial.print("[HTTPService] Mensagem: ");
-    //             Serial.println(doc["message"].as<char*>());
-    //         }
-    //         return false;
-    //     }
-
-    // }else{
-    //     return false;
-    // }
-
-    return false;
 }
 
 std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareRecord hardware)
@@ -177,8 +138,8 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
     String token = hardware.token;
 
     routeService.concat(route);
-    routeService.concat(uuid);
-    routeService.concat("/get-sensors");
+    routeService.concat(hardware.salaId);
+    routeService.concat("/get-sensors-and-actuators");
     routeService.concat("?token=");
     routeService.concat(token);
 
@@ -238,7 +199,7 @@ struct HardwareRecord HTTPService::deserializeActuator(JsonVariant sensor) {
    return disp;
 }
 
-void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
+/*void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
 {
 
     //hardware/{uuid}/get-sensors?token=TOKEN
@@ -320,10 +281,7 @@ void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &ind
 
     return;
 }
-
-void HTTPService::getDevices(HardwareRecord hardware, String devices[], int &indexDevices)
-{
-}
+*/
 
 bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 {
@@ -500,7 +458,7 @@ struct Reserva HTTPService::deserializeReserve(JsonVariant reserve) {
  * <descricao> Obtem o estado atual do monitoramento da sala  <descricao/>
  * <retorno> Struct Monitoramento com os dados do monitoramento de acordo com o banco <retorno/>
  */
-struct Monitoramento HTTPService::getMonitoringByUuid() {
+struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tipoEquipamento) {
 
     HTTP http;
     String route;
@@ -511,15 +469,16 @@ struct Monitoramento HTTPService::getMonitoringByUuid() {
     if (config.getRoute() == 1)
         route = "";
     else
-        route = "/Monitoramento/ObterMonitoramentoPorUuid/";
+        route = "/obter-por-sala-tipo-equipamento/";
 
     String routeService;
     String type = "GET";
     String params = "";
-    String uuid = environment.getHardware().uuid;
 
     routeService.concat(route);
-    routeService.concat(uuid);
+    routeService.concat(environment.getHardware().salaId);
+    routeService.concat("/");
+    routeService.concat(tipoEquipamento);
 
     String response = http.request(routeService, type, params);
 
@@ -542,9 +501,8 @@ struct Monitoramento HTTPService::getMonitoringByUuid() {
         if (doc["httpCode"].as<int>() == 200)
         {
             monitoramento.id = doc["result"]["id"].as<int>();
-            monitoramento.light = doc["result"]["luzes"].as<bool>();
-            monitoramento.conditioner = doc["result"]["arCondicionado"].as<bool>();
-            monitoramento.salaId = doc["result"]["salaId"].as<int>();
+            monitoramento.estado = doc["result"]["estado"].as<bool>();
+            monitoramento.equipamentoId = doc["result"]["equipamentoId"].as<bool>();
         }
         else
         {
@@ -584,16 +542,14 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
     String params = "";
     String response;
 
-    String id               = String(environment.getMonitoring().id);
-    String luzesLiagadas    = String(monitoring.light ? "true" : "false");
-    String arCondicionado   = String(monitoring.conditioner ? "true" : "false");
-    String salaId           = String(environment.getMonitoring().salaId);
+    String id               = String(monitoring.id);
+    String estado           = String(monitoring.estado ? "true" : "false");
+    String equipamento      = String(monitoring.equipamentoId);
 
     params.concat("{ ");
-    params.concat("\"id\": "               + id             + ", ");
-    params.concat("\"luzes\": "            + luzesLiagadas  + ", ");
-    params.concat("\"arCondicionado\": "   + arCondicionado + ", ");
-    params.concat("\"salaId\": "           + salaId         + ", ");
+    params.concat("\"id\": "              + id      + ", ");
+    params.concat("\"estado\": "          + estado  + ", ");
+    params.concat("\"equipamentoId\": "   + equipamento + ", ");
     params.concat("}");
 
     routeService.concat(route);

@@ -4,7 +4,8 @@
 #include <WiFiUDP.h>
 
 String __currentTime;
-struct Monitoramento __monitoring;
+struct Monitoramento __monitoringConditioner;
+struct Monitoramento __monitoringLight;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
 HardwareRecord EnvironmentVariablesService::__hardware; 
 String __startTimeLoadReservations;
@@ -26,6 +27,8 @@ EnvironmentVariablesService::EnvironmentVariablesService()
     __uploadedToday = false;
     __ntp.begin();
     __ntp.forceUpdate();
+    __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
+    __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
 }
 
 String EnvironmentVariablesService::getMessage() 
@@ -78,14 +81,24 @@ String EnvironmentVariablesService::setCurrentTime(String currentTime)
   __currentTime = currentTime;
 }
 
-struct Monitoramento EnvironmentVariablesService::getMonitoring()
+struct Monitoramento EnvironmentVariablesService::getMonitoringLight()
 {
-  return __monitoring;
+  return __monitoringLight;
 }
 
-void EnvironmentVariablesService::setMonitoring(struct Monitoramento monitoring)
+void EnvironmentVariablesService::setMonitoringLight(struct Monitoramento monitoring)
 {
-  __monitoring = monitoring;
+  __monitoringLight = monitoring;
+}
+
+struct Monitoramento EnvironmentVariablesService::getMonitoringConditioner()
+{
+  return __monitoringConditioner;
+}
+
+void EnvironmentVariablesService::setMonitoringConditioner(struct Monitoramento monitoring)
+{
+  __monitoringConditioner = monitoring;
 }
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
@@ -132,10 +145,10 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
     
     if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim && __hasMovement) {
 
-      if (!__monitoring.conditioner)
+      if (!__monitoringConditioner.estado)
         turnOnConditioner();
 
-      if (!__monitoring.light)
+      if (!__monitoringLight.estado)
         turnOnLight();
     }
   }
@@ -162,10 +175,10 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
   }
 
   if (notInClass) {
-    if (__monitoring.conditioner) 
+    if (__monitoringConditioner.estado) 
       turnOfConditioner();
 
-    if (__monitoring.light)
+    if (__monitoringLight.estado)
       turnOfLight();
   }
 }
@@ -184,9 +197,9 @@ void EnvironmentVariablesService::turnOnConditioner(){
   sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------
 
-  __monitoring.conditioner = true;
+  __monitoringConditioner.estado = true;
 
-  __httpRequestService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -203,11 +216,11 @@ void EnvironmentVariablesService::turnOfConditioner(){
   sendDataToActuator(TYPE_CONDITIONER, codigos);
   //------------------------------------------------------    
 
-  __monitoring.conditioner = false;
+  __monitoringConditioner.estado = false;
   
   //digitalWrite(LED, LOW);
 
-  __httpRequestService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -217,14 +230,14 @@ void EnvironmentVariablesService::turnOnLight(){
 
   Serial.println("LIGANDO LUZES");
 
-  __monitoring.light = true;
+  __monitoringLight.estado = true;
 
   // ----------------------------------------------------------
   String payload = mountPayload("LZ", "ON", "null");
   sendDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
-  __httpRequestService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 /*
@@ -234,14 +247,14 @@ void EnvironmentVariablesService::turnOfLight(){
 
   Serial.println("DESLIGANDO LUZES");
 
-  __monitoring.light = false;
+  __monitoringLight.estado = false;
   
   // ----------------------------------------------------------
   String payload = mountPayload("LZ", "OFF", "null");
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
-  __httpRequestService.putMonitoring(__monitoring);
+  __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 void EnvironmentVariablesService::awaitsReturn()
@@ -303,7 +316,6 @@ void EnvironmentVariablesService::continuousValidation()
       delay(2000);
   }
 }
-
 
 String EnvironmentVariablesService::mountPayload(String deviceType, String state, String command)
 {

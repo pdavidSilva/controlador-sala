@@ -9,16 +9,15 @@ class HTTPService
         HTTPService();
         void getInfoHardware(struct HardwareRecord&);
         bool registerHardware(struct HardwareRecord);
-        void getSensors(struct HardwareRecord, String [], int &);
-        void getDevices(struct HardwareRecord, String [], int &);
-        std::vector<struct HardwareRecord> getSensors(struct HardwareRecord hardware);
+        //void getSensors(struct HardwareRecord, String [], int &);
+        //std::vector<struct HardwareRecord> getSensors(struct HardwareRecord hardware);
         std::vector<struct HardwareRecord> getHardwares(struct HardwareRecord hardware);
         struct HardwareRecord deserializeActuator(JsonVariant sensor);
         bool getMaster(struct HardwareRecord, String &);
         bool putMonitoring(struct Monitoramento monitoring);
         std::vector<Reserva> GetReservationsWeek();
         struct Reserva deserializeReserve(JsonVariant reserve);
-        struct Monitoramento getMonitoringByUuid();
+        struct Monitoramento getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
         String getComandosIrByIdSalaAndOperacao();
 };
 

@@ -24,12 +24,16 @@ class Controller
         //send Data Monitoring
         void sendDataOfMonitoring(struct MonitoringRecord);
 
-         // WEB SOCKET
+        // WEB SOCKET
         void initServerSocket();    
         void startTaskWebSocket(); 
 
         HardwareRecord getHardwareConfig();
         void setHardwareConfig(HardwareRecord hardware);
+
+        // Validacao continua de variaveis de ambiente
+        void environmentVariablesContinuousValidation();
+        void initEnvironmentVariables(); 
 };
 
 #endif

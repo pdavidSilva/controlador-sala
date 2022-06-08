@@ -16,6 +16,7 @@
 #include "DHT.h"
 #include "BLEServerService.h"
 #include "ClientSocketService.h"
+#include "EnvironmentVariablesService.h"
 
 class Config 
 {
@@ -29,9 +30,7 @@ class Config
         bool   __debug;
         int    __type;
         int    __route;
-        static std::vector<struct Reserva> __reservations; 
-        static HardwareRecord __hardware; 
-
+        
     public : 
         
         Config();
@@ -45,11 +44,6 @@ class Config
         int    getLedStatus();
         bool   isDebug();
         int    getRoute();
-        std::vector<struct Reserva> getReservations();
-        void   setReservations(std::vector<struct Reserva> reservations);
-        HardwareRecord getHardware();
-        void setHardware(HardwareRecord hardware);
-
 };
 
 #endif

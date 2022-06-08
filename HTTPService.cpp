@@ -59,6 +59,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record)
             record.id = doc["result"]["id"].as<int>();
             record.token = doc["result"]["token"].as<char *>();
             record.uuid = doc["result"]["uuid"].as<char *>();
+            record.salaId = doc["result"]["salaId"].as<int>();
 
             return;
         }
@@ -114,48 +115,91 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
     response = http.request(routeService, type, params);
 
     return true;
-
-    // if (strstr(response.c_str(), "[ERROR]") == NULL){
-    //     DynamicJsonDocument doc(1024);
-    //     DeserializationError error = deserializeJson(doc, response);
-
-    //     if (error) {
-    //         if (config.isDebug())
-    //         {
-    //             Serial.println("==================================");
-    //             Serial.println("[HTTPService] Falha no parse JSON.......");
-    //             Serial.println(error.f_str());
-    //         }
-    //         delay(5000);
-
-    //         return false;
-    //     }
-
-    //     if(doc["httpCode"].as<int>() == 200){
-
-    //         record.id = doc["result"]["id"].as<int>();
-    //         record.token = doc["result"]["token"].as<char*>();
-    //         record.uuid = doc["result"]["uuid"].as<char*>();
-
-    //         return false;
-    //     }else{
-    //         if (config.isDebug())
-    //         {
-    //             Serial.println("==================================");
-    //             Serial.print("[HTTPService] Mensagem: ");
-    //             Serial.println(doc["message"].as<char*>());
-    //         }
-    //         return false;
-    //     }
-
-    // }else{
-    //     return false;
-    // }
-
-    return false;
 }
 
-void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
+std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareRecord hardware)
+{
+    Config config;
+    HTTP http;
+    String route;
+    std::vector<struct HardwareRecord> actuators;
+
+    if (config.getRoute() == 1)
+        route = "/hardware/";
+    else
+        route = "/hardwaredesala/";
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String response;
+
+    String uuid = String(hardware.uuid);
+    String token = hardware.token;
+
+    routeService.concat(route);
+    routeService.concat(hardware.salaId);
+    routeService.concat("/get-sensors-and-actuators");
+    routeService.concat("?token=");
+    routeService.concat(token);
+
+    response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+
+            return actuators;
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+
+            JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
+
+            for (JsonVariant sensor : jsonSensors)
+                actuators.push_back(deserializeActuator(sensor));
+
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    return actuators;
+}
+
+/*
+ * <descricao> Deserealiza objeto json e converte para a struct que armazena as reservas  <descricao/>
+ */
+struct HardwareRecord HTTPService::deserializeActuator(JsonVariant sensor) {
+   
+   struct HardwareRecord disp;
+
+   disp.uuid = sensor["uuid"].as<String>();
+   disp.typeHardwareId = sensor["TipoHardwareId"].as<int>();
+   disp.typeEquipment = sensor["TipoEquipamento"].as<int>(); 
+   return disp;
+}
+
+/*void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
 {
 
     //hardware/{uuid}/get-sensors?token=TOKEN
@@ -237,12 +281,9 @@ void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &ind
 
     return;
 }
+*/
 
-void HTTPService::getDevices(HardwareRecord hardware, String devices[], int &indexDevices)
-{
-}
-
-bool HTTPService::getMaster(HardwareRecord hardware, String &master)
+bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 {
     //hardware/{uuid}/get-master?token=TOKEN
 
@@ -314,11 +355,12 @@ bool HTTPService::getMaster(HardwareRecord hardware, String &master)
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-std::vector< struct Reserva> HTTPService::GetReservationsWeek() {
+std::vector<struct Reserva> HTTPService::GetReservationsWeek() {
     
     HTTP http;
     String route;
     Config config;
+    EnvironmentVariablesService environment;
     std::vector<struct Reserva> reservas;
         
     if (config.getRoute() == 1)
@@ -329,7 +371,7 @@ std::vector< struct Reserva> HTTPService::GetReservationsWeek() {
     String routeService;
     String type = "GET";
     String params = "";
-    String uuid = config.getHardware().uuid;
+    String uuid = environment.getHardware().uuid;
 
     routeService.concat(route);
     routeService.concat(uuid);
@@ -410,4 +452,195 @@ struct Reserva HTTPService::deserializeReserve(JsonVariant reserve) {
    //}
 
    return res;
+}
+
+/*
+ * <descricao> Obtem o estado atual do monitoramento da sala  <descricao/>
+ * <retorno> Struct Monitoramento com os dados do monitoramento de acordo com o banco <retorno/>
+ */
+struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tipoEquipamento) {
+
+    HTTP http;
+    String route;
+    Config config;
+    struct Monitoramento monitoramento;
+    EnvironmentVariablesService environment;
+        
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/Monitoramento/obter-por-sala-tipo-equipamento/";
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+
+    routeService.concat(route);
+    routeService.concat(environment.getHardware().salaId);
+    routeService.concat("/");
+    routeService.concat(tipoEquipamento);
+
+    String response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+            monitoramento.id = doc["result"]["id"].as<int>();
+            monitoramento.estado = doc["result"]["estado"].as<bool>();
+            monitoramento.equipamentoId = doc["result"]["equipamentoId"].as<bool>();
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    return monitoramento;
+}
+
+
+/*
+ * <descricao> Atualiza a tabela Monitoramento do banco de dados com as atualizacoes feitas nos equipamentos pelo ESP  <descricao/>
+ * <parametros> luzes: indica o ultimo estado das luzes (ligado/desligado) <parametros/>
+ * <parametros> condicionador: indica o ultimo estado do ar condicionado (ligado/desligado) <parametros/>
+ * <retorno> string com nome do dispotivo recebido na requisicao ou os codigos IR <retorno/>
+ */
+bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
+
+    Config config;
+    HTTP http;
+    String route;
+    EnvironmentVariablesService environment;
+
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/monitoramento";
+
+    String routeService;
+    String type = "PUT";
+    String params = "";
+    String response;
+
+    String id               = String(monitoring.id);
+    String estado           = String(monitoring.estado ? "true" : "false");
+    String equipamento      = String(monitoring.equipamentoId);
+
+    params.concat("{ ");
+    params.concat("\"id\": "              + id      + ", ");
+    params.concat("\"estado\": "          + estado  + ", ");
+    params.concat("\"equipamentoId\": "   + equipamento + ", ");
+    params.concat("}");
+
+    routeService.concat(route);
+    response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+                if (config.isDebug())
+                {
+                    Serial.println("==================================");
+                    Serial.println("[HTTPService] Falha no parse JSON.......");
+                    Serial.println(error.f_str());
+                }
+                delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+            return true;
+    }
+
+    return false;
+}
+
+/*
+ * <descricao> Obtem do servidor os codigos IR para ligar/desligar o arcondicionado <descricao/>
+ * <parametros> operacao: operacao que deve ser consultados os codigos IR (ligar/desligar) <parametros/>
+ * <retorno> lista de inteiros com os codigos IR solicitados <retorno/>
+ */
+String HTTPService::getComandosIrByIdSalaAndOperacao() {
+
+    Config config;
+    HTTP http;
+    String route;
+    String codigo = "";
+    EnvironmentVariablesService environment;
+
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/infravermelho/CodigosPorUuid/";
+
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String uuid = environment.getHardware().uuid;  
+
+    routeService.concat(route);
+    routeService.concat(environment.getHardware().salaId);
+  
+    String response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+            JsonArray jsonSensors = doc["result"].as<JsonArray>();
+
+            for (JsonVariant object : jsonSensors)
+            {
+                codigo = object["codigo"].as<String>();
+            }
+        }
+        else
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    return codigo;
 }

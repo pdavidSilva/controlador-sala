@@ -6,6 +6,7 @@ Controller::Controller(){}
 HTTPService __http;
 ClientSocketService __clientSocketService;
 BLEServerService* __bleConfig; 
+EnvironmentVariablesService __environmentService;
 Config __config; 
 
 bool Controller::start(HardwareRecord &record) const 
@@ -68,7 +69,7 @@ void Controller::configureClient()
 
 void Controller::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor)
 {
-    __http.getSensors(hardware, sensors, indexSensor);
+    //__http.getSensors(hardware, sensors, indexSensor);
     return;
 }
 
@@ -104,10 +105,20 @@ void Controller::startTaskWebSocket()
 
 HardwareRecord Controller::getHardwareConfig()
 {
-    return __config.getHardware();
+    return __environmentService.getHardware();
 }
 
 void Controller::setHardwareConfig(HardwareRecord hardware)
 {
-    __config.setHardware(hardware);
+    __environmentService.setHardware(hardware);
+}
+
+void Controller::environmentVariablesContinuousValidation()
+{
+    __environmentService.continuousValidation();
+}
+
+void Controller::initEnvironmentVariables()
+{
+    __environmentService.initEnvironmentVariables();
 }

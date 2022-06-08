@@ -25,6 +25,10 @@ EnvironmentVariablesService::EnvironmentVariablesService()
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
     __uploadedToday = false;
+}
+
+void EnvironmentVariablesService::initEnvironmentVariables() 
+{
     __ntp.begin();
     __ntp.forceUpdate();
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");

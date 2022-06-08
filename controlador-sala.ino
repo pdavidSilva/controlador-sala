@@ -66,7 +66,6 @@ void setup() {
 }
 
 void loop() {
-    
-    controller.environmentVariablesContinuousValidation();
-    
+  controller.initEnvironmentVariables();
+  controller.environmentVariablesContinuousValidation(); 
 }

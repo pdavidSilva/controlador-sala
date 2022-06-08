@@ -69,6 +69,8 @@ class EnvironmentVariablesService
     String mountPayload(String deviceType, String state, String command);
 
     void awaitsReturn();
+
+    void initEnvironmentVariables(); 
 };
 
 #endif

@@ -16,16 +16,6 @@ void setup() {
 	Serial.begin(115200);
 	bool init = false;
 
-  // mocks
-  hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
-  environment.setHardware(hardware);
-
-  sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-  indexSensors = 1;
-   
-  devices[0] = "36938872-c3ca-11ec-9d64-0242ac120002";
-  indexDevices = 1;
-
   wiFiService.connect();
 
 	 /*do {
@@ -46,19 +36,24 @@ void setup() {
 			}
 		}
 	} while( !init );*/ 
+
+  // mocks
+  hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+  environment.setHardware(hardware);
+
+  sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+  indexSensors = 1;
   
   for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
-    
-  //for(int i = 0; i < indexDevices; i++)
-  //  bleConfig->addActuator(devices[i]);
 
-  /*bleConfig->initBLE();  
-  bleConfig->scanDevices();
-  bleConfig->populateMap();
+  HardwareRecord hardware;
+  hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+  hardware.salaId = 1;
+  hardware.typeHardwareId = 1;
+  hardware.typeEquipment = 0;  
   
-  delay(2000);
-  bleConfig->startTask();*/
+  bleConfig->addActuator(hardware);
 
   controller.configureServer();
   controller.initBleTaskServer();	
@@ -71,10 +66,7 @@ void setup() {
 }
 
 void loop() {
-
-	//sensors()
-	//dispositivo()
-	
-  //Mestre -> Sensor de Presenca ()
-  //Sensor de Presenca () -> Mestre
+    
+    controller.environmentVariablesContinuousValidation();
+    
 }

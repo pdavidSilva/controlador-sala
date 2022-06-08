@@ -112,3 +112,8 @@ void Controller::setHardwareConfig(HardwareRecord hardware)
 {
     __environmentService.setHardware(hardware);
 }
+
+void Controller::environmentVariablesContinuousValidation()
+{
+    __environmentService.continuousValidation();
+}

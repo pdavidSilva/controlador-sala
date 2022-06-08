@@ -29,6 +29,7 @@ EnvironmentVariablesService::EnvironmentVariablesService()
     __ntp.forceUpdate();
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
+    __reservations = __httpRequestService.GetReservationsWeek();
 }
 
 String EnvironmentVariablesService::getMessage() 
@@ -274,6 +275,8 @@ void EnvironmentVariablesService::awaitsReturn()
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()
 {
+  __currentTime = __ntp.getFormattedTime();
+
   if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations)
   {
        
@@ -304,10 +307,10 @@ void EnvironmentVariablesService::CheckEnvironmentVariables()
 void EnvironmentVariablesService::continuousValidation()
 {
   while(true)
-  {
-      __currentTime = __ntp.getFormattedTime();
-
+  {      
       checkTimeToLoadReservations();
+
+      CheckEnvironmentVariables();
 
       turnOffManagedDevices();
       

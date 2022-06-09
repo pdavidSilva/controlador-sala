@@ -63,8 +63,15 @@ String HTTP::request(String resource, String type, String params) const{
         }
 
         if (httpCode > 0) { 
-            response = http.getString();
-        }else{
+            if(httpCode == 204){
+              response = "[NO_CONTENT]: ";
+              response.concat(httpCode);
+            }
+            else {
+              response = http.getString();
+            }
+        }
+        else{
             response = "[ERROR]";
             response.concat(httpCode);
         }

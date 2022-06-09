@@ -35,7 +35,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record)
 
     response = http.request(routeService, type, params);
 
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
@@ -145,7 +145,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
 
     response = http.request(routeService, type, params);
 
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
@@ -312,7 +312,7 @@ bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 
     response = http.request(routeService, type, params);
 
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
@@ -377,8 +377,8 @@ std::vector<struct Reserva> HTTPService::GetReservationsWeek() {
     routeService.concat(uuid);
 
     String response = http.request(routeService, type, params);
-
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
@@ -433,14 +433,14 @@ struct Reserva HTTPService::deserializeReserve(JsonVariant reserve) {
    struct Reserva res;
 
    res.id = reserve["id"].as<int>();
-   res.usuarioId = reserve["usuarioId"].as<int>();
-   res.salaId = reserve["salaId"].as<int>();
+   res.usuarioId = reserve["id-usuario"].as<int>();
+   res.salaId = reserve["id-sala"].as<int>();
    res.planejamento = reserve["planejamento"].as<int>();
    res.date = reserve["data"].as<String>();
-   res.horarioInicio = reserve["horarioInicio"].as<String>();
-   res.horarioFim = reserve["horarioFim"].as<String>();
-   res.situacao = reserve["situacao"].as<String>();
-   res.objetivo = reserve["objetivo"].as<String>();  
+   res.horarioInicio = reserve["horario-inicial"].as<String>();
+   res.horarioFim = reserve["horario-final"].as<String>();
+   res.situacao = reserve["status"].as<String>();
+   res.objetivo = reserve["objective"].as<String>();  
 
    //if (config.isDebug())
    //{
@@ -481,12 +481,12 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
     routeService.concat(tipoEquipamento);
 
     String response = http.request(routeService, type, params);
-
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
+                
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
-
+        
         if (error)
         {
             if (config.isDebug())
@@ -506,6 +506,8 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
         }
         else
         {
+            Serial.println(doc["httpCode"].as<int>());
+
             if (config.isDebug())
             {
                 Serial.println("==================================");
@@ -555,7 +557,7 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
     routeService.concat(route);
     response = http.request(routeService, type, params);
 
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
@@ -606,7 +608,7 @@ String HTTPService::getComandosIrByIdSalaAndOperacao() {
   
     String response = http.request(routeService, type, params);
 
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);

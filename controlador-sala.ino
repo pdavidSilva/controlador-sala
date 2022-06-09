@@ -39,6 +39,7 @@ void setup() {
 
   // mocks
   hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+  hardware.salaId = 1;
   environment.setHardware(hardware);
 
   sensors[0] = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
@@ -47,25 +48,25 @@ void setup() {
   for(int i = 0; i < indexSensors; i++)
     bleConfig->addSensor(sensors[i]);
 
-  HardwareRecord hardware;
-  hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
-  hardware.salaId = 1;
-  hardware.typeHardwareId = 1;
-  hardware.typeEquipment = 0;  
+  HardwareRecord atuador;
+  atuador.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+  atuador.salaId = 1;
+  atuador.typeHardwareId = 1;
+  atuador.typeEquipment = 0;  
   
-  bleConfig->addActuator(hardware);
+  bleConfig->addActuator(atuador);
 
-  controller.configureServer();
+  /*controller.configureServer();
   controller.initBleTaskServer();	
 
   //controller.startMonitoring(); 
 
   controller.initServerSocket();    
-  controller.startTaskWebSocket(); 
+  controller.startTaskWebSocket(); */
 
 }
 
 void loop() {
   controller.initEnvironmentVariables();
-  controller.environmentVariablesContinuousValidation(); 
+  //controller.environmentVariablesContinuousValidation(); 
 }

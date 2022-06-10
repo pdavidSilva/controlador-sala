@@ -9,6 +9,7 @@ using namespace std;
 
 #define TYPE_LIGHT  0
 #define TYPE_CONDITIONER  1 
+#define CHECK_TIME_TO_LOAD  60 
 
 class EnvironmentVariablesService 
 {
@@ -49,6 +50,8 @@ class EnvironmentVariablesService
 
     bool getReceivedData();
     void setReceivedData(bool receivedData);
+    
+    String getUuidActuator(int typeEquipment);
 
     void turnOnManagedDevices();
     void turnOffManagedDevices();
@@ -64,7 +67,7 @@ class EnvironmentVariablesService
 
     void continuousValidation();
     void checkTimeToLoadReservations();
-    void CheckEnvironmentVariables();
+    void checkEnvironmentVariables();
 
     String mountPayload(String deviceType, String state, String command);
 

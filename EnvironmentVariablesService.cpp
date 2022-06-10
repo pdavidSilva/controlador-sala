@@ -19,12 +19,14 @@ NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 
 BLEServerService* __bleServerConfig;
 HTTPService __httpRequestService;
+WiFiService __wifiService;
 
 EnvironmentVariablesService::EnvironmentVariablesService()
 {
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
     __uploadedToday = false;
+    __hasMovement = false;
 }
 
 void EnvironmentVariablesService::initEnvironmentVariables() 
@@ -108,6 +110,13 @@ void EnvironmentVariablesService::setMonitoringConditioner(struct Monitoramento 
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
+  Serial.println("==================================");
+  Serial.println("[ENVIRONMENT_VARIABLES]: CONECTANDO AO ATUADOR");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(uuid);
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(message);
+  
   __bleServerConfig->setReceivedRequest(true);
   __bleServerConfig->setEnvironmentSolicitation(true);
 
@@ -135,6 +144,18 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String m
   }
 }
 
+String EnvironmentVariablesService::getUuidActuator(int typeEquipment)
+{
+  String uuid = "";
+  for(struct HardwareRecord r : __bleServerConfig->getActuators())
+  {
+    if(r.typeEquipment == typeEquipment)
+      uuid = r.uuid;
+  }
+
+  return uuid;
+}
+
 /*
  * <descricao> Verifica se é para ligar os dispostivos (luzes e ar) de acordo com as 
  * infomacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
@@ -157,6 +178,8 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
         turnOnLight();
     }
   }
+
+  __hasMovement = false;
 }
 
 /*
@@ -193,9 +216,12 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
  */
 void EnvironmentVariablesService::turnOnConditioner(){
 
-  Serial.println("LIGANDO CONDICIONADOR");
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringConditioner.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO CONDICIONADOR");
 
-  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
   //------------------------------------------------------    
   String payload = mountPayload("AC", "ON", codigos);
@@ -211,10 +237,13 @@ void EnvironmentVariablesService::turnOnConditioner(){
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
 void EnvironmentVariablesService::turnOfConditioner(){
+  
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringConditioner.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO CONDICIONADOR");
 
-  Serial.println("DESLIGANDO CONDICIONADOR");
-
-  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
   //------------------------------------------------------    
   String payload = mountPayload("AC", "OFF", codigos);
@@ -233,7 +262,10 @@ void EnvironmentVariablesService::turnOfConditioner(){
  */
 void EnvironmentVariablesService::turnOnLight(){
 
-  Serial.println("LIGANDO LUZES");
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringLight.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO LUZES");
 
   __monitoringLight.estado = true;
 
@@ -250,7 +282,10 @@ void EnvironmentVariablesService::turnOnLight(){
  */
 void EnvironmentVariablesService::turnOfLight(){
 
-  Serial.println("DESLIGANDO LUZES");
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringLight.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO LUZES");
 
   __monitoringLight.estado = false;
   
@@ -271,7 +306,7 @@ void EnvironmentVariablesService::awaitsReturn()
       delay(1000);
       //if (configuration.isDebug())
       //{    
-        Serial.print("[ClientSocketService] TIME AWAITS: ");
+        Serial.print("[ENVIRONMENT_VARIABLES]: TIME AWAITS: ");
         Serial.println(millis());
       //}
   }    
@@ -279,7 +314,11 @@ void EnvironmentVariablesService::awaitsReturn()
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()
 {
+  __wifiService.connect();
+    
   __currentTime = __ntp.getFormattedTime();
+
+  __wifiService.disconnect();
 
   if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations)
   {
@@ -296,7 +335,7 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
       __uploadedToday = false; 
 }
 
-void EnvironmentVariablesService::CheckEnvironmentVariables()
+void EnvironmentVariablesService::checkEnvironmentVariables()
 {
   if (__receivedData) 
   {
@@ -304,23 +343,42 @@ void EnvironmentVariablesService::CheckEnvironmentVariables()
       __hasMovement = true;
 
     __message = "";
-    __receivedData = false;
+    __receivedData = false; //__receivedData = false;
   }
 }
 
 void EnvironmentVariablesService::continuousValidation()
 {
-  while(true)
-  {      
-      checkTimeToLoadReservations();
+  Config config;
+  int checkTimeToLoad = 0;
+  checkTimeToLoadReservations();
 
-      CheckEnvironmentVariables();
+  while(true)
+  {    
+      if(config.isDebug())
+      {
+        Serial.println("==================================");
+        Serial.print("[ENVIRONMENT_VARIABLES]: ");
+        Serial.println(__currentTime);
+      }
+      
+      checkEnvironmentVariables();
 
       turnOffManagedDevices();
       
+      turnOnManagedDevices();
+
       turnOnConditioner();
 
-      delay(2000);
+      if(checkTimeToLoad == CHECK_TIME_TO_LOAD)
+      {
+        checkTimeToLoadReservations();
+        checkTimeToLoad = 0;
+      }
+      
+      checkTimeToLoad++;
+
+      delay(1000);
   }
 }
 

@@ -49,10 +49,10 @@ void setup() {
     bleConfig->addSensor(sensors[i]);
 
   HardwareRecord atuador;
-  atuador.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+  atuador.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
   atuador.salaId = 1;
   atuador.typeHardwareId = 1;
-  atuador.typeEquipment = 0;  
+  atuador.typeEquipment = 1;  
   
   bleConfig->addActuator(atuador);
 
@@ -63,10 +63,9 @@ void setup() {
 
   controller.initServerSocket();    
   controller.startTaskWebSocket(); */
-
 }
 
 void loop() {
   controller.initEnvironmentVariables();
-  //controller.environmentVariablesContinuousValidation(); 
+  controller.environmentVariablesContinuousValidation(); 
 }

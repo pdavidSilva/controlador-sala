@@ -18,7 +18,7 @@ class HTTPService
         std::vector<Reserva> GetReservationsWeek();
         struct Reserva deserializeReserve(JsonVariant reserve);
         struct Monitoramento getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
-        String getComandosIrByIdSalaAndOperacao();
+        String getComandosIrByIdSalaAndOperacao(String uuid);
 };
 
 #endif

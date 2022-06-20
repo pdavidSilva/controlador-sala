@@ -35,6 +35,7 @@ typedef struct MonitoringRequest
   String type;
   String code;
   String uuid;
+  String acting;
 };
 
 /*

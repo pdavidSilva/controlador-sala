@@ -12,7 +12,7 @@ class HTTPService
         //void getSensors(struct HardwareRecord, String [], int &);
         //std::vector<struct HardwareRecord> getSensors(struct HardwareRecord hardware);
         std::vector<struct HardwareRecord> getHardwares(struct HardwareRecord hardware);
-        struct HardwareRecord deserializeActuator(JsonVariant sensor);
+        struct HardwareRecord deserializeDevice(JsonVariant sensor);
         bool getMaster(struct HardwareRecord, String &);
         bool putMonitoring(struct Monitoramento monitoring);
         std::vector<Reserva> GetReservationsWeek();

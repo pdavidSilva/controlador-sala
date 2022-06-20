@@ -122,3 +122,16 @@ void Controller::initEnvironmentVariables()
 {
     __environmentService.initEnvironmentVariables();
 }
+
+void Controller::fillHardwares(HardwareRecord hardware)
+{
+    std::vector<struct HardwareRecord> hardwares = __http.getHardwares(hardware);
+        
+    for(struct HardwareRecord r : hardwares)
+    {
+        if(r.typeEquipment == TYPE_SENSOR)
+            __bleConfig->addSensor(r.uuid);
+        else
+            __bleConfig->addActuator(r);
+    } 
+}

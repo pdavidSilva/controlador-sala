@@ -17,6 +17,7 @@
 #include "BLEServerService.h"
 #include "ClientSocketService.h"
 #include "EnvironmentVariablesService.h"
+#include "UtilsService.h"
 
 class Config 
 {

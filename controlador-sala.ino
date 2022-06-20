@@ -6,11 +6,6 @@ Controller controller;
 EnvironmentVariablesService environment;
 WiFiService wiFiService;
 
-String sensors[6];
-String devices[6];
-int indexSensors;
-int indexDevices;
-
 void setup() {
 	
 	Serial.begin(115200);
@@ -18,15 +13,13 @@ void setup() {
 
   wiFiService.connect();
 
-	 /*do {
+	 do {
 		if ( controller.start(hardware) ) {
 			if ( controller.registerHardware(hardware) ) {
-				controller.getSensors(hardware, sensors, indexSensors);
-        Serial.print("Sensors: ");
-        Serial.println(indexSensors);
-        controller.setHardware(hardware);
-				//controller.getDevices(hardware, devices, indexDevices);
-    
+
+        controller.setHardwareConfig(hardware);
+        controller.fillHardwares(hardware);
+
 				//if( indexSensors > 0 && indexDevices > 0 ) {				
 					//controller.startServer();
 					// if (controller.scan()) {
@@ -35,10 +28,10 @@ void setup() {
 				//}
 			}
 		}
-	} while( !init );*/ 
+	} while( !init );
 
   // mocks
-  hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
+  /*hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
   hardware.salaId = 1;
   environment.setHardware(hardware);
 
@@ -54,7 +47,7 @@ void setup() {
   atuador.typeHardwareId = 1;
   atuador.typeEquipment = 1;  
   
-  bleConfig->addActuator(atuador);
+  bleConfig->addActuator(atuador);*/
 
   /*controller.configureServer();
   controller.initBleTaskServer();	

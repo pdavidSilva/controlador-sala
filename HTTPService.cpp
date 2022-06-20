@@ -169,7 +169,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
             JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
 
             for (JsonVariant sensor : jsonSensors)
-                actuators.push_back(deserializeActuator(sensor));
+                actuators.push_back(deserializeDevice(sensor));
 
         }
         else
@@ -189,7 +189,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
 /*
  * <descricao> Deserealiza objeto json e converte para a struct que armazena as reservas  <descricao/>
  */
-struct HardwareRecord HTTPService::deserializeActuator(JsonVariant sensor) {
+struct HardwareRecord HTTPService::deserializeDevice(JsonVariant sensor) {
    
    struct HardwareRecord disp;
 

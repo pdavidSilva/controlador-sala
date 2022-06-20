@@ -14,6 +14,8 @@ class Controller
         void getSensors(struct HardwareRecord, String *, int&);
         //void getDevices(String[]&);
         bool getMaster(struct HardwareRecord, String &);
+        void fillHardwares(struct HardwareRecord);
+
 
         // BLE
         void configureClient();   
@@ -33,7 +35,7 @@ class Controller
 
         // Validacao continua de variaveis de ambiente
         void environmentVariablesContinuousValidation();
-        void initEnvironmentVariables(); 
+        void initEnvironmentVariables();
 };
 
 #endif

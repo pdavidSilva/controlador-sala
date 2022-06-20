@@ -4,8 +4,8 @@
 #include <WiFiUDP.h>
 
 String __currentTime;
-struct Monitoramento __monitoringConditioner;
-struct Monitoramento __monitoringLight;
+struct Monitoramento EnvironmentVariablesService::__monitoringConditioner;
+struct Monitoramento EnvironmentVariablesService::__monitoringLight;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
 HardwareRecord EnvironmentVariablesService::__hardware; 
 String __startTimeLoadReservations;
@@ -20,6 +20,7 @@ NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 BLEServerService* __bleServerConfig;
 HTTPService __httpRequestService;
 WiFiService __wifiService;
+UtilsService __utilsService;
 
 EnvironmentVariablesService::EnvironmentVariablesService()
 {
@@ -130,10 +131,15 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
 
       __bleServerConfig->disconnectToActuator();
   }
+
+  __utilsService.updateMonitoring(__message);
+
+  __receivedData = false;
+  __message = ""; 
                 
   __bleServerConfig->setEnvironmentSolicitation(false);
   __bleServerConfig->setReceivedRequest(false);
-} 
+}
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
 {
@@ -224,7 +230,7 @@ void EnvironmentVariablesService::turnOnConditioner(){
   String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
   //------------------------------------------------------    
-  String payload = mountPayload("AC", "ON", codigos);
+  String payload = __utilsService.mountPayload("AC", "ON", codigos);
   sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------
 
@@ -246,7 +252,7 @@ void EnvironmentVariablesService::turnOfConditioner(){
   String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
   //------------------------------------------------------    
-  String payload = mountPayload("AC", "OFF", codigos);
+  String payload = __utilsService.mountPayload("AC", "OFF", codigos);
   sendDataToActuator(TYPE_CONDITIONER, codigos);
   //------------------------------------------------------    
 
@@ -270,7 +276,7 @@ void EnvironmentVariablesService::turnOnLight(){
   __monitoringLight.estado = true;
 
   // ----------------------------------------------------------
-  String payload = mountPayload("LZ", "ON", "null");
+  String payload = __utilsService.mountPayload("LZ", "ON", "null");
   sendDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
@@ -290,7 +296,7 @@ void EnvironmentVariablesService::turnOfLight(){
   __monitoringLight.estado = false;
   
   // ----------------------------------------------------------
-  String payload = mountPayload("LZ", "OFF", "null");
+  String payload = __utilsService.mountPayload("LZ", "OFF", "null");
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
@@ -343,7 +349,7 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
       __hasMovement = true;
 
     __message = "";
-    __receivedData = false; //__receivedData = false;
+    __receivedData = false; 
   }
 }
 
@@ -380,16 +386,4 @@ void EnvironmentVariablesService::continuousValidation()
 
       delay(1000);
   }
-}
-
-String EnvironmentVariablesService::mountPayload(String deviceType, String state, String command)
-{
-    String payload;
-    payload.concat("{");
-    payload.concat("\"device_type\":" + deviceType + ", ");
-    payload.concat("\"state\":\"" + state + "\", ");
-    payload.concat("\"command\":\"" + command + "\", ");
-    payload.concat("}");
-
-    return payload;
 }

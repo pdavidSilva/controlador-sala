@@ -17,7 +17,7 @@ static BLECharacteristic* pCharacteristicSensor;
 static bool deviceConnected;
 static BLEServer* pServer;
 static bool sendData;
-static String bleUuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+EnvironmentVariablesService __environmentVariableService;
 
 
 void sendDataToServer(String data)
@@ -38,7 +38,7 @@ class MyServerCallbacks:
     void onConnect(BLEServer* pServer) {
 
       digitalWrite(LED, HIGH);
-      pCharacteristicSensor->setValue(bleUuid.c_str());
+      pCharacteristicSensor->setValue(__environmentVariableService.getHardware().uuid.c_str());
       pCharacteristicSensor->notify();
       
       deviceConnected = true;
@@ -64,12 +64,6 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
     std::string sensoriamento = pCharacteristic->getValue();
     Serial.println(sensoriamento.c_str());
-
-    // testando comunicação
-    /*delay(1500); 
-    sendData = true;
-    sendDataToServer("AC-ON");
-    sendData = false;*/
 
     if(String(GETDATA).equals(sensoriamento.c_str()))
     {

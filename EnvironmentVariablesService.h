@@ -9,19 +9,20 @@ using namespace std;
 
 #define TYPE_LIGHT  0
 #define TYPE_CONDITIONER  1 
+#define CHECK_TIME_TO_LOAD  60
 
 class EnvironmentVariablesService 
 {
   private: 
     String __currentTime;
-    struct Monitoramento __monitoringConditioner;
-    struct Monitoramento __monitoringLight;
     static vector<struct Reserva> __reservations; 
     static struct HardwareRecord __hardware; 
     static bool __receivedData;
     static String __message;
     String __startTimeLoadReservations;
     String __endTimeLoadReservations;
+    static struct Monitoramento __monitoringConditioner;
+    static struct Monitoramento __monitoringLight;
     static bool __uploadedToday;
     static bool __hasMovement;
 
@@ -49,6 +50,8 @@ class EnvironmentVariablesService
 
     bool getReceivedData();
     void setReceivedData(bool receivedData);
+    
+    String getUuidActuator(int typeEquipment);
 
     void turnOnManagedDevices();
     void turnOffManagedDevices();
@@ -64,9 +67,7 @@ class EnvironmentVariablesService
 
     void continuousValidation();
     void checkTimeToLoadReservations();
-    void CheckEnvironmentVariables();
-
-    String mountPayload(String deviceType, String state, String command);
+    void checkEnvironmentVariables();
 
     void awaitsReturn();
 

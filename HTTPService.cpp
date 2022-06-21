@@ -169,7 +169,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
             JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
 
             for (JsonVariant sensor : jsonSensors)
-                actuators.push_back(deserializeActuator(sensor));
+                actuators.push_back(deserializeDevice(sensor));
 
         }
         else
@@ -189,7 +189,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
 /*
  * <descricao> Deserealiza objeto json e converte para a struct que armazena as reservas  <descricao/>
  */
-struct HardwareRecord HTTPService::deserializeActuator(JsonVariant sensor) {
+struct HardwareRecord HTTPService::deserializeDevice(JsonVariant sensor) {
    
    struct HardwareRecord disp;
 
@@ -502,7 +502,7 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
         {
             monitoramento.id = doc["result"]["id"].as<int>();
             monitoramento.estado = doc["result"]["estado"].as<bool>();
-            monitoramento.equipamentoId = doc["result"]["equipamentoId"].as<bool>();
+            monitoramento.equipamentoId = doc["result"]["equipamentoId"].as<int>();
         }
         else
         {
@@ -585,7 +585,7 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
  * <parametros> operacao: operacao que deve ser consultados os codigos IR (ligar/desligar) <parametros/>
  * <retorno> lista de inteiros com os codigos IR solicitados <retorno/>
  */
-String HTTPService::getComandosIrByIdSalaAndOperacao() {
+String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
 
     Config config;
     HTTP http;
@@ -601,10 +601,9 @@ String HTTPService::getComandosIrByIdSalaAndOperacao() {
     String routeService;
     String type = "GET";
     String params = "";
-    String uuid = environment.getHardware().uuid;  
 
     routeService.concat(route);
-    routeService.concat(environment.getHardware().salaId);
+    routeService.concat(uuid);
   
     String response = http.request(routeService, type, params);
 

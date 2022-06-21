@@ -5,6 +5,8 @@ Config configuration;
 BLEServerService* __bleConfiguration; 
 HTTPService __httpService;
 EnvironmentVariablesService __environment;
+UtilsService __utils;
+
 ClientSocketService::ClientSocketService() {}
 
 bool ClientSocketService::__messageReturned = false;
@@ -79,7 +81,8 @@ void ClientSocketService::serverListener() {
                 
                 if(dispConnected)
                 {
-                  __bleConfiguration->sendMessageToActuator(request.code);
+                  String payload = getMessageToSend(request);
+                  __bleConfiguration->sendMessageToActuator(payload);
 
                   awaitsReturn();
 
@@ -92,6 +95,8 @@ void ClientSocketService::serverListener() {
                   client.println(__message);
                 else
                   client.println("NOT-AVALIABLE");
+
+                __utils.updateMonitoring(__message);
 
                 if (configuration.isDebug())
                 {
@@ -128,6 +133,7 @@ MonitoringRequest ClientSocketService::deserealizeObject(String payload)
     request.type = doc["type"].as<char *>();
     request.code = doc["code"].as<char *>();
     request.uuid = doc["uuid"].as<char *>();
+    request.acting = doc["acting"].as<char *>();
     
     return request;
 }
@@ -186,4 +192,24 @@ void ClientSocketService::startTaskWebSocketImpl(void* _this)
 void ClientSocketService::startTaskWebSocket()
 {
   xTaskCreate(this->startTaskWebSocketImpl, "serverListener", 8192, this, 5, NULL);
+}
+
+String ClientSocketService::getMessageToSend(MonitoringRequest request)
+{
+    String typeEquipament = "", state = "", command = "null";
+
+    if(request.type == LUZES)
+        typeEquipament = "LZ";
+    else
+    {
+        typeEquipament = "AC";
+        command = request.code;
+    }
+
+    if(request.acting == "True")
+        state = "ON";
+    else
+        state = "OFF";
+
+    return __utils.mountPayload(typeEquipament, state, command);
 }

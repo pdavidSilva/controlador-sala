@@ -39,6 +39,8 @@ class ClientSocketService
     void serverListener();
     static void startTaskWebSocketImpl(void* _this);
     void startTaskWebSocket();
+
+    String getMessageToSend(MonitoringRequest request);
 };
 
 #endif

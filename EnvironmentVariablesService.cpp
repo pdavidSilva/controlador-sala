@@ -4,8 +4,8 @@
 #include <WiFiUDP.h>
 
 String __currentTime;
-struct Monitoramento __monitoringConditioner;
-struct Monitoramento __monitoringLight;
+struct Monitoramento EnvironmentVariablesService::__monitoringConditioner;
+struct Monitoramento EnvironmentVariablesService::__monitoringLight;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
 HardwareRecord EnvironmentVariablesService::__hardware; 
 String __startTimeLoadReservations;
@@ -19,12 +19,15 @@ NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 
 BLEServerService* __bleServerConfig;
 HTTPService __httpRequestService;
+WiFiService __wifiService;
+UtilsService __utilsService;
 
 EnvironmentVariablesService::EnvironmentVariablesService()
 {
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
     __uploadedToday = false;
+    __hasMovement = false;
 }
 
 void EnvironmentVariablesService::initEnvironmentVariables() 
@@ -108,6 +111,13 @@ void EnvironmentVariablesService::setMonitoringConditioner(struct Monitoramento 
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
+  Serial.println("==================================");
+  Serial.println("[ENVIRONMENT_VARIABLES]: CONECTANDO AO ATUADOR");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(uuid);
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(message);
+  
   __bleServerConfig->setReceivedRequest(true);
   __bleServerConfig->setEnvironmentSolicitation(true);
 
@@ -121,10 +131,15 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
 
       __bleServerConfig->disconnectToActuator();
   }
+
+  __utilsService.updateMonitoring(__message);
+
+  __receivedData = false;
+  __message = ""; 
                 
   __bleServerConfig->setEnvironmentSolicitation(false);
   __bleServerConfig->setReceivedRequest(false);
-} 
+}
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
 {
@@ -133,6 +148,18 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String m
     if(r.typeEquipment == typeEquipment)
       sendDataToActuator(r.uuid, message);
   }
+}
+
+String EnvironmentVariablesService::getUuidActuator(int typeEquipment)
+{
+  String uuid = "";
+  for(struct HardwareRecord r : __bleServerConfig->getActuators())
+  {
+    if(r.typeEquipment == typeEquipment)
+      uuid = r.uuid;
+  }
+
+  return uuid;
 }
 
 /*
@@ -157,6 +184,8 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
         turnOnLight();
     }
   }
+
+  __hasMovement = false;
 }
 
 /*
@@ -193,12 +222,15 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
  */
 void EnvironmentVariablesService::turnOnConditioner(){
 
-  Serial.println("LIGANDO CONDICIONADOR");
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringConditioner.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO CONDICIONADOR");
 
-  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
   //------------------------------------------------------    
-  String payload = mountPayload("AC", "ON", codigos);
+  String payload = __utilsService.mountPayload("AC", "ON", codigos);
   sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------
 
@@ -211,13 +243,16 @@ void EnvironmentVariablesService::turnOnConditioner(){
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
 void EnvironmentVariablesService::turnOfConditioner(){
+  
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringConditioner.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO CONDICIONADOR");
 
-  Serial.println("DESLIGANDO CONDICIONADOR");
-
-  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao();
+  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
   //------------------------------------------------------    
-  String payload = mountPayload("AC", "OFF", codigos);
+  String payload = __utilsService.mountPayload("AC", "OFF", codigos);
   sendDataToActuator(TYPE_CONDITIONER, codigos);
   //------------------------------------------------------    
 
@@ -233,12 +268,15 @@ void EnvironmentVariablesService::turnOfConditioner(){
  */
 void EnvironmentVariablesService::turnOnLight(){
 
-  Serial.println("LIGANDO LUZES");
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringLight.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO LUZES");
 
   __monitoringLight.estado = true;
 
   // ----------------------------------------------------------
-  String payload = mountPayload("LZ", "ON", "null");
+  String payload = __utilsService.mountPayload("LZ", "ON", "null");
   sendDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
@@ -250,12 +288,15 @@ void EnvironmentVariablesService::turnOnLight(){
  */
 void EnvironmentVariablesService::turnOfLight(){
 
-  Serial.println("DESLIGANDO LUZES");
+  Serial.println("==================================");
+  Serial.print("[ENVIRONMENT_VARIABLES]: ");
+  Serial.println(__monitoringLight.estado ? "true" : "false");
+  Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO LUZES");
 
   __monitoringLight.estado = false;
   
   // ----------------------------------------------------------
-  String payload = mountPayload("LZ", "OFF", "null");
+  String payload = __utilsService.mountPayload("LZ", "OFF", "null");
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
@@ -271,7 +312,7 @@ void EnvironmentVariablesService::awaitsReturn()
       delay(1000);
       //if (configuration.isDebug())
       //{    
-        Serial.print("[ClientSocketService] TIME AWAITS: ");
+        Serial.print("[ENVIRONMENT_VARIABLES]: TIME AWAITS: ");
         Serial.println(millis());
       //}
   }    
@@ -279,7 +320,11 @@ void EnvironmentVariablesService::awaitsReturn()
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()
 {
+  __wifiService.connect();
+    
   __currentTime = __ntp.getFormattedTime();
+
+  __wifiService.disconnect();
 
   if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations)
   {
@@ -296,7 +341,7 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
       __uploadedToday = false; 
 }
 
-void EnvironmentVariablesService::CheckEnvironmentVariables()
+void EnvironmentVariablesService::checkEnvironmentVariables()
 {
   if (__receivedData) 
   {
@@ -304,34 +349,41 @@ void EnvironmentVariablesService::CheckEnvironmentVariables()
       __hasMovement = true;
 
     __message = "";
-    __receivedData = false;
+    __receivedData = false; 
   }
 }
 
 void EnvironmentVariablesService::continuousValidation()
 {
-  while(true)
-  {      
-      checkTimeToLoadReservations();
+  Config config;
+  int checkTimeToLoad = 0;
+  checkTimeToLoadReservations();
 
-      CheckEnvironmentVariables();
+  while(true)
+  {    
+      if(config.isDebug())
+      {
+        Serial.println("==================================");
+        Serial.print("[ENVIRONMENT_VARIABLES]: ");
+        Serial.println(__currentTime);
+      }
+      
+      checkEnvironmentVariables();
 
       turnOffManagedDevices();
       
+      turnOnManagedDevices();
+
       turnOnConditioner();
 
-      delay(2000);
+      if(checkTimeToLoad == CHECK_TIME_TO_LOAD)
+      {
+        checkTimeToLoadReservations();
+        checkTimeToLoad = 0;
+      }
+      
+      checkTimeToLoad++;
+
+      delay(1000);
   }
-}
-
-String EnvironmentVariablesService::mountPayload(String deviceType, String state, String command)
-{
-    String payload;
-    payload.concat("{");
-    payload.concat("\"device_type\":" + deviceType + ", ");
-    payload.concat("\"state\":\"" + state + "\", ");
-    payload.concat("\"command\":\"" + command + "\", ");
-    payload.concat("}");
-
-    return payload;
 }

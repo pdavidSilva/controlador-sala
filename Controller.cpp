@@ -129,7 +129,7 @@ void Controller::fillHardwares(HardwareRecord hardware)
         
     for(struct HardwareRecord r : hardwares)
     {
-        if(r.typeEquipment == TYPE_SENSOR)
+        if(r.typeHardwareId == TYPE_SENSOR)
             __bleConfig->addSensor(r.uuid);
         else
             __bleConfig->addActuator(r);

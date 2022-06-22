@@ -14,7 +14,7 @@ const int portaPresenca = GPIO_NUM_12;
 void setup() {
 	
 	Serial.begin(115200);
-	bool init = false;
+	bool init = false;*/
 
 	/*do {
 		if ( controller.start(hardwareSensor) ) {
@@ -31,13 +31,18 @@ void setup() {
 	} while( !init );*/
 
   //bleUuid = hardware.getUuid();
- /* controller.configureClient();  
-}
+  /*HardwareRecord hardware;
+  hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+  hardware.salaId = 1;
+  controller.setHardwareConfig(hardware);	
 
-void loop() {
+  controller.configureClient();  
+}*/
+
+/*void loop() {
 	Serial.println("loop");
-
-    bool leitura = digitalRead(portaPresenca);
+    
+	/*bool leitura = digitalRead(portaPresenca);
 	temperature = dht.readTemperature();
 	if(leitura) {
 		monitoringRecord.hasPresent = "S";
@@ -51,11 +56,12 @@ void loop() {
 		monitoringRecord.temperature = -1;
 	}
   	delay(1000);
-	controller.sendDataOfMonitoring(monitoringRecord);
+	controller.sendDataOfMonitoring(monitoringRecord);*/
+	
 	//sensors()
 	//dispositivo()
 	
     //Mestre -> Sensor de Presenca ()
     //Sensor de Presenca () -> Mestre
 
-}*/
+/*}*/

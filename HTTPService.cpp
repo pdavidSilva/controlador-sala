@@ -122,7 +122,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
     Config config;
     HTTP http;
     String route;
-    std::vector<struct HardwareRecord> actuators;
+    std::vector<struct HardwareRecord> hardwares;
 
     if (config.getRoute() == 1)
         route = "/hardware/";
@@ -135,7 +135,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
     String response;
 
     String uuid = String(hardware.uuid);
-    String token = hardware.token;
+    String token = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
 
     routeService.concat(route);
     routeService.concat(hardware.salaId);
@@ -160,16 +160,16 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
             }
             delay(5000);
 
-            return actuators;
+            return hardwares;
         }
 
         if (doc["httpCode"].as<int>() == 200)
         {
 
-            JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
+            JsonArray jsonSensors = doc["result"].as<JsonArray>();
 
             for (JsonVariant sensor : jsonSensors)
-                actuators.push_back(deserializeDevice(sensor));
+                hardwares.push_back(deserializeDevice(sensor));
 
         }
         else
@@ -183,7 +183,14 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
         }
     }
 
-    return actuators;
+     if (config.isDebug())
+    {
+        Serial.println("==================================");
+        Serial.print("[HTTPService] count hardwares: ");
+        Serial.println(hardwares.size());
+    }
+
+    return hardwares;
 }
 
 /*
@@ -194,8 +201,8 @@ struct HardwareRecord HTTPService::deserializeDevice(JsonVariant sensor) {
    struct HardwareRecord disp;
 
    disp.uuid = sensor["uuid"].as<String>();
-   disp.typeHardwareId = sensor["TipoHardwareId"].as<int>();
-   disp.typeEquipment = sensor["TipoEquipamento"].as<int>(); 
+   disp.typeHardwareId = sensor["tipoHardwareId"].as<int>();
+   disp.typeEquipment = sensor["tipoEquipamento"].as<int>(); 
    return disp;
 }
 

@@ -87,7 +87,7 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
     String data;
     doc['temperature'] = monitoringRecord.temperature;
     doc['hasPresent'] = monitoringRecord.hasPresent;
-
+    Serial.println("Controller -> sendDataOfMonitoring");
     serializeJson(doc, data);
     sendDataToServer(data);
     delay(3000);

@@ -22,6 +22,7 @@
 class Config 
 {
     private :
+        String __tokenApp;
         String __url;
         String __ssid;
         String __password;
@@ -35,6 +36,7 @@ class Config
         
         Config();
         
+        String getTokenApp();
         String getUrl();
         String getSSID();
         String getPassword();

@@ -6,7 +6,7 @@ Controller controller;
 String master = "";
 
 DHT dht(4, DHT11);
-int temperature; 
+float temperature; 
 const int portaPresenca = GPIO_NUM_12;
 
 //void initBLE(); 
@@ -48,6 +48,23 @@ void setup() {
 	monitoringRecord.temperature = temperature;
 
 	controller.sendDataOfMonitoring(monitoringRecord);*/
+    
+	/*bool leitura = digitalRead(portaPresenca);
+	temperature = dht.readTemperature();
+	if(leitura) {
+		monitoringRecord.hasPresent = "S";
+	} else {
+		monitoringRecord.hasPresent = "N";
+	}
+  
+	if(!isnan(temperature) || temperature != NULL){
+		monitoringRecord.temperature = temperature;
+	} else {
+		monitoringRecord.temperature = -1;
+	}
+  	delay(1000);
+	controller.sendDataOfMonitoring(monitoringRecord);*/
+	
 	//sensors()
 	//dispositivo()
 	

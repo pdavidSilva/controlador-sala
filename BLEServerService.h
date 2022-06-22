@@ -8,7 +8,7 @@
 #include <BLEDevice.h>
 #include "Structs.h"
 
-#define TYPE_SENSOR  0
+#define TYPE_SENSOR  3
 #define TYPE_ACTUATOR  1
 #define TIME_CONNECTION  10000 
 

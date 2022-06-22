@@ -42,7 +42,11 @@ class MyServerCallbacks:
       pCharacteristicSensor->notify();
       
       deviceConnected = true;
-      sendData = false;
+      sendData = true;
+      delay(2000);
+
+      //teste
+      sendDataToServer("AC-ON");
 
       Serial.println("CONECTADO");
             

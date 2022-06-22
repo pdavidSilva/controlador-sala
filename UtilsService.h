@@ -3,10 +3,10 @@
 
 #include "Config.h"
 
-#define AC_ON  "AC_ON"
-#define AC_OFF "AC_OFF" 
-#define LZ_ON  "LZ_ON" 
-#define LZ_OFF "LZ_OFF" 
+#define AC_ON  "AC-ON"
+#define AC_OFF "AC-OFF" 
+#define LZ_ON  "LZ-ON" 
+#define LZ_OFF "LZ-OFF" 
 
 class UtilsService
 {

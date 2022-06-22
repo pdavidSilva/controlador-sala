@@ -41,13 +41,6 @@ void setup() {
 
 /*void loop() {
 	Serial.println("loop");
-
-	/*bool leitura = digitalRead(portaPresenca);
-	temperature = (int)dht.readTemperature();
-	monitoringRecord.hasPresent = leitura;          
-	monitoringRecord.temperature = temperature;
-
-	controller.sendDataOfMonitoring(monitoringRecord);*/
     
 	/*bool leitura = digitalRead(portaPresenca);
 	temperature = dht.readTemperature();

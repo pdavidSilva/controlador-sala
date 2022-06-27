@@ -7,6 +7,7 @@
 #include <BLE2902.h>
 #include <Arduino.h>
 #include <String>
+#include "EquipmentService.h"
 
 #define CHARACTERISTICUUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define SERVICEUUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
@@ -18,7 +19,9 @@ static bool deviceConnected;
 static BLEServer* pServer;
 static bool sendData;
 EnvironmentVariablesService __environmentVariableService;
-
+static DeviceType deviceType;
+EquipmentService equipmentService;
+static String equipmentState = "";
 
 void sendDataToServer(String data)
 {
@@ -66,21 +69,29 @@ class MyServerCallbacks:
 class MyCallbacks: public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic * pCharacteristic) {
 
-    std::string sensoriamento = pCharacteristic->getValue();
-    Serial.println(sensoriamento.c_str());
+    std::string response = pCharacteristic->getValue();
+    Serial.println(response.c_str());
 
-    if(String(GETDATA).equals(sensoriamento.c_str()))
-    {
+    if(String(GETDATA).equals(response.c_str())) {
        sendData = true;       
+    } else if(deviceType != NULL && deviceType == ATUADOR){
+      Serial.println("ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
+      equipmentState = equipmentService.executeActionFromController(response.c_str());
+      sendData = true;
+      sendDataToServer(equipmentState.c_str());
+      sendData = false;
+      equipmentState = "";
     }
   }
 };
 
-void initBLEClient()
+void initBLEClient(String deviceName, DeviceType devType);
+void initBLEClient(String deviceName, DeviceType devType)
 {
   pinMode(LED, OUTPUT);
-
-  BLEDevice::init("ESP32");
+  deviceType = devType;
+  
+  BLEDevice::init(std::string(deviceName.c_str()));
 
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());

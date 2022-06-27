@@ -28,25 +28,25 @@ void setup() {
 				};
 			}
 		}
-	} while( !init );*/
+	} while( !init );
 
   //bleUuid = hardware.getUuid();
-  /*HardwareRecord hardware;
-  hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-  hardware.salaId = 1;
-  controller.setHardwareConfig(hardware);	
+  //HardwareRecord hardware;
+  //hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+  //hardware.salaId = 1;
+  //controller.setHardwareConfig(hardware);	
 
-  controller.configureClient();  
-}*/
+  controller.configureClient("ESP_SENSOR", SENSOR);  
+}
 
-/*void loop() {
+void loop() {
 	Serial.println("loop");
     
-	/*bool leitura = digitalRead(portaPresenca);
-	temperature = dht.readTemperature();
-	if(leitura) {
-		monitoringRecord.hasPresent = "S";
-	} else {
+	//bool leitura = digitalRead(portaPresenca);
+	//temperature = dht.readTemperature();
+	//if(leitura) {
+	//	monitoringRecord.hasPresent = "S";
+	//} else {
 		monitoringRecord.hasPresent = "N";
 	}
   
@@ -56,7 +56,7 @@ void setup() {
 		monitoringRecord.temperature = -1;
 	}
   	delay(1000);
-	controller.sendDataOfMonitoring(monitoringRecord);*/
+	controller.sendDataOfMonitoring(monitoringRecord);
 	
 	//sensors()
 	//dispositivo()
@@ -64,4 +64,4 @@ void setup() {
     //Mestre -> Sensor de Presenca ()
     //Sensor de Presenca () -> Mestre
 
-/*}*/
+}*/

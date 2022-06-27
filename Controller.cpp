@@ -62,9 +62,9 @@ void Controller::configureServer()
     __bleConfig->populateMap();
 }
 
-void Controller::configureClient()
+void Controller::configureClient(String deviceName, DeviceType deviceType)
 {
-   initBLEClient();  
+   initBLEClient(deviceName, deviceType);  
 }
 
 void Controller::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor)

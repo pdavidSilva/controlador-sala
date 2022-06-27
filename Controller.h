@@ -1,7 +1,6 @@
 #ifndef Controller_h
 #define Controller_h
 #include "Config.h"
-
 class Controller
 {   
     public:
@@ -18,7 +17,7 @@ class Controller
 
 
         // BLE
-        void configureClient();   
+        void configureClient(String deviceName, DeviceType deviceType);   
         void configureServer();   
         void initBleTaskServer();    
         bool notificateServer() const;       

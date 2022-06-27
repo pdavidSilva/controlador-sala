@@ -89,7 +89,7 @@ Vector<int> EquipmentService::SplitIrComands(String data) {
  * <retorno>  <retorno/>
  */
 void EquipmentService::SendIrComand(Vector<int> codigo) {
-    
+    IRsend irsend(kIrLed);
     int k = 0;
     uint16_t rawData[codigo.size()];
     for (int el: codigo) 
@@ -163,4 +163,28 @@ void EquipmentService::turnOffLights(){
 
   //String logMonitoramento = "Desligando luzes no horario: " + horaAtualSistema;
   //gravarLinhaEmArquivo(SPIFFS, logMonitoramento, pathLogMonitoramento);
+}
+
+String EquipmentService::executeActionFromController(String data) {
+  DynamicJsonDocument doc(1024);
+  DeserializationError error = deserializeJson(doc, data);
+  Serial.println("==================================");
+  Serial.print("[EquipmentService] executar comando recebidos do controlador : ");
+
+  String type = doc["type"].as<String>();
+  String command = doc["command"].as<String>();
+  String state = doc["state"].as<String>();
+  if(type == NULL){
+    return "ERROR"; 
+  }
+  else if(type.equals("LZ")) {
+    checkOperationLights(state);
+    return state.equals("ON") ? "LZ-ON" : "LZ-OFF";
+  } else if(type.equals("AC")) {
+    Vector<int> codigo = SplitIrComands(command);
+    SendIrComand(codigo);
+    bool isOn = checkIrms();
+    return isOn ? "AC-ON" : "AC-OFF";
+  }
+  return "ERROR"; 
 }

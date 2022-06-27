@@ -2,10 +2,15 @@
 #ifndef Config_h
 #define Config_h
 
+#include "Enums.h"
 #include <Arduino.h>
 #include <String>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <Vector.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
+#include "EmonLib.h"
 #include <ArduinoJson.h>
 #include "Controller.h"
 #include "WiFiService.h"

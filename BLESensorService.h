@@ -43,10 +43,6 @@ class MyServerCallbacks:
       
       deviceConnected = true;
       sendData = false;
-      /*delay(2000);
-
-      //teste
-      sendDataToServer("AC-ON");*/
 
       Serial.println("CONECTADO");
             

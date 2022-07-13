@@ -34,12 +34,8 @@ void setup() {
   hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";
   hardware.salaId = 1;
   controller.setHardwareConfig(hardware);
-
-  /*sensors[0] = "73d67fd6-1433-4bf3-b52a-7532a3447bd3";
-  indexSensors = 1;
   
-  for(int i = 0; i < indexSensors; i++)
-    bleConfig->addSensor(sensors[i]);
+  bleConfig->addSensor("73d67fd6-1433-4bf3-b52a-7532a3447bd3");
 
   HardwareRecord atuador;
   atuador.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
@@ -49,18 +45,19 @@ void setup() {
   
   bleConfig->addActuator(atuador);
 
+  controller.initEnvironmentVariables();
+
   controller.configureServer();
-  controller.initBleTaskServer();	*/
+  controller.initBleTaskServer();	
 
   //controller.startMonitoring(); 
 
   /*controller.initServerSocket();    
   controller.startTaskWebSocket();*/
 
-  controller.fillHardwares(hardware);
+  //controller.fillHardwares(hardware);
 }
 
 void loop() {
-  //controller.initEnvironmentVariables();
-  //controller.environmentVariablesContinuousValidation(); 
+  controller.environmentVariablesContinuousValidation(); 
 }

@@ -198,11 +198,11 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
       if (!__monitoringLight.estado)
         turnOnLight();
 
-        inclass = true;
+        inClass = true;
     }
   }
 
-  __inClass = inclass;
+  __inClass = inClass;
   __hasMovement = false;
 }
 

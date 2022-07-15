@@ -14,7 +14,7 @@ const int portaPresenca = GPIO_NUM_12;
 void setup() {
 	
 	Serial.begin(115200);
-	bool init = false;*/
+	bool init = false;
 
 	/*do {
 		if ( controller.start(hardwareSensor) ) {
@@ -65,3 +65,4 @@ void loop() {
     //Sensor de Presenca () -> Mestre
 
 }*/
+

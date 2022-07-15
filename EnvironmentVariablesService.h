@@ -23,6 +23,7 @@ class EnvironmentVariablesService
     static struct Monitoramento __monitoringLight;
     static bool __uploadedToday;
     static bool __hasMovement;
+    static bool __inClass;
 
   public: 
     EnvironmentVariablesService();
@@ -42,6 +43,9 @@ class EnvironmentVariablesService
     void  setReservations(std::vector<struct Reserva> reservations);
     struct HardwareRecord getHardware();
     void setHardware(HardwareRecord hardware);
+
+    static bool getInClass();
+    bool setInClass(bool inClass);
 
     String getMessage();
     void setMessage(String message);

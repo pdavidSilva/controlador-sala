@@ -14,7 +14,7 @@ const int portaPresenca = GPIO_NUM_12;
 void setup() {
 	
 	Serial.begin(115200);
-	bool init = false;*/
+	bool init = false;
 
 	/*do {
 		if ( controller.start(hardwareSensor) ) {
@@ -37,9 +37,9 @@ void setup() {
   controller.setHardwareConfig(hardware);	
 
   controller.configureClient();  
-}*/
+}
 
-/*void loop() {
+void loop() {
 	Serial.println("loop");
     
 	/*bool leitura = digitalRead(portaPresenca);
@@ -64,4 +64,4 @@ void setup() {
     //Mestre -> Sensor de Presenca ()
     //Sensor de Presenca () -> Mestre
 
-/*}*/
+//}

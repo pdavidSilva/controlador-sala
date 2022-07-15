@@ -13,6 +13,7 @@ String __endTimeLoadReservations;
 bool EnvironmentVariablesService::__uploadedToday;
 bool EnvironmentVariablesService::__receivedData;
 bool EnvironmentVariablesService::__hasMovement;
+bool EnvironmentVariablesService::__inClass;
 String EnvironmentVariablesService::__message;
 WiFiUDP __udp;
 NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
@@ -28,6 +29,7 @@ EnvironmentVariablesService::EnvironmentVariablesService()
     __endTimeLoadReservations    = "00:10:00";
     __uploadedToday = false;
     __hasMovement = false;
+    __inClass = false;
 }
 
 void EnvironmentVariablesService::initEnvironmentVariables() 
@@ -63,6 +65,17 @@ std::vector<struct Reserva> EnvironmentVariablesService::getReservations()
 {
     return __reservations;
 }
+
+bool EnvironmentVariablesService::setInClass(bool inClass)
+{
+    __inClass = inClass;
+}
+
+bool EnvironmentVariablesService::getInClass()
+{
+    return __inClass;
+}
+
 
 void EnvironmentVariablesService::setReservations(std::vector<struct Reserva> reservations)
 {
@@ -117,9 +130,6 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
   Serial.println(uuid);
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
   Serial.println(message);
-  
-  __bleServerConfig->setReceivedRequest(true);
-  __bleServerConfig->setEnvironmentSolicitation(true);
 
   bool dispConnected = __bleServerConfig->connectToActuator(uuid);
                 
@@ -136,18 +146,23 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
 
   __receivedData = false;
   __message = ""; 
-                
-  __bleServerConfig->setEnvironmentSolicitation(false);
-  __bleServerConfig->setReceivedRequest(false);
 }
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
 {
+  __bleServerConfig->setReceivedRequest(true);
+  __bleServerConfig->setEnvironmentSolicitation(true);
+
+  delay(1000);
+  
   for(struct HardwareRecord r : __bleServerConfig->getActuators())
   {
     if(r.typeEquipment == typeEquipment)
       sendDataToActuator(r.uuid, message);
   }
+
+  __bleServerConfig->setReceivedRequest(false);
+  __bleServerConfig->setEnvironmentSolicitation(false);
 }
 
 String EnvironmentVariablesService::getUuidActuator(int typeEquipment)
@@ -167,8 +182,8 @@ String EnvironmentVariablesService::getUuidActuator(int typeEquipment)
  * infomacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
  */
 void EnvironmentVariablesService::turnOnManagedDevices() {
-  String horaInicio, horaFim, logMonitoramento;
-  
+  String horaInicio, horaFim;
+  bool inClass = false;
   struct Reserva r;
   for (r: __reservations) {
 
@@ -182,9 +197,12 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
 
       if (!__monitoringLight.estado)
         turnOnLight();
+
+        inClass = true;
     }
   }
 
+  __inClass = inClass;
   __hasMovement = false;
 }
 
@@ -195,7 +213,6 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
 void EnvironmentVariablesService::turnOffManagedDevices() {
   String horaInicio;
   String horaFim;
-  String logMonitoramento;
   bool notInClass = true;
 
   struct Reserva r;
@@ -215,6 +232,8 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
     if (__monitoringLight.estado)
       turnOfLight();
   }
+
+  __inClass = !notInClass;
 }
 
 /*

@@ -358,7 +358,7 @@ void BLEServerService::continuousConnectionTask()
         Serial.println("[CONTINUOUS_CONNECTION]: NEW CICLE");
         for (auto item : __devicesMapped) 
         {
-            if(!__receivedRequest)
+            if(!__receivedRequest && __environmentVariables.getInClass())
             {
                 disp = item.second;
                 

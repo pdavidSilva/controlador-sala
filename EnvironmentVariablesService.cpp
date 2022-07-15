@@ -1,8 +1,5 @@
 #include "EnvironmentVariablesService.h"
 
-#include <NTPClient.h>
-#include <WiFiUDP.h>
-
 String __currentTime;
 struct Monitoramento EnvironmentVariablesService::__monitoringConditioner;
 struct Monitoramento EnvironmentVariablesService::__monitoringLight;

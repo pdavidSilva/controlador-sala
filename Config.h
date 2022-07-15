@@ -12,6 +12,8 @@
 #include <IRsend.h>
 #include "EmonLib.h"
 #include <ArduinoJson.h>
+#include <NTPClient.h>
+#include <WiFiUDP.h>
 #include "Controller.h"
 #include "WiFiService.h"
 #include "HTTP.h"

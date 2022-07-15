@@ -2,8 +2,6 @@
 #define EnvironmentVariablesService_h
 
 #include "Config.h"
-#include <NTPClient.h>
-#include <WiFiUDP.h>
 
 using namespace std;
 

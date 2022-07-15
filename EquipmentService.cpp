@@ -179,12 +179,12 @@ String EquipmentService::executeActionFromController(String data) {
   }
   else if(type.equals("LZ")) {
     checkOperationLights(state);
-    return state.equals("ON") ? "LZ-ON" : "LZ-OFF";
+    return state.equals("ON") ? LZ_ON : LZ_OFF;
   } else if(type.equals("AC")) {
     Vector<int> codigo = SplitIrComands(command);
     SendIrComand(codigo);
     bool isOn = checkIrms();
-    return isOn ? "AC-ON" : "AC-OFF";
+    return isOn ? AC_ON : AC_OFF;
   }
   return "ERROR"; 
 }

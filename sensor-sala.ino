@@ -36,7 +36,7 @@ void setup() {
   hardware.salaId = 1;
   controller.setHardwareConfig(hardware);	
 
-  controller.configureClient();  
+  controller.configureBLEClient();  
 }
 
 void loop() {

@@ -12,15 +12,17 @@ class Controller
         bool start(struct HardwareRecord&) const;
         bool registerHardware(struct HardwareRecord) const;
         void getSensors(struct HardwareRecord, String *, int&);
+
         //void getDevices(String[]&);
         bool getMaster(struct HardwareRecord, String &);
         void fillHardwares(struct HardwareRecord);
 
+        bool loadedDevices();
 
         // BLE
-        void configureClient();   
-        void configureServer();   
-        void initBleTaskServer();    
+        void configureBLEClient();   
+        void configureBLEServer();   
+        void initBLETaskServer();    
         bool notificateServer() const;       
 
         //send Data Monitoring

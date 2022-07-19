@@ -277,8 +277,6 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   __monitoringConditioner.estado = false;
   
-  //digitalWrite(LED, LOW);
-
   __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
@@ -331,8 +329,8 @@ void EnvironmentVariablesService::awaitsReturn()
       delay(1000);
       //if (configuration.isDebug())
       //{    
-        Serial.print("[ENVIRONMENT_VARIABLES]: TIME AWAITS: ");
-        Serial.println(millis());
+      //  Serial.print("[ENVIRONMENT_VARIABLES]: TIME AWAITS: ");
+      //  Serial.println(millis());
       //}
   }    
 }
@@ -392,8 +390,6 @@ void EnvironmentVariablesService::continuousValidation()
       turnOffManagedDevices();
       
       turnOnManagedDevices();
-
-      turnOnConditioner();
 
       if(checkTimeToLoad == CHECK_TIME_TO_LOAD)
       {

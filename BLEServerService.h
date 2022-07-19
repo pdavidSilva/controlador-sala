@@ -57,10 +57,10 @@ class BLEServerService
     void setReceivedRequest(bool receivedRequest);
     bool getReceivedRequest();
     
-    void setCountTypeSensor(int count);
-    void setCounttypeActuator(int count);
-    int getCountTypeSensor();
-    int getCounttypeActuator();
+    static void setCountTypeSensor(int count);
+    static void setCounttypeActuator(int count);
+    static int getCountTypeSensor();
+    static int getCounttypeActuator();
     
     bool getEnvironmentSolicitation();
     void setEnvironmentSolicitation(bool environmentSolicitation);

@@ -263,7 +263,7 @@ bool BLEServerService::connectMyDisp(BLEAdvertisedDevice* device)
         disp.setTypeDisp(TYPE_SENSOR);
         __countTypeSensor++;
       }
-      else
+      else if(isAtuador(deviceConnected->uuid.c_str()))
       {
         Serial.println("[CONNECTION]: é atuador ");
         disp.setTypeDisp(TYPE_ACTUATOR);

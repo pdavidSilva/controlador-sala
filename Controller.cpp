@@ -31,7 +31,6 @@ void Controller::restart() const
   return ;
 }
 
-
 bool Controller::registerHardware(HardwareRecord hardware) const
 {   
     bool statusRegister = false;
@@ -49,13 +48,13 @@ bool Controller::notificateServer() const
     return true;
 }
 
-void Controller::initBleTaskServer()
+void Controller::initBLETaskServer()
 {
     delay(2000);
     __bleConfig->startTaskBLE();
 }
 
-void Controller::configureServer()
+void Controller::configureBLEServer()
 {
     __bleConfig->initBLE();  
     __bleConfig->scanDevices();
@@ -134,4 +133,12 @@ void Controller::fillHardwares(HardwareRecord hardware)
         else
             __bleConfig->addActuator(r);
     } 
+}
+
+bool Controller::loadedDevices()
+{
+    if ( __bleConfig->getActuators().size() > 0 && __bleConfig->getSensors().size() > 0)
+        return true;
+
+    return false;
 }

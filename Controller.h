@@ -1,6 +1,7 @@
 #ifndef Controller_h
 #define Controller_h
 #include "Config.h"
+
 class Controller
 {   
     public:
@@ -11,15 +12,17 @@ class Controller
         bool start(struct HardwareRecord&) const;
         bool registerHardware(struct HardwareRecord) const;
         void getSensors(struct HardwareRecord, String *, int&);
+
         //void getDevices(String[]&);
         bool getMaster(struct HardwareRecord, String &);
         void fillHardwares(struct HardwareRecord);
 
+        bool loadedDevices();
 
         // BLE
         void configureClient(String deviceName, DeviceType deviceType);   
-        void configureServer();   
-        void initBleTaskServer();    
+        void configureBLEServer();   
+        void initBLETaskServer();    
         bool notificateServer() const;       
 
         //send Data Monitoring

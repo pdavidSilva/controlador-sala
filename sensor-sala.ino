@@ -35,8 +35,9 @@ void setup() {
   //hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
   //hardware.salaId = 1;
   //controller.setHardwareConfig(hardware);	
-
+  
   controller.configureClient("ESP_SENSOR", SENSOR);  
+
 }
 
 void loop() {

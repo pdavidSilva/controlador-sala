@@ -7,8 +7,8 @@
 #define AC_OFF "AC-OFF" 
 #define LZ_ON  "LZ-ON" 
 #define LZ_OFF "LZ-OFF" 
-#define TYPE_SENSOR 2
-#define TYPE_ACTUATOR 3
+#define TYPE_ACTUATOR 2
+#define TYPE_SENSOR 3
 
 class UtilsService
 {

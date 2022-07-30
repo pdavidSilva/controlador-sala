@@ -8,15 +8,12 @@
 #include <BLEDevice.h>
 #include "Structs.h"
 
-#define TYPE_SENSOR  3
-#define TYPE_ACTUATOR  1
-#define TIME_CONNECTION  10000 
+#define TIME_CONNECTION  30000 
 
 static BLEUUID SERVICE_UUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
 static BLEUUID CHARACTERISTIC_UUID("beb5483e-36e1-4688-b7f5-ea07361b26a8");
 
 using namespace std;
-
 
 class BLEServerService 
 {

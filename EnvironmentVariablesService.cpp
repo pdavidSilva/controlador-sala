@@ -252,7 +252,8 @@ void EnvironmentVariablesService::turnOnConditioner(){
 
   __monitoringConditioner.estado = true;
 
-  __httpRequestService.putMonitoring(__monitoringConditioner);
+  if(__monitoringConditioner.equipamentoId > 0 && __monitoringConditioner.id > 0)
+    __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -274,7 +275,8 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   __monitoringConditioner.estado = false;
   
-  __httpRequestService.putMonitoring(__monitoringConditioner);
+  if(__monitoringConditioner.equipamentoId > 0 && __monitoringConditioner.id > 0)
+    __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -294,7 +296,8 @@ void EnvironmentVariablesService::turnOnLight(){
   sendDataToActuator(TYPE_LIGHT,"true");  
   // ----------------------------------------------------------
 
-  __httpRequestService.putMonitoring(__monitoringLight);
+  if(__monitoringLight.equipamentoId > 0 && __monitoringLight.id > 0)
+    __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 /*
@@ -314,7 +317,8 @@ void EnvironmentVariablesService::turnOfLight(){
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
-  __httpRequestService.putMonitoring(__monitoringLight);
+  if(__monitoringLight.equipamentoId > 0 && __monitoringLight.id > 0)
+    __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 void EnvironmentVariablesService::awaitsReturn()

@@ -2,7 +2,7 @@
 #define EquipmentService_h
 
 #include "Config.h"
-#define RELE 23
+#define RELE 19
 #define pinSCT 14 
 #define tensao 127
 

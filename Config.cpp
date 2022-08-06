@@ -15,11 +15,11 @@ Config::Config(){
     __debug     = true;
     //__ssid      = "VIVOFIBRA-5F70";
     //__password  = "F03C999054";
-    __ssid      = "VIVOFIBRA-5161";
-    __password  = "DnSPtP7Cp9";
+    __ssid      = "Apartamento 201-2.4";
+    __password  = "Ald50983021";
     __basetime  = 180000;
     __ledStatus = 2;
-    __type  = ATUADOR_3;
+    __type  = TYPE_SENSOR;
     __route = 2;
     
     pinMode(__ledStatus, OUTPUT);

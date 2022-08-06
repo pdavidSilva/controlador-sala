@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -16,7 +16,7 @@ void setup() {
 	Serial.begin(115200);
 	bool init = false;
 
-	/*do {
+	do {
 		if ( controller.start(hardwareSensor) ) {
 			if ( controller.registerHardware(hardwareSensor) ) {
 				if(controller.getMaster(hardwareSensor, master))
@@ -43,11 +43,11 @@ void setup() {
 void loop() {
 	Serial.println("loop");
     
-	//bool leitura = digitalRead(portaPresenca);
-	//temperature = dht.readTemperature();
-	//if(leitura) {
-	//	monitoringRecord.hasPresent = "S";
-	//} else {
+	bool leitura = digitalRead(portaPresenca);
+	temperature = dht.readTemperature();
+	if(leitura) {
+		monitoringRecord.hasPresent = "S";
+	} else {
 		monitoringRecord.hasPresent = "N";
 	}
   
@@ -65,5 +65,4 @@ void loop() {
     //Mestre -> Sensor de Presenca ()
     //Sensor de Presenca () -> Mestre
 
-}*/
-
+}

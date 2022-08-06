@@ -137,7 +137,7 @@ void Controller::fillHardwares(HardwareRecord hardware)
 
 bool Controller::loadedDevices()
 {
-    if ( __bleConfig->getActuators().size() > 0 && __bleConfig->getSensors().size() > 0)
+    if ( __bleConfig->getActuators().size() > 0 || __bleConfig->getSensors().size() > 0)
         return true;
 
     return false;

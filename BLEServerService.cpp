@@ -190,6 +190,9 @@ void BLEServerService::populateMap()
 {
    for (auto disp : __filteredDevices) 
    {
+        Serial.println(SERVICE_UUID.toString().c_str());
+        Serial.println(disp->haveServiceUUID());
+        Serial.println(disp->toString().c_str());
         if(disp->haveServiceUUID() && disp->isAdvertisingService(SERVICE_UUID))
         {
           bool deviceConnected = false;
@@ -368,7 +371,7 @@ void BLEServerService::continuousConnectionTask()
                     Serial.print("[CONTINUOUS_CONNECTION] UUID: ");
                     Serial.println(disp.getUuid());
   
-                    Serial.print("[CONTINUOUS_CONNECTION] ADRRES: ");
+                    Serial.print("[CONTINUOUS_CONNECTION] ADDRESS: ");
                     Serial.println(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str());
                     
                     deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);

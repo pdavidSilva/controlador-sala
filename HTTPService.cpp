@@ -147,9 +147,9 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
-
+                         
         if (error)
         {
             if (config.isDebug())

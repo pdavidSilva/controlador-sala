@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -16,7 +16,7 @@ void setup() {
 	Serial.begin(115200);
 	bool init = false;
 
-	/*do {
+	do {
 		if ( controller.start(hardwareSensor) ) {
 			if ( controller.registerHardware(hardwareSensor) ) {
 				if(controller.getMaster(hardwareSensor, master))
@@ -28,21 +28,22 @@ void setup() {
 				};
 			}
 		}
-	} while( !init );*/
+	} while( !init );
 
   //bleUuid = hardware.getUuid();
-  /*HardwareRecord hardware;
-  hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-  hardware.salaId = 1;
-  controller.setHardwareConfig(hardware);	
+  //HardwareRecord hardware;
+  //hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+  //hardware.salaId = 1;
+  //controller.setHardwareConfig(hardware);	
+  
+  controller.configureClient("ESP_SENSOR", SENSOR);  
 
-  controller.configureBLEClient();  
 }
 
 void loop() {
 	Serial.println("loop");
     
-	/*bool leitura = digitalRead(portaPresenca);
+	bool leitura = digitalRead(portaPresenca);
 	temperature = dht.readTemperature();
 	if(leitura) {
 		monitoringRecord.hasPresent = "S";
@@ -56,7 +57,7 @@ void loop() {
 		monitoringRecord.temperature = -1;
 	}
   	delay(1000);
-	controller.sendDataOfMonitoring(monitoringRecord);*/
+	controller.sendDataOfMonitoring(monitoringRecord);
 	
 	//sensors()
 	//dispositivo()
@@ -64,4 +65,4 @@ void loop() {
     //Mestre -> Sensor de Presenca ()
     //Sensor de Presenca () -> Mestre
 
-//}
+}

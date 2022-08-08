@@ -2,8 +2,6 @@
 #define ClientSocketService_h
 
 #include "Config.h"
-#include "ArduinoJson.h"
-#include <IRsend.h>
 
 #define CONDICIONADOR  "CONDICIONADOR"
 #define LUZES "LUZES"

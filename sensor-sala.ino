@@ -1,4 +1,4 @@
-#include "Config.h"
+/*#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -8,8 +8,6 @@ String master = "";
 DHT dht(4, DHT11);
 float temperature; 
 const int portaPresenca = GPIO_NUM_12;
-
-//void initBLE(); 
 
 void setup() {
 	
@@ -25,19 +23,21 @@ void setup() {
 					Serial.println(master);
 					// controller.startVisibleService(); 
 					init = true;
-				};
+				}
+
+        		controller.fillHardwares(hardware);
 			}
 		}
 	} while( !init );
 
-  //bleUuid = hardware.getUuid();
-  //HardwareRecord hardware;
-  //hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-  //hardware.salaId = 1;
-  //controller.setHardwareConfig(hardware);	
+  /*
+   * HardwareRecord hardware;
+   * hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+   * hardware.salaId = 1;
+   * controller.setHardwareConfig(hardware);
+   */
   
-  controller.configureClient("ESP_SENSOR", SENSOR);  
-
+  /*controller.configureClient("ESP_SENSOR", SENSOR);  
 }
 
 void loop() {
@@ -65,4 +65,4 @@ void loop() {
     //Mestre -> Sensor de Presenca ()
     //Sensor de Presenca () -> Mestre
 
-}
+}*/

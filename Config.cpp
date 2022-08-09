@@ -13,8 +13,8 @@ Config::Config(){
     __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
     __url       = "https://webapi-cy5.conveyor.cloud/api";
     __debug     = true;
-    //__ssid      = "VIVOFIBRA-5F70";
-    //__password  = "F03C999054";
+   //__ssid      = "3F1M 2";
+   //__password  = "geladeira123";
     __ssid      = "Apartamento 201-2.4";
     __password  = "Ald50983021";
     __basetime  = 180000;

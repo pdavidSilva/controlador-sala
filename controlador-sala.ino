@@ -26,8 +26,8 @@ void setup() {
 
 			}
 		}
-	} while( !init );
-*/
+	} while( !init ); */
+  
   // mocks
   /* *
    * hardware.uuid = "36938872-c3ca-11ec-9d64-0242ac120002";

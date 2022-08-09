@@ -1,12 +1,8 @@
-/*
 #include "Config.h"
 
-//CommandDevice commandDevice;
 HardwareRecord hardware;
 Controller controller;
 String master = "";
-
-//void initBLE(); 
 
 void setup() {
 	
@@ -20,24 +16,26 @@ void setup() {
 				{
 					Serial.print("master: ");
 					Serial.println(master);
-					// controller.startVisibleService(); 
 					init = true;
-				};
+				}
+
+        		controller.fillHardwares(hardware);
 			}
 		}
-	} while( !init );
+	} while( !init ); 
 
-  //bleUuid = hardware.getUuid();
+  /*
+   * HardwareRecord hardware;
+   * hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
+   * hardware.salaId = 1;
+   * controller.setHardwareConfig(hardware);
+   */  
+  
   controller.configureClient("ESP_ATUADOR", ATUADOR);  
 }
 
 void loop() {
 	Serial.println("loop");
 
-	//sensors()
-	//dispositivo()
-	
-  //Mestre -> Sensor de Presenca ()
-  //Sensor de Presenca () -> Mestre
-
-}        */            
+  delay(5000);
+}            

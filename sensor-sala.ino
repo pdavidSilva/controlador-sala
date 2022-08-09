@@ -25,7 +25,7 @@ void setup() {
 					init = true;
 				}
 
-        		controller.fillHardwares(hardware);
+        		controller.setHardwareConfig(hardware);
 			}
 		}
 	} while( !init );

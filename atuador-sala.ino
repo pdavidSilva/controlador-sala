@@ -1,4 +1,4 @@
-#include "Config.h"
+/*#include "Config.h"
 
 HardwareRecord hardware;
 Controller controller;
@@ -9,7 +9,7 @@ void setup() {
 	Serial.begin(115200);
 	bool init = false;
 
-	do {
+	/*do {
 		if ( controller.start(hardware) ) {
 			if ( controller.registerHardware(hardware) ) {
 				if(controller.getMaster(hardware, master))
@@ -22,7 +22,7 @@ void setup() {
         		controller.setHardwareConfig(hardware);
 			}
 		}
-	} while( !init ); 
+	} while( !init ); */
 
   /*
    * HardwareRecord hardware;
@@ -31,11 +31,11 @@ void setup() {
    * controller.setHardwareConfig(hardware);
    */  
   
-  controller.configureClient("ESP_ATUADOR", ATUADOR);  
+  /* controller.configureClient("ESP_ATUADOR", ATUADOR);  
 }
 
 void loop() {
 	Serial.println("loop");
 
   delay(5000);
-}            
+}  */          

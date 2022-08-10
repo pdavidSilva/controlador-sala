@@ -470,7 +470,7 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
     HTTP http;
     String route;
     Config config;
-    struct Monitoramento monitoramento;
+    struct Monitoramento monitoramento = {0, false, 0};
     EnvironmentVariablesService environment;
         
     if (config.getRoute() == 1)

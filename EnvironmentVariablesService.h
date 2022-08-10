@@ -55,6 +55,8 @@ class EnvironmentVariablesService
     
     String getUuidActuator(int typeEquipment);
 
+    bool getRoomDuringClassTime();
+    
     void turnOnManagedDevices();
     void turnOffManagedDevices();
 

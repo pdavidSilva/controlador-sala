@@ -175,32 +175,44 @@ String EnvironmentVariablesService::getUuidActuator(int typeEquipment)
 }
 
 /*
- * <descricao> Verifica se é para ligar os dispostivos (luzes e ar) de acordo com as 
- * infomacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
+ * <descricao> Verifica se a sala está reservada no horário atual e retorna TRUE se estiver em horário de reserva <descricao/>
  */
-void EnvironmentVariablesService::turnOnManagedDevices() {
+bool EnvironmentVariablesService::getRoomDuringClassTime() {
+  
   String horaInicio, horaFim;
   bool inClass = false;
   struct Reserva r;
+  
   for (r: __reservations) {
 
     horaInicio = r.horarioInicio;
     horaFim = r.horarioFim;
     
-    if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim && __hasMovement) {
-
-      if (!__monitoringConditioner.estado)
-        turnOnConditioner();
-
-      if (!__monitoringLight.estado)
-        turnOnLight();
-
-        inClass = true;
-    }
+    if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim)
+      inClass = true;
   }
 
-  __inClass = inClass;
-  __hasMovement = false;
+  return inClass;
+}
+
+/*
+ * <descricao> Verifica se é para ligar os dispostivos (luzes e ar) de acordo com as 
+ * infomacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
+ */
+void EnvironmentVariablesService::turnOnManagedDevices() {
+    
+    if (getRoomDuringClassTime() && __hasMovement) 
+    {
+
+      if (!__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0)
+        turnOnConditioner();
+
+      if (!__monitoringLight.estado && __monitoringLight.id > 0 && __monitoringLight.equipamentoId > 0)
+        turnOnLight();
+
+    }
+  
+    __hasMovement = false;
 }
 
 /*
@@ -208,29 +220,15 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
  * informacoes obtidas dos modulos de sensoriamento e dos dados das reservas da sala <descricao/>
  */
 void EnvironmentVariablesService::turnOffManagedDevices() {
-  String horaInicio;
-  String horaFim;
-  bool notInClass = true;
 
-  struct Reserva r;
-  for (r: __reservations) {
-
-    horaInicio = r.horarioInicio;
-    horaFim = r.horarioFim;
-
-    if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim)
-      notInClass = false;
-  }
-
-  if (notInClass) {
-    if (__monitoringConditioner.estado) 
+  if (!getRoomDuringClassTime()) 
+  {
+    if (__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0) 
       turnOfConditioner();
 
-    if (__monitoringLight.estado)
+    if (__monitoringLight.estado && __monitoringLight.id > 0 && __monitoringLight.equipamentoId > 0)
       turnOfLight();
   }
-
-  __inClass = !notInClass;
 }
 
 /*
@@ -252,8 +250,7 @@ void EnvironmentVariablesService::turnOnConditioner(){
 
   __monitoringConditioner.estado = true;
 
-  if(__monitoringConditioner.equipamentoId > 0 && __monitoringConditioner.id > 0)
-    __httpRequestService.putMonitoring(__monitoringConditioner);
+  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -275,8 +272,7 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   __monitoringConditioner.estado = false;
   
-  if(__monitoringConditioner.equipamentoId > 0 && __monitoringConditioner.id > 0)
-    __httpRequestService.putMonitoring(__monitoringConditioner);
+  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -385,6 +381,8 @@ void EnvironmentVariablesService::continuousValidation()
         Serial.print("[ENVIRONMENT_VARIABLES]: ");
         Serial.println(__currentTime);
       }
+
+      __inClass = getRoomDuringClassTime();
       
       checkEnvironmentVariables();
 

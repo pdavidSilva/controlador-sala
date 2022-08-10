@@ -81,19 +81,23 @@ class MyCallbacks: public BLECharacteristicCallbacks {
   }
 };
 
-void initBLEClient(String deviceName, DeviceType devType);
 void initBLEClient(String deviceName, DeviceType devType)
 {
   pinMode(LED, OUTPUT);
   deviceType = devType;
   
+  Serial.println("========================================");
+  Serial.println("[BLE_CLIENT]: Set Name Disp");
   BLEDevice::init(std::string(deviceName.c_str()));
 
+  Serial.println("[BLE_CLIENT]: Create server");
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
+  Serial.println("[BLE_CLIENT]: Create Service");
   BLEService *pService = pServer->createService(SERVICEUUID);
 
+  Serial.println("[BLE_CLIENT]: Create Characteristic");
   pCharacteristicSensor = pService->createCharacteristic(
                       CHARACTERISTICUUID,
                       BLECharacteristic::PROPERTY_READ   |
@@ -106,17 +110,16 @@ void initBLEClient(String deviceName, DeviceType devType)
 
   pCharacteristicSensor->setCallbacks(new MyCallbacks());
 
+  Serial.println("[BLE_CLIENT]: Start Service");
   pService->start();
 
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICEUUID);
-  pAdvertising->setScanResponse(false);
+  pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x0);
   BLEDevice::startAdvertising();
 
   Serial.println("Waiting a client connection to notify...");
 }
-
-
     
 #endif

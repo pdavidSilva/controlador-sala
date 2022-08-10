@@ -1,6 +1,6 @@
-/*#include "Config.h"
+#include "Config.h"
 
-//BLEServerService* bleConfig; 
+BLEServerService* bleConfig; 
 //EnvironmentVariablesService environment;
 
 HardwareRecord hardware;
@@ -14,7 +14,7 @@ void setup() {
 
   wiFiService.connect();
 
-	 do {
+	do {
 		if ( controller.start(hardware) ) {
 			if ( controller.registerHardware(hardware) ) {
 
@@ -26,7 +26,7 @@ void setup() {
 
 			}
 		}
-	} while( !init ); */
+	} while( !init ); 
   
   // mocks
   /* *
@@ -44,9 +44,9 @@ void setup() {
    * 
    *  bleConfig->addActuator(atuador);
    * */ 
-
+   
   // Configure BLE Service
- /* controller.configureBLEServer();
+  controller.configureBLEServer();
   controller.initBLETaskServer();	
 
   // Configure Socket Service
@@ -59,4 +59,4 @@ void setup() {
 
 void loop() {
   controller.environmentVariablesContinuousValidation(); 
-}*/
+}

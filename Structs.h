@@ -39,6 +39,19 @@ typedef struct MonitoringRequest
 };
 
 /*
+ * Estrutura usada para guardar dados da solicitacao
+ */
+typedef struct Solicitacao
+{
+  int id;
+  String type;
+  String code;
+  String uuid;
+  String acting;
+};
+
+
+/*
  * Estrutura usada para guardar dados da reserva da sala
  */
 typedef struct Reserva {
@@ -61,5 +74,6 @@ struct Monitoramento {
   bool estado;
   int equipamentoId;
 };
+
 
 #endif

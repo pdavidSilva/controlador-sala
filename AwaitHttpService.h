@@ -3,7 +3,7 @@
 
 #include "Config.h"
 
-#define CONDICIONADOR  "CONDICIONADOR"
+#define CONDICIONADOR  "AR_CONDICIONADO"
 #define LUZES "LUZES"
 #define ATUALIZAR "ATUALIZAR_HORARIOS"
 
@@ -25,7 +25,7 @@ class AwaitHttpService
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
-    static void awaitSolicitation();
+    static void awaitSolicitation(void* _this);
     static void executeSolicitation(Solicitacao solicitacao); 
 
     // Solicitacao

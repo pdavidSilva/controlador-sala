@@ -106,7 +106,8 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
 
     params.concat("{");
     params.concat("\"id\":" + id + ", ");
-    params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
+    // params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
+    // params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"tipo_hardware_id\": " + tipo_hardware_id);
     params.concat("}");
@@ -212,7 +213,7 @@ struct HardwareRecord HTTPService::deserializeDevice(JsonVariant sensor) {
 struct Solicitacao HTTPService::deserializeSolicitacao(int idSolicitacao, String payload) {
     
     struct Solicitacao solicitacao;
-    DynamicJsonDocument doc(1024);
+    DynamicJsonDocument doc(4096);
     deserializeJson(doc, payload);
 
     solicitacao.id = idSolicitacao;    
@@ -695,10 +696,10 @@ struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
     routeService.concat("&todosRegistros=false");
     
     String response = http.request(routeService, type, params);
-                
+    
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(4096);
         DeserializationError error = deserializeJson(doc, response);
         
         if (error)
@@ -714,7 +715,7 @@ struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
 
         if (doc["httpCode"].as<int>() == 200)
         {
-            solicitacao = deserializeSolicitacao(doc["result"]["id"].as<int>(), doc["result"]["payload"].as<String>());
+            solicitacao = deserializeSolicitacao(doc["result"][0]["id"].as<int>(), doc["result"][0]["payload"].as<String>());
         }
         else
         {

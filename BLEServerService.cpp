@@ -367,16 +367,16 @@ void BLEServerService::continuousConnectionTask()
     while (true)
     {
         Serial.println();
-        Serial.println("[CONTINUOUS_CONNECTION] NEW CICLE");
+        // Serial.println("[CONTINUOUS_CONNECTION] NEW CICLE");
         for (auto item : __devicesMapped) 
         {
             if (__configuration.isDebug())
             {
-                Serial.print("[CONTINUOUS_CONNECTION] Receive Request: ");
-                Serial.println(__receivedRequest);
+                // Serial.print("[CONTINUOUS_CONNECTION] Receive Request: ");
+                // Serial.println(__receivedRequest);
 
-                Serial.print("[CONTINUOUS_CONNECTION] In Class: ");
-                Serial.println(__environmentVariables.getInClass());
+                // Serial.print("[CONTINUOUS_CONNECTION] In Class: ");
+                // Serial.println(__environmentVariables.getInClass());
             }
            
             if(!__receivedRequest && __environmentVariables.getInClass())

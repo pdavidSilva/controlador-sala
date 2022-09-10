@@ -31,10 +31,10 @@ void AwaitHttpService::setMessageReturned(bool messageReturned) {
 
 void AwaitHttpService::startAwait()
 {
-    // xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 5, NULL);
+    xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 5, NULL);
 }
 
-void AwaitHttpService::awaitSolicitation()
+void AwaitHttpService::awaitSolicitation(void* _this)
 {
     Solicitacao solicitacao;
     while (true)

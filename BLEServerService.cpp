@@ -12,6 +12,7 @@ vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
 unordered_map<string, Hardware> BLEServerService::__devicesMapped;
 BLEDeviceConnect* BLEServerService::__actuatorConnected;
 ClientSocketService __clientWebSocketService;
+AwaitHttpService __awaitHttpService;
 EnvironmentVariablesService __environmentVariables;
 Config __configuration;
 
@@ -40,8 +41,8 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
 
       if(__receivedRequest && !__environmentSolicitation)
       {   
-        __clientWebSocketService.setMessageReturned(true);
-        __clientWebSocketService.setMessage(data.substring(0, length));
+        __awaitHttpService.setMessageReturned(true);
+        __awaitHttpService.setMessage(data.substring(0, length));
       }
       else
       {

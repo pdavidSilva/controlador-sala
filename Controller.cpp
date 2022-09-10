@@ -5,6 +5,7 @@
 Controller::Controller(){}
 HTTPService __http;
 ClientSocketService __clientSocketService;
+AwaitHttpService __awaitHttpService;
 BLEServerService* __bleConfig; 
 EnvironmentVariablesService __environmentService;
 Config __config; 
@@ -100,6 +101,11 @@ void Controller::initServerSocket()
 void Controller::startTaskWebSocket()
 {  
     __clientSocketService.startTaskWebSocket();
+}
+
+void Controller::startTaskHttp()
+{  
+    __awaitHttpService.startAwait();
 }
 
 HardwareRecord Controller::getHardwareConfig()

@@ -50,8 +50,10 @@ void setup() {
   controller.initBLETaskServer();	
 
   // Configure Socket Service
-  controller.initServerSocket();    
-  controller.startTaskWebSocket();
+  // controller.initServerSocket();    
+  // controller.startTaskWebSocket();
+  controller.startTaskHttp();
+
 
   // Configure Environment Variables Service
   controller.initEnvironmentVariables();

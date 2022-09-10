@@ -680,7 +680,7 @@ struct MonitoringRequest HTTPService::getSolicitacao(String tipoEquipamento){
     
     HTTP http;
     Config config;
-    struct Solicitacao solicitacao;
+    struct Solicitacao solicitacao = {0,"","","",""};
     EnvironmentVariablesService environment;
 
     String route = "/Solicitacao";
@@ -742,6 +742,7 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
     Config config;
     HTTP http;
     String route;
+    EnvironmentVariablesService environment;
     
     route = "/Solicitacao/finalizar/";
 
@@ -750,6 +751,9 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
     String params = "";
     String response;
     String id = String(idSolicitacao);
+    String horaFinalizacao = environment.getNow();
+
+    params.concat("\"" + horaFinalizacao + "\"");
 
     routeService.concat(route + id);
     response = http.request(routeService, type, params);

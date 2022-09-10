@@ -332,6 +332,17 @@ void EnvironmentVariablesService::awaitsReturn()
   }    
 }
 
+String EnvironmentVariablesService::getNow()
+{
+  String now = "";
+  __wifiService.connect();
+  now = __ntp.getFormattedDate();
+  __wifiService.disconnect();
+
+  return now;
+}
+
+
 void EnvironmentVariablesService::checkTimeToLoadReservations()
 {
   __wifiService.connect();

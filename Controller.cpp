@@ -83,7 +83,7 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 
  void Controller::sendDataOfMonitoring(MonitoringRecord monitoringRecord)
 {
-    DynamicJsonDocument doc(1024);
+    DynamicJsonDocument doc(2048);
     String data;
     doc['temperature'] = monitoringRecord.temperature;
     doc['hasPresent'] = monitoringRecord.hasPresent;

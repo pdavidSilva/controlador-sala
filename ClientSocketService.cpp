@@ -127,7 +127,7 @@ MonitoringRequest ClientSocketService::deserealizeObject(String payload)
 {
     MonitoringRequest request;
 
-    DynamicJsonDocument doc(1024);
+    DynamicJsonDocument doc(2048);
     deserializeJson(doc, payload);
     
     request.type = doc["type"].as<char *>();

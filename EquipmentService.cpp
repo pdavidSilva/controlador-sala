@@ -98,7 +98,7 @@ void EquipmentService::SendIrComand(Vector<int> codigo) {
       k++;
     }
     
-    
+    Serial.println("====CODIGO_SIZE: " +  String(codigo.size()));
     irsend.sendRaw(rawData, codigo.size(), 38); // envia comando IR para o equipamento    
     delay(1000);
 }
@@ -166,7 +166,7 @@ void EquipmentService::turnOffLights(){
 }
 
 String EquipmentService::executeActionFromController(String data) {
-  DynamicJsonDocument doc(1024);
+  DynamicJsonDocument doc(2048);
   DeserializationError error = deserializeJson(doc, data);
   Serial.println("==================================");
   Serial.print("[EquipmentService] executar comando recebidos do controlador : ");
@@ -183,8 +183,9 @@ String EquipmentService::executeActionFromController(String data) {
   } else if(type.equals("AC")) {
     Vector<int> codigo = SplitIrComands(command);
     SendIrComand(codigo);
-    bool isOn = checkIrms();
-    return isOn ? AC_ON : AC_OFF;
+    //bool isOn = checkIrms();
+    //return isOn ? AC_ON : AC_OFF;
+    return state.equals("ON") ? AC_ON : AC_OFF;
   }
   return "ERROR"; 
 }

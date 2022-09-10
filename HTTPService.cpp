@@ -37,7 +37,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record)
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -257,7 +257,7 @@ struct Solicitacao HTTPService::deserializeSolicitacao(int idSolicitacao, String
 
     if (strstr(response.c_str(), "[ERROR]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -340,7 +340,7 @@ bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -406,7 +406,7 @@ std::vector<struct Reserva> HTTPService::GetReservationsWeek() {
     
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -510,7 +510,7 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
                 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
         
         if (error)
@@ -585,7 +585,7 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -635,7 +635,7 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -761,7 +761,7 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)

@@ -674,9 +674,9 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
 /**
  * <descricao> Obtém as solicitações em aberto para o hardware </descricao>
  * <parametros> tipo Tipo de Equipamento: LUZES, CONDICIONADOR</parametros>
- * <retorno> struct MonitoringRequest referente a solicitação existente para o hardware </retorno>
+ * <retorno> struct Solicitacao referente a solicitação existente para o hardware </retorno>
 */
-struct MonitoringRequest HTTPService::getSolicitacao(String tipoEquipamento){
+struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
     
     HTTP http;
     Config config;
@@ -714,7 +714,7 @@ struct MonitoringRequest HTTPService::getSolicitacao(String tipoEquipamento){
 
         if (doc["httpCode"].as<int>() == 200)
         {
-            solicitacao = deserializeSolicitacao(doc["result"]["id"].as<int>(), doc["result"]["payload"].as<String>())
+            solicitacao = deserializeSolicitacao(doc["result"]["id"].as<int>(), doc["result"]["payload"].as<String>());
         }
         else
         {

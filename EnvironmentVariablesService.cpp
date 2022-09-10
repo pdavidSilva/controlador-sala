@@ -334,12 +334,7 @@ void EnvironmentVariablesService::awaitsReturn()
 
 String EnvironmentVariablesService::getNow()
 {
-  String now = "";
-  __wifiService.connect();
-  now = __ntp.getFormattedDate();
-  __wifiService.disconnect();
-
-  return now;
+  return "2022-09-09T09:15:00";
 }
 
 

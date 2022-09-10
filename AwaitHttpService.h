@@ -19,14 +19,14 @@ class AwaitHttpService
   public: 
     AwaitHttpService();
 
-    tring getMessage();
+    String getMessage();
     void setMessage(String message);
 
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
     static void awaitSolicitation();
-    bool executeSolicitation(Solicitacao solicitacao); 
+    static void executeSolicitation(Solicitacao solicitacao); 
 
     // Solicitacao
     void startAwait();

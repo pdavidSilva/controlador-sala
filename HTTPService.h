@@ -20,7 +20,7 @@ class HTTPService
         struct Monitoramento getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
         String getComandosIrByIdSalaAndOperacao(String uuid);
         struct Solicitacao getSolicitacao(String tipoEquipamento);
-        struct Solicitacao deserializeSolicitacao(int idSolicitacao,String payload)
+        struct Solicitacao deserializeSolicitacao(int idSolicitacao,String payload);
         bool putSolicitacao(int idSolicitacao);
 };
 

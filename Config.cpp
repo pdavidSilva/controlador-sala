@@ -13,8 +13,10 @@ Config::Config(){
     __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
     __url       = "http://marcosdosea-002-site2.itempurl.com/api";
     __debug     = true;
-    __ssid      = "Josiely";
-    __password  = "JOIBSN12";
+    __ssid      = "transmissaoaula";
+    __password  = "#ufstransmissao#";
+    // __ssid      = "Josiely";
+    // __password  = "JOIBSN12";
     //__ssid      = "Apartamento 201-2.4";
     //__password  = "Ald50983021";
     __basetime  = 180000;

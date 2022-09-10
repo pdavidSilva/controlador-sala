@@ -1,7 +1,7 @@
 #include "Config.h"
 #include "AwaitHttpService.h"
 
-Config config;
+Config __configAcess;
 BLEServerService* __bleConfiguration; 
 HTTPService __httpService;
 EnvironmentVariablesService __environment;
@@ -31,7 +31,7 @@ void AwaitHttpService::setMessageReturned(bool messageReturned) {
 
 void AwaitHttpService::startAwait()
 {
-    xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 5, NULL);
+    // xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 5, NULL);
 }
 
 void AwaitHttpService::awaitSolicitation()
@@ -39,7 +39,7 @@ void AwaitHttpService::awaitSolicitation()
     Solicitacao solicitacao;
     while (true)
     {
-        if (configuration.isDebug())
+        if (__configAcess.isDebug())
         {
             Serial.println("=======================================");
             Serial.println("[AwaitHttpService] Start");
@@ -55,7 +55,7 @@ void AwaitHttpService::awaitSolicitation()
             executeSolicitation(solicitacao);
         }
 
-        if (configuration.isDebug())
+        if (__configAcess.isDebug())
         {
             Serial.println("=======================================");
             Serial.println("[AwaitHttpService] End");
@@ -75,7 +75,7 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
   { 
     i++;
     
-    if (configuration.isDebug())
+    if (__configAcess.isDebug())
     {
       Serial.print("[AwaitHttpService]: attempt number: ");
       Serial.println(i);
@@ -94,7 +94,7 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
   return deviceConnected;
 }
 
-void AwaiHttpService::executeSolicitation(Solicitacao request) 
+void AwaitHttpService::executeSolicitation(Solicitacao request) 
 {
     __bleConfiguration->setReceivedRequest(true);
     bool dispConnected = connectToActuator(request.uuid);
@@ -111,14 +111,9 @@ void AwaiHttpService::executeSolicitation(Solicitacao request)
 
     __bleConfiguration->setReceivedRequest(false);
 
-    if(__messageReturned)   
-        client.println(__message);
-    else
-        client.println("NOT-AVALIABLE");
-
     __utils.updateMonitoring(__message);
 
-    if (configuration.isDebug())
+    if (__configAcess.isDebug())
     {
         Serial.println("==================================");
         Serial.println("[AwaitHttpService] Resposta BLE");
@@ -131,7 +126,7 @@ void AwaiHttpService::executeSolicitation(Solicitacao request)
 
 }
 
-String AwaiHttpService::getMessageToSend(Solicitacao request)
+String AwaitHttpService::getMessageToSend(Solicitacao request)
 {
     String typeEquipament = "", state = "", command = "null";
 
@@ -151,14 +146,14 @@ String AwaiHttpService::getMessageToSend(Solicitacao request)
     return __utils.mountPayload(typeEquipament, state, command);
 }
 
-void AwaiHttpService::awaitsReturn()
+void AwaitHttpService::awaitsReturn()
 {
   
   unsigned long tempoLimite = millis() + 15000;
   while(millis() <= tempoLimite && !__messageReturned)
   { 
       delay(1000);
-      if (configuration.isDebug())
+      if (__configAcess.isDebug())
       {    
         Serial.print("[AwaitHttpService] TIME AWAITS: ");
         Serial.println(millis());

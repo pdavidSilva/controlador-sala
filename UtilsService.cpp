@@ -10,7 +10,7 @@ String UtilsService::mountPayload(String deviceType, String state, String comman
     payload.concat("{");
     payload.concat("\"type\":\"" + deviceType + "\", ");
     payload.concat("\"state\":\"" + state + "\", ");
-    payload.concat("\"command\":\"" + command + "\", ");
+    payload.concat("\"command\":\"" + command + "\"");
     payload.concat("}");
 
     return payload;

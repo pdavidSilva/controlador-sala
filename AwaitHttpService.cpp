@@ -102,7 +102,35 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
     if(dispConnected)
     {
         String payload = getMessageToSend(request);
-        __bleConfiguration->sendMessageToActuator(payload);
+        Serial.println("==================================");
+        Serial.println("[AwaitHttpService] Sendig Payload: " + payload);
+
+        if(payload.length() > MAX_LENGTH_PACKET)
+        {
+            String packet = "";
+            int index = 0;
+            do
+            {
+                packet = packet + payload[index];
+
+                if ((index != 0 && (index % MAX_LENGTH_PACKET) == 0) || (payload.length() - 1) == index)  
+                {
+                    Serial.println("==================================");         
+                    Serial.println("[AwaitHttpService] Sendig packet: " + packet);
+                    __bleConfiguration->sendMessageToActuator(packet);
+                    packet = "";
+                }
+
+                index++;
+
+            } while(index < payload.length());
+        }
+        else
+        {
+            __bleConfiguration->sendMessageToActuator(payload);
+        }
+
+        __bleConfiguration->sendMessageToActuator("END_DATA");
 
         awaitsReturn();
 

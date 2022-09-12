@@ -53,13 +53,13 @@ String EquipmentService::SplitGetIndex(String data, char separator, int index) {
  * <parametros> data: codigos IR recebidos na requisicao do servidor <parametros/>
  * <retorno>  <retorno/>
  */
-Vector<int> EquipmentService::SplitIrComands(String data) {
+Vector<int> EquipmentService::SplitIrComands(String codigoString) {
     
-    int storage_array[200]; // uso do vetor tem que declarar um valor max
+    int storage_array[300]; // uso do vetor tem que declarar um valor max
     Vector <int> codigo;
     codigo.setStorage(storage_array);
 
-    String codigoString = SplitGetIndex(data, ';', 1);
+    //String codigoString = SplitGetIndex(data, ',', 1);
 	
     String temp = "";
     for (int i = 0; i < codigoString.length(); i++) 
@@ -77,7 +77,6 @@ Vector<int> EquipmentService::SplitIrComands(String data) {
       }
 
     }
-
 
     return codigo;
 }
@@ -98,7 +97,8 @@ void EquipmentService::SendIrComand(Vector<int> codigo) {
       k++;
     }
     
-    Serial.println("====CODIGO_SIZE: " +  String(codigo.size()));
+    Serial.println("==================================");
+    Serial.print("[EquipmentService] Command Size: " +  String(codigo.size()));
     irsend.sendRaw(rawData, codigo.size(), 38); // envia comando IR para o equipamento    
     delay(1000);
 }
@@ -144,9 +144,6 @@ void EquipmentService::turnOnLights(){
 
   __lightOn = true;
   digitalWrite(RELE, HIGH);
-
-  //String logMonitoramento = "Ligando luzes no horario: " + horaAtualSistema;
-  //gravarLinhaEmArquivo(SPIFFS, logMonitoramento, pathLogMonitoramento);
 }
 
 /*
@@ -160,32 +157,51 @@ void EquipmentService::turnOffLights(){
 
   __lightOn = false;
   digitalWrite(RELE, LOW);
-
-  //String logMonitoramento = "Desligando luzes no horario: " + horaAtualSistema;
-  //gravarLinhaEmArquivo(SPIFFS, logMonitoramento, pathLogMonitoramento);
 }
 
 String EquipmentService::executeActionFromController(String data) {
-  DynamicJsonDocument doc(2048);
-  DeserializationError error = deserializeJson(doc, data);
+
   Serial.println("==================================");
   Serial.print("[EquipmentService] executar comando recebidos do controlador : ");
+
+  DynamicJsonDocument doc(2048);
+  DeserializationError error = deserializeJson(doc, data);
+  
+  if(error) 
+  {
+    Serial.println("==================================");
+    Serial.print("[EquipmentService] Erro ao deserializar objeto ");
+
+    return "ERROR"; 
+  }
 
   String type = doc["type"].as<String>();
   String command = doc["command"].as<String>();
   String state = doc["state"].as<String>();
-  if(type == NULL){
+
+  Serial.println("==================================");
+  Serial.print("[EquipmentService] Command: " + String(command));
+
+  if(type == NULL)
+  {
     return "ERROR"; 
-  }
-  else if(type.equals("LZ")) {
+  } 
+  else if(type.equals("LZ")) 
+  {
+    
     checkOperationLights(state);
     return state.equals("ON") ? LZ_ON : LZ_OFF;
-  } else if(type.equals("AC")) {
+
+  } 
+  else if(type.equals("AC")) 
+  {
+
     Vector<int> codigo = SplitIrComands(command);
     SendIrComand(codigo);
     //bool isOn = checkIrms();
     //return isOn ? AC_ON : AC_OFF;
     return state.equals("ON") ? AC_ON : AC_OFF;
   }
+
   return "ERROR"; 
 }

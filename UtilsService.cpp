@@ -1,6 +1,7 @@
 #include "UtilsService.h"
 
 EnvironmentVariablesService __environmentVariablesService;
+HTTPService __httpUtilService;
 
 UtilsService::UtilsService(){}
 
@@ -23,18 +24,49 @@ void UtilsService::updateMonitoring(String message)
     {
         Monitoramento monitoringLight = __environmentVariablesService.getMonitoringLight();
 
-        monitoringLight.estado = message == LZ_ON ? true : false;
+        monitoringLight.estado = (message == LZ_ON);
 
         __environmentVariablesService.setMonitoringLight(monitoringLight);
+
+        if(monitoringLight.equipamentoId > 0 && monitoringLight.id > 0)
+           __httpUtilService.putMonitoring(monitoringLight);
     }
 
     if(message == AC_OFF || message == AC_ON)
     {
        Monitoramento monitoringConditioner = __environmentVariablesService.getMonitoringConditioner();    
 
-       monitoringConditioner.estado = message == AC_ON ? true : false;
+       monitoringConditioner.estado = (message == AC_ON);
 
        __environmentVariablesService.setMonitoringConditioner(monitoringConditioner); 
+
+       if(monitoringConditioner.equipamentoId > 0 && monitoringConditioner.id > 0)
+           __httpUtilService.putMonitoring(monitoringConditioner);
     }
 
+}
+ 
+std::vector<String> UtilsService::splitPayload(String payload, int maxSize)
+{
+    std::vector<String> subStrings;
+    String packet = "";
+    int index = 0;
+
+    do
+    {
+        packet = packet + payload[index];
+
+        if ((index != 0 && (index % MAX_LENGTH_PACKET) == 0) || (payload.length() - 1) == index)  
+        {
+           subStrings.push_back(packet);
+           packet = "";
+        }
+
+        index++;
+
+    } while(index < payload.length());
+
+    subStrings.push_back(END_DATA);
+ 
+    return subStrings;  
 }

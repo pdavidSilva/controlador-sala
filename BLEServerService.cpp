@@ -374,11 +374,9 @@ void BLEServerService::continuousConnectionTask()
             if (__configuration.isDebug())
             {
                 Serial.println("=================================");
-                Serial.print("[CONTINUOUS_CONNECTION] Receive Request: ");
-                Serial.println(__receivedRequest);
+                Serial.println("[CONTINUOUS_CONNECTION] Receive Request: " + String(__receivedRequest));
 
-                Serial.print("[CONTINUOUS_CONNECTION] In Class: ");
-                Serial.println(__environmentVariables.getInClass());
+                Serial.println("[CONTINUOUS_CONNECTION] In Class: " + String(__environmentVariables.getInClass()));
             }
            
             if(!__receivedRequest && __environmentVariables.getInClass())
@@ -389,12 +387,10 @@ void BLEServerService::continuousConnectionTask()
                 {
                     if (__configuration.isDebug())
                     { 
-                        Serial.println();
-                        Serial.print("[CONTINUOUS_CONNECTION] UUID: ");
-                        Serial.println(disp.getUuid());
+                        Serial.println("================================");
+                        Serial.println("[CONTINUOUS_CONNECTION] UUID: " + String(disp.getUuid()));
       
-                        Serial.print("[CONTINUOUS_CONNECTION] ADDRESS: ");
-                        Serial.println(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str());
+                        Serial.println("[CONTINUOUS_CONNECTION] ADDRESS: " + String(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str()));
                     }
                     
                     deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);

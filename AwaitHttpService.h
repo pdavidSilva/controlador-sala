@@ -6,7 +6,6 @@
 #define CONDICIONADOR  "AR_CONDICIONADO"
 #define LUZES "LUZES"
 #define ATUALIZAR "ATUALIZAR_HORARIOS"
-#define MAX_LENGTH_PACKET 500
 
 class AwaitHttpService 
 {

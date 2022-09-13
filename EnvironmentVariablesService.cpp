@@ -132,11 +132,19 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
                 
   if(dispConnected)
   {
-      __bleServerConfig->sendMessageToActuator(message);
+    std::vector<String> subStrings = __utilsService.splitPayload(message, MAX_LENGTH_PACKET);
 
-      awaitsReturn();
+    String packet;
+    for (packet : subStrings)
+    {
+      Serial.println("==================================");         
+      Serial.println("[ENVIRONMENT_VARIABLES] Sendig packet: " + packet);
+      __bleServerConfig->sendMessageToActuator(packet);
+    }
+        
+    awaitsReturn();
 
-      __bleServerConfig->disconnectToActuator();
+    __bleServerConfig->disconnectToActuator();
   }
 
   __utilsService.updateMonitoring(__message);
@@ -247,10 +255,6 @@ void EnvironmentVariablesService::turnOnConditioner(){
   String payload = __utilsService.mountPayload("AC", "ON", codigos);
   sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------
-
-  __monitoringConditioner.estado = true;
-
-  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -267,12 +271,8 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   //------------------------------------------------------    
   String payload = __utilsService.mountPayload("AC", "OFF", codigos);
-  sendDataToActuator(TYPE_CONDITIONER, codigos);
+  sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------    
-
-  __monitoringConditioner.estado = false;
-  
-  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -285,15 +285,10 @@ void EnvironmentVariablesService::turnOnLight(){
   Serial.println(__monitoringLight.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO LUZES");
 
-  __monitoringLight.estado = true;
-
   // ----------------------------------------------------------
   String payload = __utilsService.mountPayload("LZ", "ON", "null");
-  sendDataToActuator(TYPE_LIGHT,"true");  
+  sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
-
-  if(__monitoringLight.equipamentoId > 0 && __monitoringLight.id > 0)
-    __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 /*
@@ -305,16 +300,12 @@ void EnvironmentVariablesService::turnOfLight(){
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
   Serial.println(__monitoringLight.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO LUZES");
-
-  __monitoringLight.estado = false;
   
   // ----------------------------------------------------------
   String payload = __utilsService.mountPayload("LZ", "OFF", "null");
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
-  if(__monitoringLight.equipamentoId > 0 && __monitoringLight.id > 0)
-    __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 void EnvironmentVariablesService::awaitsReturn()

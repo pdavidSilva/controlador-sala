@@ -105,32 +105,15 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
         Serial.println("==================================");
         Serial.println("[AwaitHttpService] Sendig Payload: " + payload);
 
-        if(payload.length() > MAX_LENGTH_PACKET)
+        std::vector<String> subStrings = __utils.splitPayload(payload, MAX_LENGTH_PACKET);
+
+        String packet;
+        for (packet : subStrings)
         {
-            String packet = "";
-            int index = 0;
-            do
-            {
-                packet = packet + payload[index];
-
-                if ((index != 0 && (index % MAX_LENGTH_PACKET) == 0) || (payload.length() - 1) == index)  
-                {
-                    Serial.println("==================================");         
-                    Serial.println("[AwaitHttpService] Sendig packet: " + packet);
-                    __bleConfiguration->sendMessageToActuator(packet);
-                    packet = "";
-                }
-
-                index++;
-
-            } while(index < payload.length());
+            Serial.println("==================================");         
+            Serial.println("[AwaitHttpService] Sendig packet: " + packet);
+            __bleConfiguration->sendMessageToActuator(packet);
         }
-        else
-        {
-            __bleConfiguration->sendMessageToActuator(payload);
-        }
-
-        __bleConfiguration->sendMessageToActuator("END_DATA");
 
         awaitsReturn();
 

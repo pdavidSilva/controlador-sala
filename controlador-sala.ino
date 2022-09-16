@@ -39,9 +39,9 @@ void setup() {
 
 
   // Configure Environment Variables Service
-  controller.initEnvironmentVariables();
+  //controller.initEnvironmentVariables();
 }
 
 void loop() {
-  controller.environmentVariablesContinuousValidation(); 
+  //controller.environmentVariablesContinuousValidation(); 
 }*/

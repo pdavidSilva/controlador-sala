@@ -7,6 +7,7 @@
 #include <BLE2902.h>
 #include <Arduino.h>
 #include <String>
+#include "Global.h"
 #include "EquipmentService.h"
 
 #define CHARACTERISTICUUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
@@ -36,6 +37,10 @@ void sendDataToServer(String data)
         delay(1500); 
       }
   }
+}
+
+void EnabledToSend(bool enabledToSend) {
+  sendData = enabledToSend;
 }
 
 class MyServerCallbacks: 
@@ -83,10 +88,12 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         Serial.println("===============================================");
         Serial.println("[BLESensorService] ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
-        equipmentState = equipmentService.executeActionFromController(receivedData);
-        sendData = true;
-        sendDataToServer(equipmentState.c_str());
-        sendData = false;
+        HAS_IR_TO_SEND = true;
+        COMMAND_IR = receivedData;
+        //equipmentState = equipmentService.executeActionFromController(receivedData);
+        //sendData = true;
+        //sendDataToServer(equipmentState.c_str());
+        //sendData = false;
         equipmentState = "";
         receivedData = "";
       }

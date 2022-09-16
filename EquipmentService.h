@@ -2,11 +2,11 @@
 #define EquipmentService_h
 
 #include "Config.h"
+#include "Global.h"
 #define RELE 19
 #define pinSCT 14 
 #define tensao 127
 
-const uint16_t kIrLed = 12;
 
 class EquipmentService 
 {

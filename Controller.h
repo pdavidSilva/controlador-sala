@@ -39,6 +39,9 @@ class Controller
         // Validacao continua de variaveis de ambiente
         void environmentVariablesContinuousValidation();
         void initEnvironmentVariables();
+
+        // Send Commands
+        void ExecuteCommandIR(String command);
 };
 
 #endif

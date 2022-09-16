@@ -8,6 +8,8 @@ ClientSocketService __clientSocketService;
 AwaitHttpService __awaitHttpService;
 BLEServerService* __bleConfig; 
 EnvironmentVariablesService __environmentService;
+EquipmentService __equipmentService;
+
 Config __config; 
 
 bool Controller::start(HardwareRecord &record) const 
@@ -87,9 +89,11 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
     String data;
     doc['temperature'] = monitoringRecord.temperature;
     doc['hasPresent'] = monitoringRecord.hasPresent;
-    Serial.println("Controller -> sendDataOfMonitoring");
+    Serial.println("[Controller] sendDataOfMonitoring");
     serializeJson(doc, data);
+    EnabledToSend(true);
     sendDataToServer(data);
+    EnabledToSend(false);
     delay(3000);
   }
 
@@ -147,4 +151,13 @@ bool Controller::loadedDevices()
         return true;
 
     return false;
+}
+
+void Controller::ExecuteCommandIR(String command) 
+{
+  EnabledToSend(true);
+  Serial.println("[CONTROLLER] FOWARD TO SEND IR COMMAND: " + command); 
+  String response = __equipmentService.executeActionFromController(command);
+  sendDataToServer(response);
+  EnabledToSend(false);
 }

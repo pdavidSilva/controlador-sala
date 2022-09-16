@@ -40,7 +40,8 @@ class Config
         bool   __debug;
         int    __type;
         int    __route;
-        
+        int    __wifiFailAttempts;
+        int    __commandSendAttempts;
     public : 
         
         Config();
@@ -53,7 +54,9 @@ class Config
         int    getBaseTime();
         int    getLedStatus();
         bool   isDebug();
-        int    getRoute();
+        int    getRoute();        
+        int    getWifiFailAttempts();
+        int    getCommandSendAttempts();
 };
 
 #endif

@@ -78,6 +78,7 @@ Vector<int> EquipmentService::SplitIrComands(String codigoString) {
 
     }
 
+
     return codigo;
 }
 
@@ -88,7 +89,6 @@ Vector<int> EquipmentService::SplitIrComands(String codigoString) {
  * <retorno>  <retorno/>
  */
 void EquipmentService::SendIrComand(Vector<int> codigo) {
-    IRsend irsend(kIrLed);
     int k = 0;
     uint16_t rawData[codigo.size()];
     for (int el: codigo) 
@@ -98,7 +98,7 @@ void EquipmentService::SendIrComand(Vector<int> codigo) {
     }
     
     Serial.println("==================================");
-    Serial.print("[EquipmentService] Command Size: " +  String(codigo.size()));
+    Serial.println("[EquipmentService] Command Size: " +  String(codigo.size()));
     irsend.sendRaw(rawData, codigo.size(), 38); // envia comando IR para o equipamento    
     delay(1000);
 }
@@ -198,6 +198,7 @@ String EquipmentService::executeActionFromController(String data) {
   {
 
     Vector<int> codigo = SplitIrComands(command);
+
     int attempt = 0;
 
     bool isSuccessful;

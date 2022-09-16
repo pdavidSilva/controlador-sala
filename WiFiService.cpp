@@ -10,7 +10,7 @@ void WiFiService::connect()
     
     int attempt = 0;
     WiFi.begin(config.getSSID().c_str(), config.getPassword().c_str());
-    while (WiFi.status() != WL_CONNECTED)
+    while (WiFi.status() != WL_CONNECTED && attempt < config.getWifiFailAttempts())
     {
         digitalWrite(config.getLedStatus(), HIGH);
         delay(1000);
@@ -24,6 +24,12 @@ void WiFiService::connect()
             Serial.println("[WiFiService] SSID: " + config.getSSID());
             Serial.println("[WiFiService] Password: " + config.getPassword());
         }
+    }
+
+    if(WiFi.status() != WL_CONNECTED && attempt == config.getWifiFailAttempts()) {
+      Serial.println("[WiFiService] Excedido o número de tentativas de conexão ao Wifi: " + config.getWifiFailAttempts());
+      Serial.println("[WiFiService] Reiniciando ESP...");
+      ESP.restart();
     }
 
     digitalWrite(config.getLedStatus(), HIGH);

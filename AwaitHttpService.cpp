@@ -49,7 +49,6 @@ void AwaitHttpService::awaitSolicitation(void* _this)
         if (solicitacao.id != 0){
             executeSolicitation(solicitacao);
         }
-
         solicitacao = __httpService.getSolicitacao(CONDICIONADOR);
         if (solicitacao.id != 0){
             executeSolicitation(solicitacao);
@@ -67,9 +66,10 @@ void AwaitHttpService::awaitSolicitation(void* _this)
 
 bool AwaitHttpService::connectToActuator(String uuidDevice) 
 {
+  Serial.println("[AwaitHttpService]: connectToActuator ACTUATOR : " + uuidDevice);
   bool deviceConnected = false;
   int i = 0;
-  int count = 5;
+  int count = 8;
             
   do
   { 
@@ -85,7 +85,7 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
     
     if(deviceConnected)
       break;
-      
+    delay(2000);  
   } while(i < count);
 
   if( i >= count && !deviceConnected)

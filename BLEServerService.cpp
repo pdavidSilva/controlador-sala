@@ -212,9 +212,9 @@ void BLEServerService::populateMap()
             if (__configuration.isDebug())
             {
               Serial.println("====================================");
-              Serial.print("[CONNECTION]: Atteempt Device: ");
+              Serial.print("[CONNECTION]: Attempt Device: ");
               Serial.println(disp->toString().c_str());
-              Serial.print("[CONNECTION]: Atteempt Number: ");
+              Serial.print("[CONNECTION]: Attempt Number: ");
               Serial.println(index);
               Serial.println("====================================");
             }

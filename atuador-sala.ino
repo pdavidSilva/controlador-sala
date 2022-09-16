@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 HardwareRecord hardware;
 Controller controller;
@@ -24,18 +24,11 @@ void setup() {
 		}
 	} while( !init ); 
 
-  /*
-   * HardwareRecord hardware;
-   * hardware.uuid = "63e21b8d-9fc0-4246-9b4c-c16bc94889e6";
-   * hardware.salaId = 1;
-   * controller.setHardwareConfig(hardware);
-   */  
-  
-  /*controller.configureClient("ESP_ATUADOR", ATUADOR);  
+  controller.configureClient("ESP_ATUADOR", ATUADOR);  
 }
 
 void loop() {
   Serial.println("[Loop] Await message");
 
   delay(5000);
-}*/
+}

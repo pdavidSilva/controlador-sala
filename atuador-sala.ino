@@ -11,8 +11,8 @@ const uint16_t kIrLed = 12;
 IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
 
 void setup() {
-	
 	Serial.begin(115200);
+	irsend.begin();
 	bool init = false;
 
 	do {

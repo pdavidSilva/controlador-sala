@@ -157,7 +157,7 @@ void EquipmentService::turnOffLights(){
 
   __lightOn = false;
   digitalWrite(RELE, LOW);
-}
+}                                         
 
 String EquipmentService::executeActionFromController(String data) {
   Config config;
@@ -203,8 +203,8 @@ String EquipmentService::executeActionFromController(String data) {
 
     bool isSuccessful;
     bool isOn;
-    //do 
-    //{
+    do 
+    {
       Serial.print("[EquipmentService] Enviando comando, tentativa: " + attempt);
 
       SendIrComand(codigo);
@@ -213,7 +213,7 @@ String EquipmentService::executeActionFromController(String data) {
       isSuccessful = (isOn == state.equals("ON") ? AC_ON : AC_OFF);
       attempt++;
 
-    //} while(!isSuccessful && attempt < config.getCommandSendAttempts());
+    } while(!isSuccessful && attempt < config.getCommandSendAttempts());
 
     Serial.println("[EquipmentService] Comando finalizado, Sucesso: " + isSuccessful);
 

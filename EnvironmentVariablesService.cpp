@@ -220,7 +220,7 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
 
     }
   
-    __hasMovement = false;
+    //__hasMovement = false;
 }
 
 /*
@@ -358,6 +358,8 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
   {
     if (__message.equals("S") == 0)
       __hasMovement = true;
+    else
+      __hasMovement = false;
 
     __message = "";
     __receivedData = false; 

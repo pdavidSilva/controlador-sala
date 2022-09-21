@@ -12,6 +12,7 @@ bool EnvironmentVariablesService::__receivedData;
 bool EnvironmentVariablesService::__hasMovement;
 bool EnvironmentVariablesService::__inClass;
 String EnvironmentVariablesService::__message;
+unsigned long EnvironmentVariablesService::__lastTimeAttended;
 WiFiUDP __udp;
 NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 
@@ -36,6 +37,16 @@ void EnvironmentVariablesService::initEnvironmentVariables()
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
     __reservations = __httpRequestService.GetReservationsWeek();
+}
+
+unsigned long EnvironmentVariablesService::getLastTimeAttended() 
+{
+    return __lastTimeAttended;
+}
+
+void EnvironmentVariablesService::setLastTimeAttended(unsigned long time) 
+{
+    __lastTimeAttended = time;
 }
 
 String EnvironmentVariablesService::getMessage() 
@@ -209,7 +220,7 @@ bool EnvironmentVariablesService::getRoomDuringClassTime() {
  */
 void EnvironmentVariablesService::turnOnManagedDevices() {
     
-    if (getRoomDuringClassTime() && __hasMovement) 
+    if (__inClass && __hasMovement) 
     {
 
       if (!__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0)
@@ -218,9 +229,7 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
       if (!__monitoringLight.estado && __monitoringLight.id > 0 && __monitoringLight.equipamentoId > 0)
         turnOnLight();
 
-    }
-  
-    //__hasMovement = false;
+    }  
 }
 
 /*
@@ -229,7 +238,9 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
  */
 void EnvironmentVariablesService::turnOffManagedDevices() {
 
-  if (!getRoomDuringClassTime()) 
+  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > CHECK_TIME_TO_TURN_OFF;
+
+  if (!__inClass || (__inClass && longTimeWithoutMovement)) 
   {
     if (__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0) 
       turnOfConditioner();
@@ -356,10 +367,15 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
 {
   if (__receivedData) 
   {
-    if (__message.equals("S") == 0)
+    if (__message.equals("S") == 0) 
+    {
       __hasMovement = true;
-    else
+      __lastTimeAttended = millis();
+    } 
+    else 
+    {
       __hasMovement = false;
+    }
 
     __message = "";
     __receivedData = false; 
@@ -370,7 +386,7 @@ void EnvironmentVariablesService::continuousValidation()
 {
   Config config;
   int checkTimeToLoad = 0;
-  checkTimeToLoadReservations();
+  __reservations = __httpRequestService.GetReservationsWeek();
 
   while(true)
   {    
@@ -391,7 +407,7 @@ void EnvironmentVariablesService::continuousValidation()
 
       if(checkTimeToLoad == CHECK_TIME_TO_LOAD)
       {
-        checkTimeToLoadReservations();
+        __reservations = __httpRequestService.GetReservationsWeek();
         checkTimeToLoad = 0;
       }
       

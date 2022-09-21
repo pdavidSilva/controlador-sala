@@ -59,13 +59,10 @@ Vector<int> EquipmentService::SplitIrComands(String codigoString) {
     Vector <int> codigo;
     codigo.setStorage(storage_array);
 
-    //String codigoString = SplitGetIndex(data, ',', 1);
-	
     String temp = "";
     for (int i = 0; i < codigoString.length(); i++) 
     {
-      
-      if (codigoString.charAt(i) == ',' || i == codigoString.length() - 1) 
+      if (codigoString.charAt(i) == ',') 
       {
         codigo.push_back(temp.toInt());
         temp = "";
@@ -75,9 +72,8 @@ Vector<int> EquipmentService::SplitIrComands(String codigoString) {
         if (codigoString.charAt(i) != ';' || codigoString.charAt(i) != ' ')
           temp += codigoString.charAt(i);
       }
-
     }
-
+     codigo.push_back(temp.toInt());
 
     return codigo;
 }
@@ -205,7 +201,7 @@ String EquipmentService::executeActionFromController(String data) {
     bool isOn;
     do 
     {
-      Serial.print("[EquipmentService] Enviando comando, tentativa: " + attempt);
+      Serial.println("[EquipmentService] Enviando comando, tentativa: " + attempt);
 
       SendIrComand(codigo);
       isOn = checkIrms();

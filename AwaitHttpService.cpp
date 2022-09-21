@@ -97,6 +97,8 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
 void AwaitHttpService::executeSolicitation(Solicitacao request) 
 {
     __bleConfiguration->setReceivedRequest(true);
+    delay(1500);
+    
     bool dispConnected = connectToActuator(request.uuid);
 
     if(dispConnected)

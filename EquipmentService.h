@@ -6,7 +6,7 @@
 #define RELE 19
 #define pinSCT 14 
 #define tensao 127
-
+#define MAX_SIZE_COMMAND 400
 
 class EquipmentService 
 {
@@ -22,7 +22,7 @@ class EquipmentService
 
     bool getLightOn();
     void setLightOn(bool light);
-    Vector<int> SplitIrComands(String data);
+    void SplitIrComands(String data, Vector<int> &codigo);
     String SplitGetIndex(String data, char separator, int index);
     void SendIrComand(Vector <int> codigo);
     bool checkIrms();

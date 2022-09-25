@@ -43,5 +43,5 @@ void setup() {
 }
 
 void loop() {
-  //controller.environmentVariablesContinuousValidation(); 
+  controller.environmentVariablesContinuousValidation(); 
 }*/

@@ -24,7 +24,7 @@ void setup() {
 					// controller.startVisibleService(); 
 					init = true;
 				}
-        		controller.setHardwareConfig(hardware);
+        controller.setHardwareConfig(hardwareSensor);
 
 			}
 		}

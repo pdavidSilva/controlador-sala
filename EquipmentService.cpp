@@ -53,11 +53,7 @@ String EquipmentService::SplitGetIndex(String data, char separator, int index) {
    <parametros> data: codigos IR recebidos na requisicao do servidor <parametros/>
    <retorno>  <retorno/>
 */
-void EquipmentService::SplitIrComands(String codigoString, Vector <int> &codigo) {
-
-  //int storage_array[300]; // uso do vetor tem que declarar um valor max
-  //Vector <int> codigo;
-  //codigo.setStorage(storage_array);
+void EquipmentService::SplitIrComands(String codigoString, vector <int> &codigo) {
 
   String temp = "";
   for (int i = 0; i < codigoString.length(); i++)
@@ -82,7 +78,7 @@ void EquipmentService::SplitIrComands(String codigoString, Vector <int> &codigo)
    <parametros> data: codigos IR recebidos na requisicao do servidor <parametros/>
    <retorno>  <retorno/>
 */
-void EquipmentService::SendIrComand(Vector<int> codigo) {
+void EquipmentService::SendIrComand(vector<int> codigo) {
   int k = 0;
   uint16_t rawData[codigo.size()];
   for (int el : codigo)
@@ -191,9 +187,7 @@ String EquipmentService::executeActionFromController(String data) {
   else if (type.equals("AC"))
   {
 
-      int storage_array[MAX_SIZE_COMMAND]; // uso do vetor tem que declarar um valor max
-      Vector <int> codigo;
-      codigo.setStorage(storage_array);
+      vector <int> codigo;
       SplitIrComands(command, codigo);
     int attempt = 0;
 

@@ -22,9 +22,9 @@ class EquipmentService
 
     bool getLightOn();
     void setLightOn(bool light);
-    void SplitIrComands(String data, Vector<int> &codigo);
+    void SplitIrComands(String data, vector<int> &codigo);
     String SplitGetIndex(String data, char separator, int index);
-    void SendIrComand(Vector <int> codigo);
+    void SendIrComand(vector <int> codigo);
     bool checkIrms();
     void checkOperationLights(String msg);
     void turnOnLights();

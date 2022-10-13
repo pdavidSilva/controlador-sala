@@ -92,7 +92,17 @@ String HTTP::request(String resource, String type, String params) const{
       
     }
 
+    if(config.isDebug()){
+        Serial.println("==================================");  
+        Serial.println("[HTTP] HTTP FINALIZADO: " + String(httpCode));
+    }
+
     wifi.disconnect();
     
+    if(config.isDebug()){
+        Serial.println("==================================");  
+        Serial.println("[HTTP] WIFI DESCONECTADO: " + String(httpCode));
+    }
+
     return response;
 }

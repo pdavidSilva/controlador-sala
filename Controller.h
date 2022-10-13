@@ -30,7 +30,8 @@ class Controller
 
         // WEB SOCKET
         void initServerSocket();    
-        void startTaskWebSocket(); 
+        void startTaskWebSocket();
+        void startTaskHttp();
 
         HardwareRecord getHardwareConfig();
         void setHardwareConfig(HardwareRecord hardware);
@@ -38,6 +39,9 @@ class Controller
         // Validacao continua de variaveis de ambiente
         void environmentVariablesContinuousValidation();
         void initEnvironmentVariables();
+
+        // Send Commands
+        void ExecuteCommandIR(String command);
 };
 
 #endif

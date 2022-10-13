@@ -7,11 +7,13 @@
 #include <BLE2902.h>
 #include <Arduino.h>
 #include <String>
+#include "Global.h"
 #include "EquipmentService.h"
 
 #define CHARACTERISTICUUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define SERVICEUUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define GETDATA  "GETDATA"
+#define GET_DATA  "GET_DATA"
+#define END_DATA  "END_DATA"
 #define LED 2
 
 static BLECharacteristic* pCharacteristicSensor;  
@@ -22,6 +24,7 @@ EnvironmentVariablesService __environmentVariableService;
 static DeviceType deviceType;
 EquipmentService equipmentService;
 static String equipmentState = "";
+static String receivedData = "";
 
 void sendDataToServer(String data)
 {
@@ -36,6 +39,10 @@ void sendDataToServer(String data)
   }
 }
 
+void EnabledToSend(bool enabledToSend) {
+  sendData = enabledToSend;
+}
+
 class MyServerCallbacks: 
     public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -47,7 +54,8 @@ class MyServerCallbacks:
       deviceConnected = true;
       sendData = false;
 
-      Serial.println("CONECTADO");
+      Serial.println("===============================================");
+      Serial.println("[BLESensorService] CONECTADO");
             
       delay(1000);
     };
@@ -55,7 +63,8 @@ class MyServerCallbacks:
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;      
       digitalWrite(LED, LOW);
-      Serial.println("DESCONECTADO");
+      Serial.println("===============================================");
+      Serial.println("[BLESensorService] DESCONECTADO");
 
       ESP.restart();
     }
@@ -66,17 +75,32 @@ class MyCallbacks: public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic * pCharacteristic) {
 
     std::string response = pCharacteristic->getValue();
-    Serial.println(response.c_str());
+    Serial.println("===============================================");
+    Serial.println("[BLESensorService] Receive packet: " + String(response.c_str()));
 
-    if(String(GETDATA).equals(response.c_str())) {
+    if(String(GET_DATA).equals(response.c_str())) 
+    {
        sendData = true;       
-    } else if(deviceType != NULL && deviceType == ATUADOR){
-      Serial.println("ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
-      equipmentState = equipmentService.executeActionFromController(response.c_str());
-      sendData = true;
-      sendDataToServer(equipmentState.c_str());
-      sendData = false;
-      equipmentState = "";
+    } 
+    else if(deviceType != NULL && deviceType == ATUADOR)
+    {
+      if(String(END_DATA).equals(response.c_str()))
+      {
+        Serial.println("===============================================");
+        Serial.println("[BLESensorService] ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
+        HAS_IR_TO_SEND = true;
+        COMMAND_IR = receivedData;
+        //equipmentState = equipmentService.executeActionFromController(receivedData);
+        //sendData = true;
+        //sendDataToServer(equipmentState.c_str());
+        //sendData = false;
+        equipmentState = "";
+        receivedData = "";
+      }
+      else
+      {
+        receivedData = receivedData + response.c_str();
+      }
     }
   }
 };

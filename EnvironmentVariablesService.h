@@ -7,7 +7,8 @@ using namespace std;
 
 #define TYPE_LIGHT  0
 #define TYPE_CONDITIONER  1 
-#define CHECK_TIME_TO_LOAD  60
+#define CHECK_TIME_TO_LOAD  20
+#define CHECK_TIME_TO_TURN_OFF  900000 // 15 MINUTOS
 
 class EnvironmentVariablesService 
 {
@@ -24,9 +25,13 @@ class EnvironmentVariablesService
     static bool __uploadedToday;
     static bool __hasMovement;
     static bool __inClass;
+    static unsigned long __lastTimeAttended;
 
   public: 
     EnvironmentVariablesService();
+
+    unsigned long getLastTimeAttended();
+    void setLastTimeAttended(unsigned long time);
 
     String getCurrentTime();
     String setCurrentTime(String currentTime);
@@ -38,6 +43,7 @@ class EnvironmentVariablesService
     void setMonitoringConditioner(struct Monitoramento monitoramento);
 
     String getNtpFormatedTime();
+    String getNow();
 
     std::vector<struct Reserva> getReservations();
     void  setReservations(std::vector<struct Reserva> reservations);

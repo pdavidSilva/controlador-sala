@@ -37,7 +37,7 @@ void HTTPService::getInfoHardware(HardwareRecord &record)
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -106,7 +106,8 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
 
     params.concat("{");
     params.concat("\"id\":" + id + ", ");
-    params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
+    // params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
+    // params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"tipo_hardware_id\": " + tipo_hardware_id);
     params.concat("}");
@@ -206,6 +207,24 @@ struct HardwareRecord HTTPService::deserializeDevice(JsonVariant sensor) {
    return disp;
 }
 
+/*
+ * <descricao> Deserealiza objeto json e converte para a struct que armazena a solicitacao  <descricao/>
+ */
+struct Solicitacao HTTPService::deserializeSolicitacao(int idSolicitacao, String payload) {
+    
+    struct Solicitacao solicitacao;
+    DynamicJsonDocument doc(4096);
+    deserializeJson(doc, payload);
+
+    solicitacao.id = idSolicitacao;    
+    solicitacao.code = doc["code"].as<char *>();
+    solicitacao.type = doc["type"].as<char *>();
+    solicitacao.uuid = doc["uuid"].as<char *>();
+    solicitacao.acting = doc["acting"].as<char *>();
+ 
+   return solicitacao;
+}
+
 /*void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
 {
 
@@ -238,7 +257,7 @@ struct HardwareRecord HTTPService::deserializeDevice(JsonVariant sensor) {
 
     if (strstr(response.c_str(), "[ERROR]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -321,7 +340,7 @@ bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -387,7 +406,7 @@ std::vector<struct Reserva> HTTPService::GetReservationsWeek() {
     
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -491,7 +510,7 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
                 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
         
         if (error)
@@ -566,7 +585,7 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -616,7 +635,7 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -651,4 +670,114 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
     }
 
     return codigo;
+}
+
+/**
+ * <descricao> Obtém as solicitações em aberto para o hardware </descricao>
+ * <parametros> tipo Tipo de Equipamento: LUZES, CONDICIONADOR</parametros>
+ * <retorno> struct Solicitacao referente a solicitação existente para o hardware </retorno>
+*/
+struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
+    
+    HTTP http;
+    Config config;
+    struct Solicitacao solicitacao = {0,"","","",""};
+    EnvironmentVariablesService environment;
+
+    String route = "/Solicitacao";
+    String routeService;
+    String type = "GET";
+    String params = "";
+    String idHardware = String(environment.getHardware().id);
+
+    routeService.concat(route);
+    routeService.concat("?idHardware=" + idHardware);
+    routeService.concat("&tipo=" + tipoEquipamento);
+    routeService.concat("&todosRegistros=false");
+    
+    String response = http.request(routeService, type, params);
+    
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
+    {
+        DynamicJsonDocument doc(4096);
+        DeserializationError error = deserializeJson(doc, response);
+        
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+        {
+            solicitacao = deserializeSolicitacao(doc["result"][0]["id"].as<int>(), doc["result"][0]["payload"].as<String>());
+        }
+        else
+        {
+            Serial.println(doc["httpCode"].as<int>());
+
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.print("[HTTPService] Mensagem: ");
+                Serial.println(doc["message"].as<char *>());
+            }
+        }
+    }
+
+    return solicitacao;
+}
+
+/**
+ * <descricao> Finaliza a solicitacao </descricao>
+ * <parametros> idSolicitacao Identificador da solicitação</parametros>
+ * <retorno> bool Retorno da solicitação </retorno>
+*/
+bool HTTPService::putSolicitacao(int idSolicitacao) {
+
+    Config config;
+    HTTP http;
+    String route;
+    EnvironmentVariablesService environment;
+    
+    route = "/Solicitacao/finalizar/";
+
+    String routeService;
+    String type = "PUT";
+    String params = "";
+    String response;
+    String id = String(idSolicitacao);
+    String horaFinalizacao = environment.getNow();
+
+    params.concat("\"" + horaFinalizacao + "\"");
+
+    routeService.concat(route + id);
+    response = http.request(routeService, type, params);
+
+    if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
+    {
+        DynamicJsonDocument doc(2048);
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error)
+        {
+            if (config.isDebug())
+            {
+                Serial.println("==================================");
+                Serial.println("[HTTPService] Falha no parse JSON.......");
+                Serial.println(error.f_str());
+            }
+            delay(5000);
+        }
+
+        if (doc["httpCode"].as<int>() == 200)
+            return true;
+    }
+
+    return false;
 }

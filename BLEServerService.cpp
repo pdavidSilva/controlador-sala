@@ -12,6 +12,7 @@ vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
 unordered_map<string, Hardware> BLEServerService::__devicesMapped;
 BLEDeviceConnect* BLEServerService::__actuatorConnected;
 ClientSocketService __clientWebSocketService;
+AwaitHttpService __clientAwaitHttpService;
 EnvironmentVariablesService __environmentVariables;
 Config __configuration;
 
@@ -27,21 +28,22 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
 {
     if (isNotify) 
     {
-       Serial.print("Notify callback for characteristic: ");
+      Serial.println("====================================================");
+      Serial.print("[BLEServerService] Notify callback for characteristic: ");
       Serial.println(pBLERemoteCharacteristic->getUUID().toString().c_str());
-      Serial.print(" of data length ");
+      Serial.print("[BLEServerService] of data length ");
       Serial.println(length);
-      Serial.print("data: ");
+      Serial.print("[BLEServerService] data: ");
       String data = String(((char*)pData));
       Serial.println(data.substring(0, length));
       
-      Serial.print("[BLEServerService]: receive request enabled: ");
+      Serial.print("[BLEServerService] receive request enabled: ");
       Serial.println(__receivedRequest);
 
       if(__receivedRequest && !__environmentSolicitation)
       {   
-        __clientWebSocketService.setMessageReturned(true);
-        __clientWebSocketService.setMessage(data.substring(0, length));
+        __clientAwaitHttpService.setMessageReturned(true);
+        __clientAwaitHttpService.setMessage(data.substring(0, length));
       }
       else
       {
@@ -203,16 +205,16 @@ void BLEServerService::populateMap()
         if(disp->haveServiceUUID() && disp->isAdvertisingService(SERVICE_UUID))
         {
           bool deviceConnected = false;
-          int index = 0, MAX = 3;
+          int index = 0, MAX = 4;
           
           do
           {
             if (__configuration.isDebug())
             {
               Serial.println("====================================");
-              Serial.print("[CONNECTION]: Atteempt Device: ");
+              Serial.print("[CONNECTION]: Attempt Device: ");
               Serial.println(disp->toString().c_str());
-              Serial.print("[CONNECTION]: Atteempt Number: ");
+              Serial.print("[CONNECTION]: Attempt Number: ");
               Serial.println(index);
               Serial.println("====================================");
             }
@@ -311,7 +313,7 @@ bool BLEServerService::connectMyDisp(BLEAdvertisedDevice* device)
 void BLEServerService::sendMessageToActuator(String data) 
 {        
     if(__actuatorConnected->pClient->isConnected())
-          __actuatorConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
+        __actuatorConnected->pRemoteCharacteristic->writeValue(std::string(data.c_str()), false);
 }
 
 void BLEServerService::disconnectToActuator() 
@@ -365,17 +367,16 @@ void BLEServerService::continuousConnectionTask()
 
     while (true)
     {
-        Serial.println();
+        Serial.println("=================================");
         Serial.println("[CONTINUOUS_CONNECTION] NEW CICLE");
         for (auto item : __devicesMapped) 
         {
             if (__configuration.isDebug())
             {
-                Serial.print("[CONTINUOUS_CONNECTION] Receive Request: ");
-                Serial.println(__receivedRequest);
+                Serial.println("=================================");
+                Serial.println("[CONTINUOUS_CONNECTION] Receive Request: " + String(__receivedRequest));
 
-                Serial.print("[CONTINUOUS_CONNECTION] In Class: ");
-                Serial.println(__environmentVariables.getInClass());
+                Serial.println("[CONTINUOUS_CONNECTION] In Class: " + String(__environmentVariables.getInClass()));
             }
            
             if(!__receivedRequest && __environmentVariables.getInClass())
@@ -386,12 +387,10 @@ void BLEServerService::continuousConnectionTask()
                 {
                     if (__configuration.isDebug())
                     { 
-                        Serial.println();
-                        Serial.print("[CONTINUOUS_CONNECTION] UUID: ");
-                        Serial.println(disp.getUuid());
+                        Serial.println("================================");
+                        Serial.println("[CONTINUOUS_CONNECTION] UUID: " + String(disp.getUuid()));
       
-                        Serial.print("[CONTINUOUS_CONNECTION] ADDRESS: ");
-                        Serial.println(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str());
+                        Serial.println("[CONTINUOUS_CONNECTION] ADDRESS: " + String(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str()));
                     }
                     
                     deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
@@ -404,7 +403,7 @@ void BLEServerService::continuousConnectionTask()
                         {
                           if(deviceCon->pClient->isConnected())
                           {
-                            String data = "GETDATA";
+                            String data = "GET_DATA";
                             deviceCon->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
                             allDisconected = false;
                           }
@@ -441,7 +440,7 @@ void BLEServerService::continuousConnectionTask()
             }
             else
             {
-               Serial.println("[CONTINUOUS_CONNECTION]: Request Enabled or No Class");
+               Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
             }
         }
         count = 0;

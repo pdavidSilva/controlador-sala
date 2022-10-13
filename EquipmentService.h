@@ -2,11 +2,11 @@
 #define EquipmentService_h
 
 #include "Config.h"
+#include "Global.h"
 #define RELE 19
 #define pinSCT 14 
 #define tensao 127
-
-const uint16_t kIrLed = 12;
+#define MAX_SIZE_COMMAND 400
 
 class EquipmentService 
 {
@@ -22,9 +22,9 @@ class EquipmentService
 
     bool getLightOn();
     void setLightOn(bool light);
-    Vector<int> SplitIrComands(String data);
+    void SplitIrComands(String data, vector<int> &codigo);
     String SplitGetIndex(String data, char separator, int index);
-    void SendIrComand(Vector <int> codigo);
+    void SendIrComand(vector <int> codigo);
     bool checkIrms();
     void checkOperationLights(String msg);
     void turnOnLights();

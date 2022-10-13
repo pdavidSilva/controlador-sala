@@ -19,6 +19,9 @@ class HTTPService
         struct Reserva deserializeReserve(JsonVariant reserve);
         struct Monitoramento getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
         String getComandosIrByIdSalaAndOperacao(String uuid);
+        struct Solicitacao getSolicitacao(String tipoEquipamento);
+        struct Solicitacao deserializeSolicitacao(int idSolicitacao,String payload);
+        bool putSolicitacao(int idSolicitacao);
 };
 
 #endif

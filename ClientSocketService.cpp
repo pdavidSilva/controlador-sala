@@ -2,10 +2,10 @@
 #include "ClientSocketService.h"
 
 Config configuration;
-BLEServerService* __bleConfiguration; 
-HTTPService __httpService;
-EnvironmentVariablesService __environment;
-UtilsService __utils;
+BLEServerService* __bleClientConfiguration; 
+HTTPService __httpClientService;
+EnvironmentVariablesService __env;
+UtilsService __utilsClient;
 
 ClientSocketService::ClientSocketService() {}
 
@@ -75,28 +75,28 @@ void ClientSocketService::serverListener() {
             
             if (request.type == CONDICIONADOR || request.type == LUZES) { 
 
-                __bleConfiguration->setReceivedRequest(true);
+                __bleClientConfiguration->setReceivedRequest(true);
 
                 bool dispConnected = connectToActuator(request.uuid);
                 
                 if(dispConnected)
                 {
                   String payload = getMessageToSend(request);
-                  __bleConfiguration->sendMessageToActuator(payload);
+                  __bleClientConfiguration->sendMessageToActuator(payload);
 
                   awaitsReturn();
 
-                  __bleConfiguration->disconnectToActuator();
+                  __bleClientConfiguration->disconnectToActuator();
                 }
                 
-                __bleConfiguration->setReceivedRequest(false);
+                __bleClientConfiguration->setReceivedRequest(false);
 
                 if(__messageReturned)   
                   client.println(__message);
                 else
                   client.println("NOT-AVALIABLE");
 
-                __utils.updateMonitoring(__message);
+                __utilsClient.updateMonitoring(__message);
 
                 if (configuration.isDebug())
                 {
@@ -111,7 +111,7 @@ void ClientSocketService::serverListener() {
 
             }  else if(request.type == ATUALIZAR) {
                   
-                __environment.setReservations(__httpService.GetReservationsWeek());
+                __env.setReservations(__httpClientService.GetReservationsWeek());
 
                 client.println("OK");
             }
@@ -127,7 +127,7 @@ MonitoringRequest ClientSocketService::deserealizeObject(String payload)
 {
     MonitoringRequest request;
 
-    DynamicJsonDocument doc(1024);
+    DynamicJsonDocument doc(2048);
     deserializeJson(doc, payload);
     
     request.type = doc["type"].as<char *>();
@@ -155,7 +155,7 @@ bool ClientSocketService::connectToActuator(String uuidDevice)
       Serial.println(i);
     }
     
-    deviceConnected = __bleConfiguration->connectToActuator(uuidDevice);
+    deviceConnected = __bleClientConfiguration->connectToActuator(uuidDevice);
     
     if(deviceConnected)
       break;
@@ -211,5 +211,5 @@ String ClientSocketService::getMessageToSend(MonitoringRequest request)
     else
         state = "OFF";
 
-    return __utils.mountPayload(typeEquipament, state, command);
+    return __utilsClient.mountPayload(typeEquipament, state, command);
 }

@@ -12,6 +12,7 @@ bool EnvironmentVariablesService::__receivedData;
 bool EnvironmentVariablesService::__hasMovement;
 bool EnvironmentVariablesService::__inClass;
 String EnvironmentVariablesService::__message;
+unsigned long EnvironmentVariablesService::__lastTimeAttended;
 WiFiUDP __udp;
 NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 
@@ -36,6 +37,16 @@ void EnvironmentVariablesService::initEnvironmentVariables()
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
     __reservations = __httpRequestService.GetReservationsWeek();
+}
+
+unsigned long EnvironmentVariablesService::getLastTimeAttended() 
+{
+    return __lastTimeAttended;
+}
+
+void EnvironmentVariablesService::setLastTimeAttended(unsigned long time) 
+{
+    __lastTimeAttended = time;
 }
 
 String EnvironmentVariablesService::getMessage() 
@@ -132,11 +143,19 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
                 
   if(dispConnected)
   {
-      __bleServerConfig->sendMessageToActuator(message);
+    std::vector<String> subStrings = __utilsService.splitPayload(message, MAX_LENGTH_PACKET);
 
-      awaitsReturn();
+    String packet;
+    for (packet : subStrings)
+    {
+      Serial.println("==================================");         
+      Serial.println("[ENVIRONMENT_VARIABLES] Sendig packet: " + packet);
+      __bleServerConfig->sendMessageToActuator(packet);
+    }
+        
+    awaitsReturn();
 
-      __bleServerConfig->disconnectToActuator();
+    __bleServerConfig->disconnectToActuator();
   }
 
   __utilsService.updateMonitoring(__message);
@@ -201,7 +220,7 @@ bool EnvironmentVariablesService::getRoomDuringClassTime() {
  */
 void EnvironmentVariablesService::turnOnManagedDevices() {
     
-    if (getRoomDuringClassTime() && __hasMovement) 
+    if (__inClass && __hasMovement) 
     {
 
       if (!__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0)
@@ -210,9 +229,7 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
       if (!__monitoringLight.estado && __monitoringLight.id > 0 && __monitoringLight.equipamentoId > 0)
         turnOnLight();
 
-    }
-  
-    __hasMovement = false;
+    }  
 }
 
 /*
@@ -221,7 +238,9 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
  */
 void EnvironmentVariablesService::turnOffManagedDevices() {
 
-  if (!getRoomDuringClassTime()) 
+  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > CHECK_TIME_TO_TURN_OFF;
+
+  if (!__inClass || (__inClass && longTimeWithoutMovement)) 
   {
     if (__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0) 
       turnOfConditioner();
@@ -247,10 +266,6 @@ void EnvironmentVariablesService::turnOnConditioner(){
   String payload = __utilsService.mountPayload("AC", "ON", codigos);
   sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------
-
-  __monitoringConditioner.estado = true;
-
-  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -267,12 +282,8 @@ void EnvironmentVariablesService::turnOfConditioner(){
 
   //------------------------------------------------------    
   String payload = __utilsService.mountPayload("AC", "OFF", codigos);
-  sendDataToActuator(TYPE_CONDITIONER, codigos);
+  sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------    
-
-  __monitoringConditioner.estado = false;
-  
-  __httpRequestService.putMonitoring(__monitoringConditioner);
 }
 
 /*
@@ -285,15 +296,10 @@ void EnvironmentVariablesService::turnOnLight(){
   Serial.println(__monitoringLight.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO LUZES");
 
-  __monitoringLight.estado = true;
-
   // ----------------------------------------------------------
   String payload = __utilsService.mountPayload("LZ", "ON", "null");
-  sendDataToActuator(TYPE_LIGHT,"true");  
+  sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
-
-  if(__monitoringLight.equipamentoId > 0 && __monitoringLight.id > 0)
-    __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 /*
@@ -305,16 +311,12 @@ void EnvironmentVariablesService::turnOfLight(){
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
   Serial.println(__monitoringLight.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO LUZES");
-
-  __monitoringLight.estado = false;
   
   // ----------------------------------------------------------
   String payload = __utilsService.mountPayload("LZ", "OFF", "null");
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
-  if(__monitoringLight.equipamentoId > 0 && __monitoringLight.id > 0)
-    __httpRequestService.putMonitoring(__monitoringLight);
 }
 
 void EnvironmentVariablesService::awaitsReturn()
@@ -331,6 +333,12 @@ void EnvironmentVariablesService::awaitsReturn()
       //}
   }    
 }
+
+String EnvironmentVariablesService::getNow()
+{
+  return "2022-09-09T09:15:00";
+}
+
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()
 {
@@ -359,8 +367,15 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
 {
   if (__receivedData) 
   {
-    if (__message.equals("S") == 0)
+    if (__message.equals("S") == 0) 
+    {
       __hasMovement = true;
+      __lastTimeAttended = millis();
+    } 
+    else 
+    {
+      __hasMovement = false;
+    }
 
     __message = "";
     __receivedData = false; 
@@ -371,7 +386,7 @@ void EnvironmentVariablesService::continuousValidation()
 {
   Config config;
   int checkTimeToLoad = 0;
-  checkTimeToLoadReservations();
+  __reservations = __httpRequestService.GetReservationsWeek();
 
   while(true)
   {    
@@ -392,7 +407,7 @@ void EnvironmentVariablesService::continuousValidation()
 
       if(checkTimeToLoad == CHECK_TIME_TO_LOAD)
       {
-        checkTimeToLoadReservations();
+        __reservations = __httpRequestService.GetReservationsWeek();
         checkTimeToLoad = 0;
       }
       

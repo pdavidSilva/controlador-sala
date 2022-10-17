@@ -50,7 +50,7 @@ void loop() {
 		monitoringRecord.temperature = -1;
 	}
   	delay(1000);
-	controller.sendDataOfMonitoring(monitoringRecord);
+	controller.sendDataMonitoring(monitoringRecord);
 	
 	//sensors()
 	//dispositivo()

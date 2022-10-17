@@ -70,3 +70,14 @@ std::vector<String> UtilsService::splitPayload(String payload, int maxSize)
  
     return subStrings;  
 }
+
+String UtilsService::mountDataMonitoring(MonitoringRecord record) 
+{
+    DynamicJsonDocument doc(2048);
+    String data;
+    doc['temperature'] = record.temperature;
+    doc['hasPresent'] = record.hasPresent;
+    Serial.println("[UtilsService] sendDataMonitoring");
+    serializeJson(doc, data);
+    return data;
+}

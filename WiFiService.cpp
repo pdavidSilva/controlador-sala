@@ -9,6 +9,7 @@ void WiFiService::connect()
     delay(4000);
     
     int attempt = 0;
+    WiFi.mode(WIFI_STA);
     WiFi.begin(config.getSSID().c_str(), config.getPassword().c_str());
     while (WiFi.status() != WL_CONNECTED && attempt < config.getWifiFailAttempts())
     {

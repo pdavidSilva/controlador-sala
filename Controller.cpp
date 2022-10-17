@@ -4,12 +4,11 @@
 
 Controller::Controller(){}
 HTTPService __http;
-ClientSocketService __clientSocketService;
-AwaitHttpService __awaitHttpService;
+MqttService __mqttService;
 BLEServerService* __bleConfig; 
 EnvironmentVariablesService __environmentService;
 EquipmentService __equipmentService;
-UtilsService __utilsService;
+UtilsService __utilService;
 Config __config; 
 
 bool Controller::start(HardwareRecord &record) const 
@@ -69,43 +68,25 @@ void Controller::configureClient(String deviceName, DeviceType deviceType)
    initBLEClient(deviceName, deviceType);  
 }
 
-void Controller::getSensors(HardwareRecord hardware, String sensors[], int &indexSensor)
-{
-    __http.getSensors(hardware, sensors, indexSensor);
-    return;
-}
-
 bool Controller::getMaster(HardwareRecord hardware, String &master)
 {
     __http.getMaster(hardware, master);
     return !master.equals("") ? true : false;
-
-
 }
 
- void Controller::sendDataOfMonitoring(MonitoringRecord monitoringRecord)
+void Controller::sendDataMonitoring(MonitoringRecord monitoringRecord)
 {
     String data;
-    data = __utilsService.mountDataMonitoring(monitoringRecord);
+    data = __utilService.mountDataMonitoring(monitoringRecord);
     EnabledToSend(true);
     sendDataToServer(data);
     EnabledToSend(false);
     delay(3000);
-  }
-
-void Controller::initServerSocket()
-{
-  __clientSocketService.initServer();
 }
 
-void Controller::startTaskWebSocket()
+void Controller::startTaskMqtt(HardwareRecord hardware)
 {  
-    __clientSocketService.startTaskWebSocket();
-}
-
-void Controller::startTaskHttp()
-{  
-    __awaitHttpService.startAwait();
+    __mqttService.startMqttService(hardware);
 }
 
 HardwareRecord Controller::getHardwareConfig()

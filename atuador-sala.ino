@@ -1,4 +1,4 @@
-#include "Global.h"
+/*#include "Global.h"
 #include "Config.h"
 
 HardwareRecord hardware;
@@ -43,3 +43,4 @@ void loop() {
 
   delay(2000);
 }
+*/

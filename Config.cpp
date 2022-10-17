@@ -3,6 +3,10 @@
 String __url;
 String __ssid;
 String __password;
+String __mqttServer;
+int __mqttPort;
+String __mqttUser;
+String __mqttPassword;
 int    __ledStatus;
 int    __basetime;
 int    __type;
@@ -19,9 +23,13 @@ Config::Config(){
     // __password  = "JOIBSN12";
     __ssid      = "Apartamento 201-2.4";
     __password  = "Ald50983021";
+    __mqttServer = "5cca6ae0a1694e46b4f3459338a2e561.s2.eu.hivemq.cloud";
+    __mqttPort = 8884;
+    __mqttUser = "esp_client";
+    __mqttPassword = "Salas@2022";
     __basetime  = 180000;
     __ledStatus = 2;
-    __type  = TYPE_ACTUATOR;
+    __type  = TYPE_CONTROLLER;
     __route = 2;
     __wifiFailAttempts = 30;
     __commandSendAttempts = 3;
@@ -47,6 +55,27 @@ String Config::getSSID()
 String Config::getPassword()
 {
 	return __password;
+}
+
+String Config::getMqttServer() 
+{
+    return __mqttServer;
+}
+
+int Config::getMqttPort() 
+{
+    return __mqttPort;
+
+}
+
+String Config::getMqttUser()
+{
+    return __mqttUser;
+}
+        
+String Config::getMqttPassword() 
+{
+    return __mqttPassword;
 }
 
 int	Config::getBaseTime()

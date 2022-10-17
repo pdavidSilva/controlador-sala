@@ -11,9 +11,7 @@ class Controller
         // HTTP
         bool start(struct HardwareRecord&) const;
         bool registerHardware(struct HardwareRecord) const;
-        void getSensors(struct HardwareRecord, String *, int&);
 
-        //void getDevices(String[]&);
         bool getMaster(struct HardwareRecord, String &);
         void fillHardwares(struct HardwareRecord);
 
@@ -26,12 +24,12 @@ class Controller
         bool notificateServer() const;       
 
         //send Data Monitoring
-        void sendDataOfMonitoring(struct MonitoringRecord);
+        void sendDataMonitoring(struct MonitoringRecord);
 
         // WEB SOCKET
         void initServerSocket();    
         void startTaskWebSocket();
-        void startTaskHttp();
+        void startTaskMqtt(HardwareRecord hardware);
 
         HardwareRecord getHardwareConfig();
         void setHardwareConfig(HardwareRecord hardware);

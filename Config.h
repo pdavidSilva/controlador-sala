@@ -23,8 +23,8 @@
 #include "Hardware.h"
 #include "DHT.h"
 #include "BLEServerService.h"
-#include "ClientSocketService.h"
-#include "AwaitHttpService.h"
+#include <PubSubClient.h>
+#include "MqttService.h"
 #include "EnvironmentVariablesService.h"
 #include "UtilsService.h"
 
@@ -35,6 +35,11 @@ class Config
         String __url;
         String __ssid;
         String __password;
+        String __mqttServer;
+        int __mqttPort;
+        String __mqttUser;
+        String __mqttPassword;
+
         int    __ledStatus;
         int    __basetime;
         bool   __debug;
@@ -50,6 +55,10 @@ class Config
         String getUrl();
         String getSSID();
         String getPassword();
+        String getMqttServer();
+        int getMqttPort();
+        String getMqttUser();
+        String getMqttPassword();
         int    getType();
         int    getBaseTime();
         int    getLedStatus();

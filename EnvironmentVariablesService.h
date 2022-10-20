@@ -9,7 +9,7 @@ using namespace std;
 #define TYPE_CONDITIONER  1 
 #define CHECK_TIME_TO_LOAD  20
 #define CHECK_TIME_TO_TURN_OFF  900000 // 15 MINUTOS
-
+  
 class EnvironmentVariablesService 
 {
   private: 

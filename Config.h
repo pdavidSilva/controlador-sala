@@ -54,7 +54,7 @@ class Config
         String getTokenApp();
         String getUrl();
         String getSSID();
-        String getPassword();
+        String getWIFIPassword();
         String getMqttServer();
         int getMqttPort();
         String getMqttUser();

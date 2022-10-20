@@ -12,6 +12,8 @@ class MqttService
   private:
     static bool __messageReturned;
     static String __message;
+    static WiFiClientSecure __espClient;
+    static PubSubClient * __client;
     static String getMessageToSend(MonitoringRequest request);
     static MonitoringRequest deserealizeObject(String payload);
     static void callback(char* topic, byte* payload, unsigned int length);

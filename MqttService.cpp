@@ -2,7 +2,7 @@
 #include "MqttService.h"
 #define MSG_BUFFER_SIZE (500)
 
-const char *ROOT_CA PROGMEM = R"EOF(
+static const char *ROOT_CA PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
 TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
@@ -41,8 +41,8 @@ BLEServerService* __bleConfiguration;
 HTTPService __httpService;
 EnvironmentVariablesService __environment;
 UtilsService __utils;
-WiFiClientSecure __espClient;
-PubSubClient * __client;
+WiFiClientSecure MqttService::__espClient;
+PubSubClient * MqttService::__client;
 
 HardwareRecord __hardware;
 
@@ -240,7 +240,9 @@ void MqttService::reconnect() {
     Serial.print("[MqttService] Attempting MQTT connection… DEVICE: " + __hardware.uuid);
     String clientId = "ESP8266Client";
     String sub = "esp/" + __hardware.uuid;
-    if (__client->connect(clientId.c_str(), __configAccess.getMqttUser().c_str(), __configAccess.getPassword().c_str())) {
+    Serial.println("\n\nserver: " +  __configAccess.getMqttUser());
+    Serial.println("pass: " +  __configAccess.getMqttPassword());
+    if (__client->connect(clientId.c_str(), __configAccess.getMqttUser().c_str(), __configAccess.getMqttPassword().c_str())) {
       Serial.println("[MqttService] Connected");
       __client->subscribe(sub.c_str());
     } else {
@@ -255,6 +257,8 @@ void MqttService::reconnect() {
 void MqttService::setup() {
   __espClient.setCACert(ROOT_CA);
   __client = new PubSubClient(__espClient);
+    Serial.println("\n\nuser: " +  __configAccess.getMqttServer());
+    Serial.println("\nport: " +  __configAccess.getMqttPort());
 
   __client->setServer(__configAccess.getMqttServer().c_str(), __configAccess.getMqttPort());
   __client->setCallback(callback);

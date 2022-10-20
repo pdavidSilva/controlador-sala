@@ -10,7 +10,7 @@ void WiFiService::connect()
     
     int attempt = 0;
     WiFi.mode(WIFI_STA);
-    WiFi.begin(config.getSSID().c_str(), config.getPassword().c_str());
+    WiFi.begin(config.getSSID().c_str(), config.getWIFIPassword().c_str());
     while (WiFi.status() != WL_CONNECTED && attempt < config.getWifiFailAttempts())
     {
         digitalWrite(config.getLedStatus(), HIGH);
@@ -23,7 +23,7 @@ void WiFiService::connect()
             Serial.println("[WiFiService] Conectando ao Wifi");
             Serial.println("[WiFiService] Tentativa: " + String(attempt));
             Serial.println("[WiFiService] SSID: " + config.getSSID());
-            Serial.println("[WiFiService] Password: " + config.getPassword());
+            Serial.println("[WiFiService] Password: " + config.getWIFIPassword());
         }
     }
 

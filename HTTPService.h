@@ -17,8 +17,8 @@ class HTTPService
         bool putMonitoring(struct Monitoramento monitoring);
         std::vector<Reserva> GetReservationsWeek();
         struct Reserva deserializeReserve(JsonVariant reserve);
-        struct Monitoramento getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
-        String getComandosIrByIdSalaAndOperacao(String uuid);
+        std::vector<struct Monitoramento> getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
+        String getComandosIrByUuidAndOperacao(String uuid, int operacao);
         struct Solicitacao getSolicitacao(String tipoEquipamento);
         struct Solicitacao deserializeSolicitacao(int idSolicitacao,String payload);
         bool putSolicitacao(int idSolicitacao);

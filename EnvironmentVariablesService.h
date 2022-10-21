@@ -7,6 +7,8 @@ using namespace std;
 
 #define TYPE_LIGHT  0
 #define TYPE_CONDITIONER  1 
+#define TURN_ON  1
+#define TURN_OFF  2 
 #define CHECK_TIME_TO_LOAD  20
 #define CHECK_TIME_TO_TURN_OFF  900000 // 15 MINUTOS
 
@@ -20,8 +22,8 @@ class EnvironmentVariablesService
     static String __message;
     String __startTimeLoadReservations;
     String __endTimeLoadReservations;
-    static struct Monitoramento __monitoringConditioner;
-    static struct Monitoramento __monitoringLight;
+    static vector<struct Monitoramento> __monitoringConditioner;
+    static vector<struct Monitoramento> __monitoringLight;
     static bool __uploadedToday;
     static bool __hasMovement;
     static bool __inClass;
@@ -36,11 +38,11 @@ class EnvironmentVariablesService
     String getCurrentTime();
     String setCurrentTime(String currentTime);
 
-    struct Monitoramento getMonitoringLight();
-    void setMonitoringLight(struct Monitoramento monitoramento);
+    std::vector<struct Monitoramento> getMonitoringLight();
+    void setMonitoringLight(std::vector<struct Monitoramento>  monitoramento);
 
-    struct Monitoramento getMonitoringConditioner();
-    void setMonitoringConditioner(struct Monitoramento monitoramento);
+    std::vector<struct Monitoramento> getMonitoringConditioner();
+    void setMonitoringConditioner(std::vector<struct Monitoramento>  monitoramento);
 
     String getNtpFormatedTime();
     String getNow();
@@ -67,13 +69,13 @@ class EnvironmentVariablesService
     void turnOffManagedDevices();
 
     void sendDataToActuator(String uuid, String message);
-    void sendDataToActuator(int typeEquipment, String message);
+    void sendDataToActuator(int typeEquipment, String uuid, String message);
 
-    void turnOfLight();
-    void turnOnLight();
+    void turnOfLight(String uuid);
+    void turnOnLight(String uuid);
 
-    void turnOnConditioner();
-    void turnOfConditioner();
+    void turnOnConditioner(String uuid);
+    void turnOfConditioner(String uuid);
 
     void continuousValidation();
     void checkTimeToLoadReservations();
@@ -82,6 +84,19 @@ class EnvironmentVariablesService
     void awaitsReturn();
 
     void initEnvironmentVariables(); 
+
+    bool hasLightTurnOn(); 
+    bool hasConditionerTurnOn();
+    bool hasLightTurnOff(); 
+    bool hasConditionerTurnOff();
+
+    std::vector<String> getActuatorsByTypeEquipment(int typeEquipment);
+
+    struct Monitoramento getMonitoringConditionerByUuid(String uuid);
+    struct Monitoramento getMonitoringLightByUuid(String uuid);
+
+    void updateMonitoringConditioner(struct Monitoramento monitoring);
+    void updateMonitoringLight(struct Monitoramento monitoring);
 };
 
 #endif

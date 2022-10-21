@@ -124,7 +124,7 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
 
     __bleConfiguration->setReceivedRequest(false);
 
-    __utils.updateMonitoring(__message);
+    __utils.updateMonitoring(__message, request.uuid);
 
     if (__configAcess.isDebug())
     {

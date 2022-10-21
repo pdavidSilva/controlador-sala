@@ -96,7 +96,7 @@ void ClientSocketService::serverListener() {
                 else
                   client.println("NOT-AVALIABLE");
 
-                __utilsClient.updateMonitoring(__message);
+                __utilsClient.updateMonitoring(__message, request.uuid);
 
                 if (configuration.isDebug())
                 {

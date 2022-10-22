@@ -253,7 +253,7 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String u
 {
   for(struct HardwareRecord r : __bleServerConfig->getActuators())
   {
-    if(r.uuid.equals(uuid))
+    if(r.uuid.equals(uuid) && typeEquipment == r.typeEquipment)
       sendDataToActuator(r.uuid, message);
   }
 }

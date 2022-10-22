@@ -1,3 +1,4 @@
+#include "WiFi.h"
 #include "Config.h"
 #include "WiFiService.h"
 
@@ -5,9 +6,7 @@ WiFiService::WiFiService(){}
 Config config;
 
 void WiFiService::connect()  
-{   
-    delay(4000);
-    
+{       
     int attempt = 0;
     WiFi.mode(WIFI_STA);
     WiFi.begin(config.getSSID().c_str(), config.getWIFIPassword().c_str());
@@ -49,7 +48,9 @@ void WiFiService::connect()
 
 void WiFiService::disconnect()  
 {
-    WiFi.disconnect();
+    //WiFi.disconnect();
+    Serial.print("connectado: ");
+    Serial.println(WiFi.isConnected());
     digitalWrite(config.getLedStatus(), LOW); 
 
     if (config.isDebug())

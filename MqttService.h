@@ -2,7 +2,7 @@
 #define MqttService_h
 
 #include "Config.h"
-
+#include "Global.h"
 #define CONDICIONADOR  "AR_CONDICIONADO"
 #define LUZES "LUZES"
 #define ATUALIZAR "ATUALIZAR_HORARIOS"
@@ -12,8 +12,6 @@ class MqttService
   private:
     static bool __messageReturned;
     static String __message;
-    static WiFiClientSecure __espClient;
-    static PubSubClient * __client;
     static String getMessageToSend(MonitoringRequest request);
     static MonitoringRequest deserealizeObject(String payload);
     static void callback(char* topic, byte* payload, unsigned int length);
@@ -21,7 +19,7 @@ class MqttService
     static void reconnect();
 
   public: 
-    MqttService();
+    MqttService(PubSubClient *client);
     
     String getMessage();
     void setMessage(String message);
@@ -33,7 +31,7 @@ class MqttService
     static void executeSolicitation(MonitoringRequest solicitacao); 
 
     // Solicitacao
-    void startMqttService(HardwareRecord Hardware);
+    void startMqttService(PubSubClient *client, HardwareRecord Hardware);
     static bool connectToActuator(String uuidDevice);
 };
 

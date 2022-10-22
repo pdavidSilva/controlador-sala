@@ -14,6 +14,7 @@
 #include <ArduinoJson.h>
 #include <NTPClient.h>
 #include <WiFiUDP.h>
+#include <PubSubClient.h>
 #include "Controller.h"
 #include "WiFiService.h"
 #include "HTTP.h"
@@ -23,7 +24,6 @@
 #include "Hardware.h"
 #include "DHT.h"
 #include "BLEServerService.h"
-#include <PubSubClient.h>
 #include "MqttService.h"
 #include "EnvironmentVariablesService.h"
 #include "UtilsService.h"

@@ -25,7 +25,7 @@ Config::Config(){
     __password  = "Ald50983021";
     __mqttServer = "5cca6ae0a1694e46b4f3459338a2e561.s2.eu.hivemq.cloud";
     __mqttPort = 8883;
-    __mqttUser = "server";
+    __mqttUser = "esp_client";
     __mqttPassword = "Salas@2022";
     __basetime  = 180000;
     __ledStatus = 2;

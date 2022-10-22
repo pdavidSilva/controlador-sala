@@ -97,7 +97,7 @@ String HTTP::request(String resource, String type, String params) const{
         Serial.println("[HTTP] HTTP FINALIZADO: " + String(httpCode));
     }
 
-    wifi.disconnect();
+    //wifi.disconnect();
     
     if(config.isDebug()){
         Serial.println("==================================");  

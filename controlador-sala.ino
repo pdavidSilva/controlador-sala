@@ -5,6 +5,8 @@ BLEServerService* bleConfig;
 HardwareRecord hardware;
 Controller controller;
 WiFiService wiFiService;
+WiFiClientSecure espClient;
+PubSubClient * client;
 
 void setup() {
 	
@@ -12,33 +14,36 @@ void setup() {
 	bool init = false;
 
   wiFiService.connect();
+  espClient.setCACert(ROOT_CA);
+  client = new PubSubClient(espClient);
 
 	do {
-		if ( controller.start(hardware) ) {
-			if ( controller.registerHardware(hardware) ) {
+	 	if ( controller.start(hardware) ) {
+	 		if ( controller.registerHardware(hardware) ) {
 
         controller.setHardwareConfig(hardware);
         controller.fillHardwares(hardware);
 
-				if ( controller.loadedDevices() )				
-					init = true;
+	 			if ( controller.loadedDevices() )				
+	 				init = true;
 
-			}
-		}
-	} while( !init ); 
+	 		}
+	 	}
+	 } while( !init ); 
 
-  // Configure BLE Service
-  controller.configureBLEServer();
-  controller.initBLETaskServer();	
+   Configure BLE Service
+  //controller.configureBLEServer();
+  //controller.initBLETaskServer();	
 
   // Configure Mqtt Service
-  controller.startTaskMqtt(hardware);
+  controller.startTaskMqtt(client, hardware);
 
 
   // Configure Environment Variables Service
-  controller.initEnvironmentVariables();
+  //controller.initEnvironmentVariables();
+
 }
 
 void loop() {
-  controller.environmentVariablesContinuousValidation(); 
-}
+   //controller.environmentVariablesContinuousValidation(); 
+ }

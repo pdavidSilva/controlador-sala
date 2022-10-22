@@ -4,7 +4,6 @@
 
 Controller::Controller(){}
 HTTPService __http;
-MqttService __mqttService;
 BLEServerService* __bleConfig; 
 EnvironmentVariablesService __environmentService;
 EquipmentService __equipmentService;
@@ -84,9 +83,10 @@ void Controller::sendDataMonitoring(MonitoringRecord monitoringRecord)
     delay(3000);
 }
 
-void Controller::startTaskMqtt(HardwareRecord hardware)
+void Controller::startTaskMqtt(PubSubClient *client, HardwareRecord hardware)
 {  
-    __mqttService.startMqttService(hardware);
+    MqttService mqttService(client);
+    mqttService.startMqttService(client, hardware);
 }
 
 HardwareRecord Controller::getHardwareConfig()

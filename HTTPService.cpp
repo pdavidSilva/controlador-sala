@@ -528,14 +528,14 @@ std::vector<struct Monitoramento> HTTPService::getMonitoringByIdSalaAndEquipamen
         {
             JsonArray jsonSensors = doc["result"].as<JsonArray>();
             
+            struct Monitoramento monitoramento;
+
             for (JsonVariant object : jsonSensors)
             {
-                struct Monitoramento monitoramento = {0, false, "", 0};
-
-                monitoramento.id = doc["result"]["id"].as<int>();
-                monitoramento.estado = doc["result"]["estado"].as<bool>();
-                monitoramento.uuid = doc["result"]["uuid"].as<String>();
-                monitoramento.equipamentoId = doc["result"]["equipamentoId"].as<int>();
+                monitoramento.id = object["id"].as<int>();
+                monitoramento.estado = object["estado"].as<bool>();
+                monitoramento.uuid = object["uuid"].as<String>();
+                monitoramento.equipamentoId = object["equipamentoId"].as<int>();
 
                 monitoramentos.push_back(monitoramento);
             }

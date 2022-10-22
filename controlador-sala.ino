@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 BLEServerService* bleConfig; 
 //EnvironmentVariablesService environment;
@@ -37,11 +37,10 @@ void setup() {
   // controller.startTaskWebSocket();
   controller.startTaskHttp();
 
-
   // Configure Environment Variables Service
-  //controller.initEnvironmentVariables();
+  controller.initEnvironmentVariables();
 }
 
 void loop() {
   controller.environmentVariablesContinuousValidation(); 
-}*/
+}

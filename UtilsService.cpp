@@ -28,8 +28,8 @@ void UtilsService::updateMonitoring(String message, String uuid)
 
         if(monitoringLight.equipamentoId > 0 && monitoringLight.id > 0) 
         {
-           __httpUtilService.putMonitoring(monitoringLight);
            __environmentVariablesService.updateMonitoringLight(monitoringLight);
+           __httpUtilService.putMonitoring(monitoringLight);
         }
     }
 
@@ -41,8 +41,8 @@ void UtilsService::updateMonitoring(String message, String uuid)
 
        if(monitoringConditioner.equipamentoId > 0 && monitoringConditioner.id > 0)
        {
-           __httpUtilService.putMonitoring(monitoringConditioner);
            __environmentVariablesService.updateMonitoringConditioner(monitoringConditioner); 
+           __httpUtilService.putMonitoring(monitoringConditioner);
        }
     }
 

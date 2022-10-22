@@ -1,4 +1,4 @@
-#include "Global.h"
+/*#include "Global.h"
 #include "Config.h"
 
 HardwareRecord hardware;
@@ -8,9 +8,9 @@ String master = "";
 bool HAS_IR_TO_SEND = false;
 String COMMAND_IR;
 const uint16_t kIrLed = 12;
-IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
+IRsend irsend(kIrLed); */ // Set the GPIO to be used to sending the message.
 
-void setup() {
+/*void setup() {
 	Serial.begin(115200);
 	irsend.begin();
 	bool init = false;
@@ -42,4 +42,4 @@ void loop() {
   }
 
   delay(2000);
-}
+}*/

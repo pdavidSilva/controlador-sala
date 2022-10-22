@@ -9,7 +9,7 @@ using namespace std;
 #define TYPE_CONDITIONER  1 
 #define TURN_ON  1
 #define TURN_OFF  2 
-#define CHECK_TIME_TO_LOAD  20
+#define CHECK_TIME_TO_LOAD  600
 #define CHECK_TIME_TO_TURN_OFF  900000 // 15 MINUTOS
 
 class EnvironmentVariablesService 
@@ -71,11 +71,11 @@ class EnvironmentVariablesService
     void sendDataToActuator(String uuid, String message);
     void sendDataToActuator(int typeEquipment, String uuid, String message);
 
-    void turnOfLight(String uuid);
+    void turnOffLight(String uuid);
     void turnOnLight(String uuid);
 
     void turnOnConditioner(String uuid);
-    void turnOfConditioner(String uuid);
+    void turnOffConditioner(String uuid);
 
     void continuousValidation();
     void checkTimeToLoadReservations();

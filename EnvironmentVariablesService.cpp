@@ -312,9 +312,8 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
     
     if (__inClass && __hasMovement) 
     {
-      if(hasConditionerTurnOn() || hasLightTurnOn())
+      if(hasConditionerTurnOff() || hasLightTurnOff())
       {
-      
           __bleServerConfig->setReceivedRequest(true);
           __bleServerConfig->setEnvironmentSolicitation(true);
 
@@ -332,7 +331,6 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
           
           __bleServerConfig->setReceivedRequest(false);
           __bleServerConfig->setEnvironmentSolicitation(false);
-
       }
     }  
 }
@@ -347,27 +345,27 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
 
   if (!__inClass || (__inClass && longTimeWithoutMovement)) 
   {
-    if(hasConditionerTurnOff() || hasLightTurnOff())
+    if(hasConditionerTurnOn() || hasLightTurnOn())
     {
-
       __bleServerConfig->setReceivedRequest(true);
       __bleServerConfig->setEnvironmentSolicitation(true);
 
       struct Monitoramento monitoring = {0, false, "", 0};
 
       for(monitoring : __monitoringConditioner) {
-        if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
-           turnOfConditioner(monitoring.uuid);
+        if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0) {
+          turnOfConditioner(monitoring.uuid);
+        }
       }
 
       for(monitoring : __monitoringLight) {
-        if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
+        if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0) {
           turnOfLight(monitoring.uuid);
+        }
       }
 
       __bleServerConfig->setReceivedRequest(false);
       __bleServerConfig->setEnvironmentSolicitation(false);
-
     }
   }
 }
@@ -391,7 +389,7 @@ void EnvironmentVariablesService::turnOnConditioner(String uuid) {
 /*
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::turnOfConditioner(String uuid) {
+void EnvironmentVariablesService::turnOffConditioner(String uuid) {
   
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
@@ -423,7 +421,7 @@ void EnvironmentVariablesService::turnOnLight(String uuid){
 /*
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::turnOfLight(String uuid){
+void EnvironmentVariablesService::turnOffLight(String uuid){
 
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
@@ -503,7 +501,6 @@ void EnvironmentVariablesService::continuousValidation()
 {
   Config config;
   int checkTimeToLoad = 0;
-  __reservations = __httpRequestService.GetReservationsWeek();
 
   while(true)
   {    

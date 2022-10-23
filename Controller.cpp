@@ -9,6 +9,8 @@ EnvironmentVariablesService __environmentService;
 EquipmentService __equipmentService;
 UtilsService __utilService;
 Config __config; 
+MqttService __mqttService;
+
 
 bool Controller::start(HardwareRecord &record) const 
 {   
@@ -83,10 +85,16 @@ void Controller::sendDataMonitoring(MonitoringRecord monitoringRecord)
     delay(3000);
 }
 
-void Controller::startTaskMqtt(PubSubClient *client, HardwareRecord hardware)
+void Controller::configureMqtt(PubSubClient *client, HardwareRecord hardware)
 {  
     MqttService mqttService(client);
-    mqttService.startMqttService(client, hardware);
+    __mqttService = mqttService;
+    //mqttService.startMqttService(client, hardware);
+}
+
+void Controller::startMqttService()
+{  
+    __mqttService.monitorSolicitation();
 }
 
 HardwareRecord Controller::getHardwareConfig()

@@ -13,9 +13,7 @@ void setup() {
 	Serial.begin(115200);
 	bool init = false;
 
-  wiFiService.connect();
-  espClient.setCACert(ROOT_CA);
-  client = new PubSubClient(espClient);
+   wiFiService.connect();
 
 	do {
 	 	if ( controller.start(hardware) ) {
@@ -31,19 +29,22 @@ void setup() {
 	 	}
 	 } while( !init ); 
 
-   Configure BLE Service
-  //controller.configureBLEServer();
-  //controller.initBLETaskServer();	
-
+  espClient.setCACert(ROOT_CA);
+  client = new PubSubClient(espClient);
   // Configure Mqtt Service
-  controller.startTaskMqtt(client, hardware);
 
+  //Configure BLE Service
+  controller.configureBLEServer();
+  controller.initBLETaskServer();	
 
-  // Configure Environment Variables Service
+  controller.configureMqtt(client, hardware);
+
+  //Configure Environment Variables Service
   //controller.initEnvironmentVariables();
 
 }
 
 void loop() {
+    controller.startMqttService();
    //controller.environmentVariablesContinuousValidation(); 
  }

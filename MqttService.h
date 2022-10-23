@@ -20,6 +20,7 @@ class MqttService
 
   public: 
     MqttService(PubSubClient *client);
+    MqttService();
     
     String getMessage();
     void setMessage(String message);
@@ -27,7 +28,7 @@ class MqttService
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
-    static void monitorSolicitation(void* _this);
+    void monitorSolicitation();
     static void executeSolicitation(MonitoringRequest solicitacao); 
 
     // Solicitacao

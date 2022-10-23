@@ -7,7 +7,6 @@
 #include <String>
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <Vector.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include "EmonLib.h"
@@ -35,10 +34,6 @@ class Config
         String __url;
         String __ssid;
         String __password;
-        String __mqttServer;
-        int __mqttPort;
-        String __mqttUser;
-        String __mqttPassword;
 
         int    __ledStatus;
         int    __basetime;
@@ -55,10 +50,6 @@ class Config
         String getUrl();
         String getSSID();
         String getWIFIPassword();
-        String getMqttServer();
-        int getMqttPort();
-        String getMqttUser();
-        String getMqttPassword();
         int    getType();
         int    getBaseTime();
         int    getLedStatus();

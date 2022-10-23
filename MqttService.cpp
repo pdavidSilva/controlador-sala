@@ -13,6 +13,11 @@ HardwareRecord __hardware;
 
 char msg[MSG_BUFFER_SIZE];
 
+const char* mqtt_server = "5cca6ae0a1694e46b4f3459338a2e561.s2.eu.hivemq.cloud";
+uint16_t mqtt_port = 8883;
+const char* mqtt_user = "esp_client";
+const char* mqtt_pass = "Salas@2022";
+
 bool MqttService::__messageReturned = false;
 String MqttService::__message = "";
 
@@ -20,6 +25,9 @@ MqttService::MqttService(PubSubClient *client) {
   __client = client;
 }
 
+MqttService::MqttService() {
+
+}
 
 String MqttService::getMessage() {
     return  __message;
@@ -37,20 +45,20 @@ void MqttService::startMqttService(PubSubClient *client, HardwareRecord hardware
 {
     __client = client;
     __hardware = hardware;
-    xTaskCreate(this->monitorSolicitation, "monitorSolicitation", 8192, this, 5, NULL);
+    //xTaskCreate(this->monitorSolicitation, "monitorSolicitation", 4096, this, 5, NULL);
 }
 
-void MqttService::monitorSolicitation(void* _this)
+void MqttService::monitorSolicitation()
 {
     setup();
     MonitoringRequest request;
     while (true)
     {
-        if (__configAccess.isDebug())
-        {
-            Serial.println("=======================================");
-            Serial.println("[MqttService] Start");
-        }
+        // if (__configAccess.isDebug())
+        // {
+        //     Serial.println("=======================================");
+        //     Serial.println("[MqttService] Start");
+        // }
 
         if (!__client->connected()) {
             reconnect();
@@ -58,11 +66,11 @@ void MqttService::monitorSolicitation(void* _this)
 
         __client->loop();
 
-        if (__configAccess.isDebug())
-        {
-            Serial.println("=======================================");
-            Serial.println("[MqttService] End");
-        }
+        // if (__configAccess.isDebug())
+        // {
+        //     Serial.println("=======================================");
+        //     Serial.println("[MqttService] End");
+        // }
     }
     
 }
@@ -206,14 +214,12 @@ void MqttService::reconnect() {
 
   while (!__client->connected()) {
     Serial.print("[MqttService] Attempting MQTT connection… DEVICE: " + __hardware.uuid);
-    String __clientId = "ESP8266__client";
-    String sub = "esp/" + __hardware.uuid;
-    Serial.println("\n\nserver: " +  __configAccess.getMqttUser());
-    Serial.println("pass: " +  __configAccess.getMqttPassword());
+    String clientId = "esp/" + __hardware.uuid;
+    String topic = clientId;
     
-    if (__client->connect(__clientId.c_str(), "server", "Salas@2022")) {
+    if (__client->connect(clientId.c_str(), mqtt_user, mqtt_pass)) {
       Serial.println("[MqttService] Connected");
-      __client->subscribe(sub.c_str());
+      __client->subscribe(topic.c_str());
     } else {
       Serial.print("[MqttService] Failed, rc = ");
       Serial.print(__client->state());
@@ -223,12 +229,8 @@ void MqttService::reconnect() {
   }
 }
 
-void MqttService::setup() {
-    Serial.println("\n\nuser: " +  __configAccess.getMqttServer());
-    Serial.print("\nport: " );
-    Serial.println(__configAccess.getMqttPort());
-    const char* mqtt_server = "5cca6ae0a1694e46b4f3459338a2e561.s2.eu.hivemq.cloud";
-
-  __client->setServer(mqtt_server, 8883);
+void MqttService::setup()
+{
+  __client->setServer(mqtt_server, mqtt_port);
   __client->setCallback(callback);
 }

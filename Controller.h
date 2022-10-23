@@ -29,8 +29,8 @@ class Controller
         // WEB SOCKET
         void initServerSocket();    
         void startTaskWebSocket();
-        void startTaskMqtt(PubSubClient *client, HardwareRecord hardware);
-
+        void configureMqtt(PubSubClient *client, HardwareRecord hardware);
+        void startMqttService();
         HardwareRecord getHardwareConfig();
         void setHardwareConfig(HardwareRecord hardware);
 

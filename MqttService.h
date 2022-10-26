@@ -28,7 +28,7 @@ class MqttService
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
-    void monitorSolicitation();
+    static void monitorSolicitation(void* _this);
     static void executeSolicitation(MonitoringRequest solicitacao); 
 
     // Solicitacao

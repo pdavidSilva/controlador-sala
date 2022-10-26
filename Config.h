@@ -1,3 +1,4 @@
+#include "stdint.h"
 
 #ifndef Config_h
 #define Config_h
@@ -34,7 +35,10 @@ class Config
         String __url;
         String __ssid;
         String __password;
-
+        char* __mqttServer;
+        uint16_t __mqttPort;
+        String __mqttUser;
+        String __mqttPassword;
         int    __ledStatus;
         int    __basetime;
         bool   __debug;
@@ -50,6 +54,10 @@ class Config
         String getUrl();
         String getSSID();
         String getWIFIPassword();
+        char* getMqttServer();
+        uint16_t getMqttPort();
+        String getMqttUser();
+        String getMqttPassword();
         int    getType();
         int    getBaseTime();
         int    getLedStatus();

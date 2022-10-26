@@ -3,7 +3,7 @@
 String __url;
 String __ssid;
 String __password;
-String __mqttServer;
+char* __mqttServer;
 int __mqttPort;
 String __mqttUser;
 String __mqttPassword;
@@ -17,12 +17,16 @@ Config::Config(){
     __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
     __url       = "http://marcosdosea-002-site2.itempurl.com/api";
     __debug     = true;
-    __ssid      = "TransmissaoAula";
-    __password  = "#ufstransmissao#";
+    //__ssid      = "TransmissaoAula";
+    //__password  = "#ufstransmissao#";
     // __ssid      = "Josiely";
     // __password  = "JOIBSN12";
-    //__ssid      = "Apartamento 201-2.4";
-    //__password  = "Ald50983021";
+    __ssid      = "Apartamento 201-2.4";
+    __password  = "Ald50983021";
+    __mqttServer = "5cca6ae0a1694e46b4f3459338a2e561.s2.eu.hivemq.cloud";
+    __mqttPort = 8883;
+    __mqttUser = "esp_client";
+    __mqttPassword = "Salas@2022";
     __basetime  = 180000;
     __ledStatus = 2;
     __type  = TYPE_CONTROLLER;
@@ -51,6 +55,27 @@ String Config::getSSID()
 String Config::getWIFIPassword()
 {
 	return __password;
+}
+
+char* Config::getMqttServer() 
+{
+    return __mqttServer;
+}
+
+uint16_t Config::getMqttPort() 
+{
+    return __mqttPort;
+
+}
+
+String Config::getMqttUser()
+{
+    return __mqttUser;
+}
+        
+String Config::getMqttPassword() 
+{
+    return __mqttPassword;
 }
 
 int	Config::getBaseTime()

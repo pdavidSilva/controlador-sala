@@ -237,6 +237,8 @@ void BLEServerService::populateMap()
   
     if (__devicesMapped.size() == 0)
       Serial.println("[CONNECTION]: no devices found");    
+      //__pBLEScan->stop();
+      //BLEDevice::deinit(false);
 }
   
 bool BLEServerService::isSensor(String uuid)

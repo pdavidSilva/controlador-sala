@@ -85,16 +85,11 @@ void Controller::sendDataMonitoring(MonitoringRecord monitoringRecord)
     delay(3000);
 }
 
-void Controller::configureMqtt(PubSubClient *client, HardwareRecord hardware)
+void Controller::startTaskMqtt(PubSubClient *client, HardwareRecord hardware)
 {  
     MqttService mqttService(client);
     __mqttService = mqttService;
-    //mqttService.startMqttService(client, hardware);
-}
-
-void Controller::startMqttService()
-{  
-    __mqttService.monitorSolicitation();
+    __mqttService.startMqttService(client, hardware);
 }
 
 HardwareRecord Controller::getHardwareConfig()

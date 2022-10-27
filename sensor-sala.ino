@@ -4,6 +4,7 @@ HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
 Controller controller;
 String master = "";
+String COMMAND;
 bool SEND_DATA = false;
 Config conf;
 

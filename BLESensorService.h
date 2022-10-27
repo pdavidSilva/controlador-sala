@@ -86,8 +86,8 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         Serial.println("===============================================");
         Serial.println("[BLESensorService] ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
-        HAS_IR_TO_SEND = true;
-        COMMAND_IR = receivedData;
+        SEND_DATA = true;
+        COMMAND = receivedData;
         equipmentState = "";
         receivedData = "";
       }

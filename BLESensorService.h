@@ -1,3 +1,4 @@
+#include "WCharacter.h"
 #ifndef BLESensorService_h
 #define BLESensorService_h
 
@@ -43,8 +44,7 @@ void EnabledToSend(bool enabledToSend) {
   sendData = enabledToSend;
 }
 
-class MyServerCallbacks: 
-    public BLEServerCallbacks {
+class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
 
       digitalWrite(LED, HIGH);
@@ -55,10 +55,8 @@ class MyServerCallbacks:
       sendData = false;
 
       Serial.println("===============================================");
-      Serial.println("[BLESensorService] CONECTADO");
-            
-      delay(1000);
-    };
+      Serial.println("[BLESensorService] CONECTADO");   
+    }
 
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;      
@@ -90,10 +88,6 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         Serial.println("[BLESensorService] ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
         HAS_IR_TO_SEND = true;
         COMMAND_IR = receivedData;
-        //equipmentState = equipmentService.executeActionFromController(receivedData);
-        //sendData = true;
-        //sendDataToServer(equipmentState.c_str());
-        //sendData = false;
         equipmentState = "";
         receivedData = "";
       }
@@ -101,6 +95,11 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         receivedData = receivedData + response.c_str();
       }
+    } else if(deviceType != NULL && deviceType == SENSOR) {
+        if(sendData) {
+          Serial.println("[BLESensorService] SENSOR - (ONWRITE) DATA ENSORIAMENTO");
+          SEND_DATA = true;
+        }
     }
   }
 };

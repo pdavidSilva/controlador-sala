@@ -7,7 +7,7 @@
 extern bool HAS_IR_TO_SEND;
 extern String COMMAND_IR;
 extern IRsend irsend;  // Set the GPIO to be used to sending the message.
-extern bool BLE_LOCK;
+extern bool SEND_DATA;
 static const char *ROOT_CA PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw

@@ -46,6 +46,7 @@ class Config
         int    __route;
         int    __wifiFailAttempts;
         int    __commandSendAttempts;
+        int    __timesToHasOne;
     public : 
         
         Config();
@@ -65,6 +66,7 @@ class Config
         int    getRoute();        
         int    getWifiFailAttempts();
         int    getCommandSendAttempts();
+        int    getTimesToHasOne();
 };
 
 #endif

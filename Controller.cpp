@@ -82,7 +82,6 @@ void Controller::sendDataMonitoring(MonitoringRecord monitoringRecord)
     EnabledToSend(true);
     sendDataToServer(data);
     EnabledToSend(false);
-    delay(3000);
 }
 
 void Controller::startTaskMqtt(PubSubClient *client, HardwareRecord hardware)

@@ -12,6 +12,7 @@ int    __basetime;
 int    __type;
 int    __route;
 bool   __debug;
+int    __timesToHasOne;
 
 Config::Config(){
     __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
@@ -33,7 +34,8 @@ Config::Config(){
     __route = 2;
     __wifiFailAttempts = 30;
     __commandSendAttempts = 3;
-
+    __timesToHasOne = 3;
+    
     pinMode(__ledStatus, OUTPUT);
 }
 
@@ -111,4 +113,8 @@ int Config::getCommandSendAttempts()
 bool Config::isDebug() 
 {
 	return __debug;
+}
+
+int Config::getTimesToHasOne() {
+  return __timesToHasOne;
 }

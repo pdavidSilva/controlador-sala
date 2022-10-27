@@ -75,9 +75,9 @@ String UtilsService::mountDataMonitoring(MonitoringRecord record)
 {
     DynamicJsonDocument doc(2048);
     String data;
-    doc['temperature'] = record.temperature;
+    doc['temperature'] = (!isnan(record.temperature) && record.temperature > 0 && record.temperature != NULL) ? record.temperature : -1;
     doc['hasPresent'] = record.hasPresent;
-    Serial.println("[UtilsService] sendDataMonitoring");
+    Serial.println("[UtilsService] mountDataMonitoring");
     serializeJson(doc, data);
     return data;
 }

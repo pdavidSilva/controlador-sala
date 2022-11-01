@@ -1,4 +1,3 @@
-#include "WCharacter.h"
 #ifndef BLESensorService_h
 #define BLESensorService_h
 

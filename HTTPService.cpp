@@ -148,7 +148,7 @@ std::vector<struct HardwareRecord> HTTPService::getHardwares(struct HardwareReco
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(2048);
+        DynamicJsonDocument doc(4096);
         DeserializationError error = deserializeJson(doc, response);
                          
         if (error)
@@ -204,6 +204,7 @@ struct HardwareRecord HTTPService::deserializeDevice(JsonVariant sensor) {
    disp.uuid = sensor["uuid"].as<String>();
    disp.typeHardwareId = sensor["tipoHardwareId"].as<int>();
    disp.typeEquipment = sensor["tipoEquipamento"].as<int>(); 
+   
    return disp;
 }
 

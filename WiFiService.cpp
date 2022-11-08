@@ -48,9 +48,8 @@ void WiFiService::connect()
 
 void WiFiService::disconnect()  
 {
-    //WiFi.disconnect();
-    Serial.print("connectado: ");
-    Serial.println(WiFi.isConnected());
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
     digitalWrite(config.getLedStatus(), LOW); 
 
     if (config.isDebug())

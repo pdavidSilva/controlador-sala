@@ -18,9 +18,9 @@ class Controller
         bool loadedDevices();
 
         // BLE
-        void configureClient(String deviceName, DeviceType deviceType);   
-        void configureBLEServer();   
-        void initBLETaskServer();    
+        void setupBLEClient(String deviceName, DeviceType deviceType);   
+        void setupBLEServer();   
+        void startBLETaskServer();    
         bool notificateServer() const;       
 
         //send Data Monitoring

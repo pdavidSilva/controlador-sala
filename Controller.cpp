@@ -51,20 +51,23 @@ bool Controller::notificateServer() const
     return true;
 }
 
-void Controller::initBLETaskServer()
+void Controller::startBLETaskServer()
 {
     delay(2000);
     __bleConfig->startTaskBLE();
 }
 
-void Controller::configureBLEServer()
+void Controller::setupBLEServer()
 {
     __bleConfig->initBLE();  
-    __bleConfig->scanDevices();
+    __bleConfig->activeBLEScan();
+    __bleConfig->setFilteredDevices(__bleConfig->scanDevices());
+    __bleConfig->stopScan();
     __bleConfig->populateMap();
+    __bleConfig->deinitBLE();
 }
 
-void Controller::configureClient(String deviceName, DeviceType deviceType)
+void Controller::setupBLEClient(String deviceName, DeviceType deviceType)
 {
    initBLEClient(deviceName, deviceType);  
 }

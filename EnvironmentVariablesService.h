@@ -82,6 +82,8 @@ class EnvironmentVariablesService
     void awaitsReturn();
 
     void initEnvironmentVariables(); 
+
+    struct MonitoringRecord deserealizeData(String message);
 };
 
 #endif

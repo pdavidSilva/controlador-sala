@@ -4,6 +4,7 @@
 int __id;
 String __uuid;
 String __token;
+String __mac;
 int __typeDisp;
 String __characteristic;
 BLEAdvertisedDevice* __bleAdvertisedDevice;
@@ -50,6 +51,12 @@ void Hardware::setToken(String token)
 {
   __token = token;
 }
+
+void Hardware::setMac(String mac)
+{
+  __mac = mac;
+}
+
 void Hardware::setTypeDisp(int type)
 {
     __typeDisp = type;
@@ -78,6 +85,11 @@ String Hardware::getUuid() const
 String Hardware::getToken() const 
 {
   return __token;
+}
+
+String Hardware::getMac()
+{
+  return __mac;
 }
 
 int Hardware::getTypeDisp()

@@ -9,6 +9,7 @@ class Hardware
         int __id;
         String __uuid;
         String __token;
+        String __mac;
 
         int __typeDisp;
         String __characteristic;
@@ -25,12 +26,14 @@ class Hardware
         void   setId(int);
         void   setUuid(String);
         void   setToken(String);
+        void   setMac(String mac);
         void   setTypeDisp(int id);
         void   setCharacteristic(String uuid);
         void   setBLEAdvertisedDevice(BLEAdvertisedDevice *bleAdvertisedDevice);
       
         int    getId() const; 
         String getUuid() const; 
+        String getMac(); 
         String getToken() const;
         int getTypeDisp();
         String getCharacteristic();

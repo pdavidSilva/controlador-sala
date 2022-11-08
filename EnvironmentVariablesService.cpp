@@ -341,12 +341,8 @@ String EnvironmentVariablesService::getNow()
 
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()
-{
-  __wifiService.connect();
-    
+{    
   __currentTime = __ntp.getFormattedTime();
-
-  __wifiService.disconnect();
 
   if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations)
   {
@@ -367,7 +363,9 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
 {
   if (__receivedData) 
   {
-    if (__message.equals("S") == 0) 
+    struct MonitoringRecord variables = deserealizeData(__message);
+
+    if (variables.hasPresent.equals("S") == 0) 
     {
       __hasMovement = true;
       __lastTimeAttended = millis();
@@ -380,6 +378,29 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
     __message = "";
     __receivedData = false; 
   }
+}
+
+struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String message)
+{
+  struct MonitoringRecord environmentVariables = {"", 0.0};
+  
+  Config config;
+  DynamicJsonDocument doc(1024);
+  DeserializationError error = deserializeJson(doc, message);
+  
+  if (!error)
+  {
+    environmentVariables.temperature = doc["temperature"].as<int>();
+    environmentVariables.hasPresent = doc["hasPresent"].as<String>();
+  }
+  else if(config.isDebug())
+  {
+    Serial.println("==================================");
+    Serial.println("[HTTPService] Falha no parse JSON.......");
+    Serial.println(error.f_str());
+  }
+
+  return environmentVariables;
 }
 
 void EnvironmentVariablesService::continuousValidation()

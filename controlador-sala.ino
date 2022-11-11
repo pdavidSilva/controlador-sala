@@ -34,16 +34,15 @@ void setup() {
   // Configure Mqtt Service
 
   //Configure BLE Service
-  controller.configureBLEServer();
-  //controller.initBLETaskServer();	
+  controller.setupBLEServer();
+  controller.startBLETaskServer();	
 
   controller.startTaskMqtt(client, hardware);
 
   //Configure Environment Variables Service
-  //controller.initEnvironmentVariables();
-
+  controller.initEnvironmentVariables();
 }
 
 void loop() {
-   //controller.environmentVariablesContinuousValidation(); 
+   controller.environmentVariablesContinuousValidation(); 
  }

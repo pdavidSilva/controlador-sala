@@ -441,29 +441,50 @@ bool BLEServerService::connectToActuator(String uuidDevice)
 void BLEServerService::continuousConnectionTask() 
 {  
     WiFiService wifiService;
-    BLEDeviceConnect *deviceConnected;
-    vector<BLEDeviceConnect*> aux;
-    vector<BLEAdvertisedDevice*> bleDevices;
-    bool isDeviceConected = false, longTimeWithoutConnections = false;
-    Hardware disp;
-    int count = 0;
+    bool longTimeWithoutConnections = false;
 
     while (true)
     {
       Serial.println("=========================================================");
       Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
+
       longTimeWithoutConnections = (millis() - __lastTimeConnectionCycle) >= TIME_WAITING_CONNECTION;
 
       if(longTimeWithoutConnections) 
       {
         wifiService.disconnect();
+
         initBLE();
 
         Serial.println("=================================");
-        Serial.println("[CONTINUOUS_CONNECTION] NEW CICLE");
+        Serial.println("[CONTINUOUS_CONNECTION] after init");
+
+        newCicle();      
         
-        for (auto item : __devicesMapped) 
-        {
+        setLastTimeConnectionCycle(millis());
+
+        deinitBLE();
+
+        wifiService.connect();
+      }
+
+      vTaskDelay(4000);
+    }
+}
+
+void BLEServerService::newCicle()
+{
+    BLEDeviceConnect *deviceConnected;
+    vector<BLEDeviceConnect*> aux;
+    bool isDeviceConected = false;
+    Hardware disp;
+    int count = 0;
+
+    Serial.println("=================================");
+    Serial.println("[CONTINUOUS_CONNECTION] NEW CICLE");
+        
+    for (auto item : __devicesMapped) 
+    {
           if (__configuration.isDebug())
           {
             Serial.println("=================================");
@@ -517,20 +538,9 @@ void BLEServerService::continuousConnectionTask()
 
             Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
           }
-        }
-
-        isDeviceConected = false;
-        
-        setLastTimeConnectionCycle(millis());
-
-        deinitBLE();
-
-        wifiService.connect();
-      }
-
-      count = 0;
-      delay(6000);
     }
+
+    setLastTimeConnectionCycle(millis());
 }
 
 vector<BLEAdvertisedDevice*> BLEServerService::getAvaliableDevices(vector<BLEAdvertisedDevice*> allDevices)

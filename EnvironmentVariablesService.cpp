@@ -81,7 +81,7 @@ bool EnvironmentVariablesService::setInClass(bool inClass)
 
 bool EnvironmentVariablesService::getInClass()
 {
-    return __inClass;
+    return true;
 }
 
 

@@ -61,6 +61,8 @@ class BLEServerService
     void addActuator(HardwareRecord act);
     void setReceivedRequest(bool receivedRequest);
     bool getReceivedRequest();
+
+    void newCicle();
     
     static void setCountTypeSensor(int count);
     static void setCounttypeActuator(int count);

@@ -21,7 +21,7 @@ Config::Config(){
     __password  = "Ald50983021";
     __basetime  = 180000;
     __ledStatus = 2;
-    __type  = TYPE_ACTUATOR;
+    __type  = TYPE_CONTROLLER;
     __route = 2;
     __wifiFailAttempts = 30;
     __commandSendAttempts = 3;

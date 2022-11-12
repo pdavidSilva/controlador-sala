@@ -677,11 +677,11 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
  * <parametros> tipo Tipo de Equipamento: LUZES, CONDICIONADOR</parametros>
  * <retorno> struct Solicitacao referente a solicitação existente para o hardware </retorno>
 */
-struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
+struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamento){
     
     HTTP http;
     Config config;
-    struct Solicitacao solicitacao = {0,"","","",""};
+    std::vector<Solicitacao> solicitacao;
     EnvironmentVariablesService environment;
 
     String route = "/Solicitacao";
@@ -713,9 +713,16 @@ struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
             delay(5000);
         }
 
+
+
         if (doc["httpCode"].as<int>() == 200)
         {
-            solicitacao = deserializeSolicitacao(doc["result"][0]["id"].as<int>(), doc["result"][0]["payload"].as<String>());
+            JsonArray solicitacoesJson = doc["result"].as<JsonArray>();
+
+            for (JsonVariant sol : solicitacoesJson)
+            {
+                solicitacao.push_back(deserializeSolicitacao(sol["id"].as<int>(), sol["payload"].as<String>()));
+            }
         }
         else
         {

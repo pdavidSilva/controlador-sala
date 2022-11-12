@@ -36,7 +36,7 @@ void AwaitHttpService::startAwait()
 
 void AwaitHttpService::awaitSolicitation(void* _this)
 {
-    Solicitacao solicitacao;
+    std::vector<Solicitacao> solicitacao;
     while (true)
     {
         if (__configAcess.isDebug())
@@ -45,13 +45,10 @@ void AwaitHttpService::awaitSolicitation(void* _this)
             Serial.println("[AwaitHttpService] Start");
         }
 
-        solicitacao = __httpService.getSolicitacao(LUZES);
-        if (solicitacao.id != 0){
-            executeSolicitation(solicitacao);
-        }
-        solicitacao = __httpService.getSolicitacao(CONDICIONADOR);
-        if (solicitacao.id != 0){
-            executeSolicitation(solicitacao);
+        solicitacao = __httpService.getSolicitacao(MONITORAMENTO);
+        for (Solicitacao s : solicitacao)
+        {
+            executeSolicitation(s);
         }
 
         if (__configAcess.isDebug())

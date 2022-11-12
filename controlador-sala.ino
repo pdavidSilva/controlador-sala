@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 BLEServerService* bleConfig; 
 //EnvironmentVariablesService environment;
@@ -43,5 +43,5 @@ void setup() {
 }
 
 void loop() {
-  controller.environmentVariablesContinuousValidation(); 
-}*/
+  //controller.environmentVariablesContinuousValidation(); 
+}

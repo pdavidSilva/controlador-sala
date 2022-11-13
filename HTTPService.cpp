@@ -106,8 +106,6 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
 
     params.concat("{");
     params.concat("\"id\":" + id + ", ");
-    // params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
-    // params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"tipo_hardware_id\": " + tipo_hardware_id);
     params.concat("}");
@@ -224,90 +222,6 @@ struct Solicitacao HTTPService::deserializeSolicitacao(int idSolicitacao, String
  
    return solicitacao;
 }
-
-/*void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
-{
-
-    //hardware/{uuid}/get-sensors?token=TOKEN
-
-    Config config;
-    HTTP http;
-    String route;
-
-    if (config.getRoute() == 1)
-        route = "/hardware/";
-    else
-        route = "/hardwaredesala/";
-
-    String routeService;
-    String type = "GET";
-    String params = "";
-    String response;
-
-    String uuid = String(hardware.uuid);
-    String token = hardware.token;
-
-    routeService.concat(route);
-    routeService.concat(uuid);
-    routeService.concat("/get-sensors");
-    routeService.concat("?token=");
-    routeService.concat(token);
-
-    response = http.request(routeService, type, params);
-
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
-    {
-        DynamicJsonDocument doc(2048);
-        DeserializationError error = deserializeJson(doc, response);
-
-        if (error)
-        {
-            if (config.isDebug())
-            {
-                Serial.println("==================================");
-                Serial.println("[HTTPService] Falha no parse JSON.......");
-                Serial.println(error.f_str());
-            }
-            delay(5000);
-
-            return;
-        }
-
-        if (doc["httpCode"].as<int>() == 200)
-        {
-
-            JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
-
-            int i = 0;
-            for (JsonVariant sensor : jsonSensors)
-            {
-                sensors[i] = sensor["uuid"].as<char *>();
-                i++;
-            }
-
-            indexSensors = doc["result"]["length"].as<int>();
-
-            return;
-        }
-        else
-        {
-            if (config.isDebug())
-            {
-                Serial.println("==================================");
-                Serial.print("[HTTPService] Mensagem: ");
-                Serial.println(doc["message"].as<char *>());
-            }
-            return;
-        }
-    }
-    else
-    {
-        return;
-    }
-
-    return;
-}
-*/
 
 bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 {

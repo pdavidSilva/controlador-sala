@@ -8,6 +8,7 @@ AwaitHttpService __awaitHttpService;
 BLEServerService* __bleConfig; 
 EnvironmentVariablesService __environmentService;
 EquipmentService __equipmentService;
+UtilsService __utilService;
 
 bool Controller::start(HardwareRecord &record) const 
 {   

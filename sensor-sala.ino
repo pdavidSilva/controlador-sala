@@ -2,6 +2,7 @@
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
+WiFiService wiFiService;
 Controller controller;
 String master = "";
 String COMMAND;
@@ -18,6 +19,8 @@ void setup() {
 	
 	Serial.begin(115200);
 	bool init = false;
+
+  wiFiService.connect();
 
 	do {
 		if ( controller.start(hardwareSensor) ) {

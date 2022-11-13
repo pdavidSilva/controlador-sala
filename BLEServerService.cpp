@@ -478,7 +478,6 @@ void BLEServerService::newCicle()
           }
     }
 
-    setLastTimeConnectionCycle(millis());
 }
 
 

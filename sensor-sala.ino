@@ -1,4 +1,4 @@
-/*##include "Config.h"
+/*#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -34,7 +34,7 @@ void setup() {
 		}
 	} while( !init );
   
-  controller.setupBLEClient(ESP_SENSOR_" + hardwareSensor.id, SENSOR);
+  controller.setupBLEClient("ESP_SENSOR_" + hardwareSensor.id, SENSOR);
 }
 
 void loop() {
@@ -51,7 +51,7 @@ void loop() {
     monitoringRecord.hasPresent = qtdDetectouPresenca >= conf.getTimesToHasOne() ? "S" : "N";
     monitoringRecord.temperature = temperature;
   
-    controller.sendDataMonitoring(monitoringRecord);
+    controller.sendDataOfMonitoring(monitoringRecord);
     SEND_DATA = false;
     qtdDetectouPresenca = 0;
   }

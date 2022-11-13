@@ -1,6 +1,5 @@
 #include "BLEServerService.h"
 
-unsigned long BLEServerService::__lastTimeConnectionCycle;
 int BLEServerService::__countTypeSensor = 0;
 int BLEServerService::__countTypeActuator = 0;
 std::vector<String> BLEServerService::__sensors;
@@ -270,6 +269,26 @@ bool BLEServerService::isAtuador(String uuid)
   
    return false;
 }
+
+bool BLEServerService::isSensorListed(String uuid, int typeDisp)
+{ 
+  Hardware disp;
+
+  for (auto item : __devicesMapped) 
+  {
+      disp = item.second;
+
+      Serial.println("[BLEServerService]: uuid mapped: " + disp.getUuid());
+
+      if (uuid.equals(disp.getUuid().c_str()) && disp.getTypeDisp() == typeDisp) 
+      {
+        Serial.println("[BLEServerService]: device found");
+        return true;
+      }
+  }
+
+  return false;
+}
   
 bool BLEServerService::connectMyDisp(BLEAdvertisedDevice* device) 
 {
@@ -378,23 +397,18 @@ void BLEServerService::continuousConnectionTask()
 
   while (true)
   {
-    longTimeWithoutConnections = (millis() - __lastTimeConnectionCycle) >= TIME_WAITING_CONNECTION;
+    vTaskDelay(TIME_WAITING_CONNECTION/portTICK_PERIOD_MS);
 
-    if(longTimeWithoutConnections) 
-    {
-      Serial.println("=========================================================");
-      Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
+    Serial.println("=========================================================");
+    Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
 
-      wifiService.disconnect();
+    wifiService.disconnect();
 
-      newCicle();      
+    newCicle();      
         
-      setLastTimeConnectionCycle(millis());
+    setLastTimeConnectionCycle(millis());
 
-      wifiService.connect();
-    }
-
-    vTaskDelay(500);
+    wifiService.connect();
   }
 }
 
@@ -579,15 +593,5 @@ void BLEServerService::startTaskBLEImpl(void* _this)
 
 void BLEServerService::startTaskBLE()
 {
-    xTaskCreate(this->startTaskBLEImpl, "Task", 8192, this, 5, NULL);
+    xTaskCreate(this->startTaskBLEImpl, "Task", 8192, this, 4, NULL);
 }
-
-unsigned long BLEServerService::getLastTimeConnectionCycle()
-{
-  return __lastTimeConnectionCycle;
-}
-
-void BLEServerService::setLastTimeConnectionCycle(unsigned long time)
-{
-  __lastTimeConnectionCycle = time;
-} 

@@ -44,7 +44,7 @@ void AwaitHttpService::awaitSolicitation(void* _this)
         {
             if (__configAcess.isDebug())
             {
-                Serial.println("=======================================");
+                Serial.println("\n=======================================");
                 Serial.println("[AwaitHttpService] Start");
             }
 
@@ -57,12 +57,12 @@ void AwaitHttpService::awaitSolicitation(void* _this)
 
             if (__configAcess.isDebug())
             {
-                Serial.println("=======================================");
+                Serial.println("\n=======================================");
                 Serial.println("[AwaitHttpService] End");
             }
         }
 
-        vTaskDelay(1000);
+        vTaskDelay(1000/portTICK_PERIOD_MS);
     }
     
 }
@@ -88,7 +88,9 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
     
     if(deviceConnected)
       break;
-    delay(2000);  
+
+    delay(2000);
+
   } while(i < count);
 
   if( i >= count && !deviceConnected)
@@ -99,8 +101,12 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
 
 void AwaitHttpService::executeSolicitation(Solicitacao request) 
 {
+    if(!__bleConfiguration->isSensorListed(request.uuid, TYPE_ACTUATOR))
+        return; 
+
     __bleConfiguration->setReceivedRequest(true);
-    delay(1500);
+
+    vTaskDelay(1500/portTICK_PERIOD_MS);
     
     bool dispConnected = connectToActuator(request.uuid);
 
@@ -164,7 +170,6 @@ String AwaitHttpService::getMessageToSend(Solicitacao request)
 
 void AwaitHttpService::awaitsReturn()
 {
-  
   unsigned long tempoLimite = millis() + 15000;
   while(millis() <= tempoLimite && !__messageReturned)
   { 

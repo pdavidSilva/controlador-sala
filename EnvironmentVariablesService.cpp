@@ -13,11 +13,11 @@ bool EnvironmentVariablesService::__inClass;
 String EnvironmentVariablesService::__message;
 unsigned long EnvironmentVariablesService::__lastTimeAttended;
 unsigned long EnvironmentVariablesService::__lastTimeLoadReservations;
-
 BLEServerService* __bleServerConfig;
 HTTPService __httpRequestService;
 WiFiService __wifiService;
 UtilsService __utilsService;
+Config __config;
 
 EnvironmentVariablesService::EnvironmentVariablesService()
 {
@@ -330,7 +330,7 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
   if(WiFi.status() != WL_CONNECTED)   
     return;
 
-  __currentTime = __httpRequestService.getTime("GETTIME");
+  __currentTime = __httpRequestService.getTime(GET_TIME);
   
   bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= TIME_TO_LOAD;
 
@@ -366,8 +366,7 @@ struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String mess
 {
   struct MonitoringRecord environmentVariables = {"", 0.0};
   
-  Config config;
-  DynamicJsonDocument doc(1024);
+  DynamicJsonDocument doc(512);
   DeserializationError error = deserializeJson(doc, message);
   
   if (!error)
@@ -375,7 +374,7 @@ struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String mess
     environmentVariables.temperature = doc["temperature"].as<int>();
     environmentVariables.hasPresent = doc["hasPresent"].as<String>();
   }
-  else if(config.isDebug())
+  else if(__config.isDebug())
   {
     Serial.println("==================================");
     Serial.println("[HTTPService] Falha no parse JSON.......");
@@ -388,9 +387,7 @@ struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String mess
 
 void EnvironmentVariablesService::continuousValidation()
 {
-  Config config;
-
-  if(config.isDebug())
+  if(__config.isDebug())
   {
     Serial.println("==================================");
     Serial.print("[ENVIRONMENT_VARIABLES]: ");
@@ -407,5 +404,5 @@ void EnvironmentVariablesService::continuousValidation()
       
   turnOnManagedDevices();
 
-  vTaskDelay(1000);
+  vTaskDelay(1000/portTICK_PERIOD_MS);
 }

@@ -10,6 +10,7 @@ using namespace std;
 #define TIME_TO_LOAD  600000
 #define TIME_TO_TURN_OFF  900000 // 15 MINUTOS
 #define TIME_TO_AWAIT_RETURN  15000 
+#define GET_TIME  "GETTIME"
 
 
 class EnvironmentVariablesService 

@@ -70,16 +70,12 @@ class BLEServerService
 
     void closeConnections(vector<BLEDeviceConnect*> aux);
 
+    bool isSensorListed(String uuid, int typeDisp);
+
     // metods task
     void continuousConnectionTask();
     static void startTaskBLEImpl(void*);
     void startTaskBLE();
-
-  private:
-    static unsigned long __lastTimeConnectionCycle;
-
-    unsigned long getLastTimeConnectionCycle();
-    void setLastTimeConnectionCycle(unsigned long time); 
   
 };
 

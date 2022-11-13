@@ -278,7 +278,8 @@ bool BLEServerService::isSensorListed(String uuid, int typeDisp)
   {
       disp = item.second;
 
-      Serial.println("[BLEServerService]: uuid mapped: " + disp.getUuid());
+      Serial.println("==================================");         
+      Serial.println("[BLEServerService]: mapping uuid: " + disp.getUuid());
 
       if (uuid.equals(disp.getUuid().c_str()) && disp.getTypeDisp() == typeDisp) 
       {

@@ -406,8 +406,6 @@ void BLEServerService::continuousConnectionTask()
 
     newCicle();      
         
-    setLastTimeConnectionCycle(millis());
-
     wifiService.connect();
   }
 }
@@ -479,8 +477,6 @@ void BLEServerService::newCicle()
             Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
           }
     }
-
-    setLastTimeConnectionCycle(millis());
 }
 
 

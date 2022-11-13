@@ -61,6 +61,9 @@ void AwaitHttpService::awaitSolicitation(void* _this)
                 Serial.println("[AwaitHttpService] End");
             }
         }
+        
+        Serial.print("[AwaitHttpService] value:");
+        Serial.println(portTICK_PERIOD_MS);
 
         vTaskDelay(1000/portTICK_PERIOD_MS);
     }

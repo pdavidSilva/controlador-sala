@@ -127,9 +127,6 @@ void EnvironmentVariablesService::setLastTimeLoadReservations(unsigned long time
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
-  if(!__bleServerConfig->isSensorListed(uuid, TYPE_ACTUATOR))
-    return;
-
   Serial.println("==================================");
   Serial.println("[ENVIRONMENT_VARIABLES]: CONECTANDO AO ATUADOR");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
@@ -164,16 +161,22 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
 {
+  String uuid = getUuidActuator(typeEquipment);
+
+  if(!__bleServerConfig->isSensorListed(uuid, TYPE_ACTUATOR))
+  {
+    Serial.println("==================================");         
+    Serial.println("[ENVIRONMENT_VARIABLES]: No matching actuator with this uuid: " + uuid);
+
+    return;
+  }
+
   __bleServerConfig->setReceivedRequest(true);
   __bleServerConfig->setEnvironmentSolicitation(true);
 
   delay(1000);
   
-  for(struct HardwareRecord r : __bleServerConfig->getActuators())
-  {
-    if(r.typeEquipment == typeEquipment)
-      sendDataToActuator(r.uuid, message);
-  }
+  sendDataToActuator(uuid, message);
 
   __bleServerConfig->setReceivedRequest(false);
   __bleServerConfig->setEnvironmentSolicitation(false);

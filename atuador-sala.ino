@@ -38,11 +38,12 @@ void setup() {
 
 void loop() {
   Serial.println("[Loop] Await message"); 
+  
   if(SEND_DATA) {
     Serial.println("[Loop] FOWARD TO SEND IR"); 
     SEND_DATA = false;
     controller.ExecuteCommandIR(COMMAND);
   }
 
-  delay(500);
+  delay(200);
 }*/

@@ -1,4 +1,4 @@
-#include "Config.h"
+/*#include "Config.h"
 
 BLEServerService* bleConfig; 
 
@@ -34,7 +34,7 @@ void setup() {
   // Configure Socket Service
   // controller.initServerSocket();    
   // controller.startTaskWebSocket();
-  controller.startTaskHttp();
+  //controller.startTaskHttp();
 
   // Configure Environment Variables Service
   //controller.initEnvironmentVariables();
@@ -42,4 +42,4 @@ void setup() {
 
 void loop() {
   //controller.environmentVariablesContinuousValidation(); 
-}
+}*/

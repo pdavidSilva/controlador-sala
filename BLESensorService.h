@@ -19,7 +19,6 @@
 static BLECharacteristic* pCharacteristicSensor;  
 static bool deviceConnected;
 static BLEServer* pServer;
-static bool sendData;
 EnvironmentVariablesService __environmentVariableService;
 static DeviceType deviceType;
 EquipmentService equipmentService;
@@ -30,17 +29,13 @@ void sendDataToServer(String data)
 {
   if (deviceConnected) 
   {
-      if(sendData)
+      if(SEND_DATA)
       {
         pCharacteristicSensor->setValue(data.c_str());
         pCharacteristicSensor->notify();
         delay(100); 
       }
   }
-}
-
-void EnabledToSend(bool enabledToSend) {
-  sendData = enabledToSend;
 }
 
 class MyServerCallbacks: 
@@ -52,7 +47,7 @@ class MyServerCallbacks:
       pCharacteristicSensor->notify();
       
       deviceConnected = true;
-      sendData = false;
+      SEND_DATA = false;
 
       Serial.println("===============================================");
       Serial.println("[BLESensorService] CONECTADO");
@@ -80,7 +75,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
     if(String(GET_DATA).equals(response.c_str())) 
     {
-       sendData = true;       
+        SEND_DATA = true;
     } 
     else if(deviceType != NULL && deviceType == ATUADOR)
     {
@@ -98,12 +93,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         receivedData = receivedData + response.c_str();
       }
-    } else if(deviceType != NULL && deviceType == SENSOR) {
-        if(sendData) {
-          Serial.println("[BLESensorService] SENSOR - (ONWRITE) DATA ENSORIAMENTO");
-          SEND_DATA = true;
-        }
-    }
+    } 
   }
 };
 

@@ -85,9 +85,7 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 {
     String data;
     data = __utilService.mountDataMonitoring(monitoringRecord);
-    EnabledToSend(true);
     sendDataToServer(data);
-    EnabledToSend(false);
 }
 
 void Controller::startTaskHttp()
@@ -138,8 +136,6 @@ bool Controller::loadedDevices()
 
 void Controller::ExecuteCommandIR(String command) 
 {
-  EnabledToSend(true);
   String response = __equipmentService.executeActionFromController(command);
   sendDataToServer(response);
-  EnabledToSend(false);
 }

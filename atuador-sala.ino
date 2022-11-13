@@ -2,6 +2,7 @@
 #include "Config.h"
 
 HardwareRecord hardware;
+WiFiService wiFiService;
 Controller controller;
 String master = "";
 
@@ -14,6 +15,8 @@ void setup() {
 	Serial.begin(115200);
 	irsend.begin();
 	bool init = false;
+
+  wiFiService.connect();
 
 	do {
 		if ( controller.start(hardware) ) {

@@ -377,11 +377,31 @@ bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
     return false;
 }
 
+String HTTPService::getTime(String identifier)
+{
+    Config config;
+    HTTP http;
+    String route;
+
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/Time/";
+
+    String routeService;
+    routeService.concat(route);
+    routeService.concat(identifier);
+  
+    String response = http.request(routeService, "GET", "");
+
+    return response;
+}
+
 
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-std::vector<struct Reserva> HTTPService::GetReservationsToday() {
+std::vector<struct Reserva> HTTPService::getReservationsToday() {
     
     HTTP http;
     String route;

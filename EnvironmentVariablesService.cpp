@@ -13,8 +13,6 @@ bool EnvironmentVariablesService::__inClass;
 String EnvironmentVariablesService::__message;
 unsigned long EnvironmentVariablesService::__lastTimeAttended;
 unsigned long EnvironmentVariablesService::__lastTimeLoadReservations;
-WiFiUDP __udp;
-NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
 
 BLEServerService* __bleServerConfig;
 HTTPService __httpRequestService;
@@ -31,11 +29,9 @@ EnvironmentVariablesService::EnvironmentVariablesService()
 
 void EnvironmentVariablesService::initEnvironmentVariables() 
 {
-    __ntp.begin();
-    __ntp.forceUpdate();
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
-    __reservations = __httpRequestService.GetReservationsToday();
+    __reservations = __httpRequestService.getReservationsToday();
     __lastTimeLoadReservations = millis();
 }
 
@@ -97,16 +93,6 @@ struct HardwareRecord EnvironmentVariablesService::getHardware()
 void EnvironmentVariablesService::setHardware(HardwareRecord hardware)
 {
     __hardware = hardware;
-}
-
-String EnvironmentVariablesService::getCurrentTime()
-{
-    return __currentTime;
-}
-
-String EnvironmentVariablesService::setCurrentTime(String currentTime)
-{
-  __currentTime = currentTime;
 }
 
 struct Monitoramento EnvironmentVariablesService::getMonitoringLight()
@@ -344,13 +330,13 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
   if(WiFi.status() != WL_CONNECTED)   
     return;
 
-  __currentTime = __ntp.getFormattedTime();
-
+  __currentTime = __httpRequestService.getTime("GETTIME");
+  
   bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= TIME_TO_LOAD;
 
   if (timeToLoadReservations)
   {
-    __reservations = __httpRequestService.GetReservationsToday();
+    __reservations = __httpRequestService.getReservationsToday();
     setLastTimeLoadReservations(millis());
   } 
 }

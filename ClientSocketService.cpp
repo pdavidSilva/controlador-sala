@@ -111,7 +111,7 @@ void ClientSocketService::serverListener() {
 
             }  else if(request.type == ATUALIZAR) {
                   
-                __env.setReservations(__httpClientService.GetReservationsToday());
+                __env.setReservations(__httpClientService.getReservationsToday());
 
                 client.println("OK");
             }

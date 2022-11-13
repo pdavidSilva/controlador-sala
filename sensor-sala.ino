@@ -34,7 +34,7 @@ void setup() {
 		}
 	} while( !init );
   
-  controller.configureClient("ESP_SENSOR_" + hardwareSensor.id, SENSOR);  
+  controller.setupBLEClient(ESP_SENSOR_" + hardwareSensor.id, SENSOR);
 }
 
 void loop() {

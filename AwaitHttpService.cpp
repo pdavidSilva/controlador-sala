@@ -37,26 +37,32 @@ void AwaitHttpService::startAwait()
 void AwaitHttpService::awaitSolicitation(void* _this)
 {
     std::vector<Solicitacao> solicitacao;
-    while (true)
+    
+    while(true)
     {
-        if (__configAcess.isDebug())
+        if(WiFi.status() == WL_CONNECTED)
         {
-            Serial.println("=======================================");
-            Serial.println("[AwaitHttpService] Start");
+            if (__configAcess.isDebug())
+            {
+                Serial.println("=======================================");
+                Serial.println("[AwaitHttpService] Start");
+            }
+
+            solicitacao = __httpService.getSolicitacao(MONITORAMENTO);
+            
+            for (Solicitacao s : solicitacao)
+            {
+                executeSolicitation(s);
+            }
+
+            if (__configAcess.isDebug())
+            {
+                Serial.println("=======================================");
+                Serial.println("[AwaitHttpService] End");
+            }
         }
 
-        solicitacao = __httpService.getSolicitacao(MONITORAMENTO);
-        for (Solicitacao s : solicitacao)
-        {
-            executeSolicitation(s);
-        }
-
-        if (__configAcess.isDebug())
-        {
-            Serial.println("=======================================");
-            Serial.println("[AwaitHttpService] End");
-        }
-        delay(500);
+        vTaskDelay(1000);
     }
     
 }

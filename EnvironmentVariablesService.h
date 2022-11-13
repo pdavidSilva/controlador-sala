@@ -7,8 +7,10 @@ using namespace std;
 
 #define TYPE_LIGHT  0
 #define TYPE_CONDITIONER  1 
-#define CHECK_TIME_TO_LOAD  20
-#define CHECK_TIME_TO_TURN_OFF  900000 // 15 MINUTOS
+#define TIME_TO_LOAD  600000
+#define TIME_TO_TURN_OFF  900000 // 15 MINUTOS
+#define TIME_TO_AWAIT_RETURN  15000 
+
 
 class EnvironmentVariablesService 
 {
@@ -22,10 +24,10 @@ class EnvironmentVariablesService
     String __endTimeLoadReservations;
     static struct Monitoramento __monitoringConditioner;
     static struct Monitoramento __monitoringLight;
-    static bool __uploadedToday;
     static bool __hasMovement;
     static bool __inClass;
     static unsigned long __lastTimeAttended;
+    static unsigned long __lastTimeLoadReservations;
 
   public: 
     EnvironmentVariablesService();
@@ -81,7 +83,14 @@ class EnvironmentVariablesService
 
     void awaitsReturn();
 
+    struct MonitoringRecord deserealizeData(String message);
+
     void initEnvironmentVariables(); 
+
+    unsigned long getLastTimeLoadReservations();
+
+    void setLastTimeLoadReservations(unsigned long time);
+
 };
 
 #endif

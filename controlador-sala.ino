@@ -29,8 +29,8 @@ void setup() {
 	} while( !init ); 
 
   // Configure BLE Service
-  controller.configureBLEServer();
-  controller.initBLETaskServer();	
+  controller.setupBLEServer();
+  controller.startBLETaskServer();	
 
   // Configure Socket Service
   // controller.initServerSocket();    
@@ -43,5 +43,5 @@ void setup() {
 }
 
 void loop() {
-  //controller.environmentVariablesContinuousValidation(); 
+  controller.environmentVariablesContinuousValidation(); 
 }

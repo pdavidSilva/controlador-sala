@@ -1,6 +1,6 @@
 #include "BLEServerService.h"
 
-
+unsigned long BLEServerService::__lastTimeConnectionCycle;
 int BLEServerService::__countTypeSensor = 0;
 int BLEServerService::__countTypeActuator = 0;
 std::vector<String> BLEServerService::__sensors;
@@ -11,7 +11,6 @@ BLEScan* BLEServerService::__pBLEScan;
 vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
 unordered_map<string, Hardware> BLEServerService::__devicesMapped;
 BLEDeviceConnect* BLEServerService::__actuatorConnected;
-ClientSocketService __clientWebSocketService;
 AwaitHttpService __clientAwaitHttpService;
 EnvironmentVariablesService __environmentVariables;
 Config __configuration;
@@ -57,103 +56,102 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
 BLEDeviceConnect* BLEServerService::connectToDevice(BLEAdvertisedDevice* myDevice, bool validateConnection) 
 {
     BLEDeviceConnect* device = new BLEDeviceConnect();
+    
     device->deviceFound = true;
-  
-    delay(500);
+
+    Serial.println("[CONNECTION]: - Create client");
+    
     device->pClient = BLEDevice::createClient();
-    Serial.println("[CONNECTION]: - Created client");
-  
-    delay(500);
+      
     bool ok = device->pClient->connect(myDevice);
   
-    if(ok)
+    if(!ok) 
     {
-        Serial.println("[CONNECTION]: - Connected to disp");
+      device->deviceFound = false;
+      return device;
+    } 
+    
+    Serial.println("[CONNECTION]: - Connected to disp");
   
-        delay(500);
-        device->pRemoteService = device->pClient->getService(SERVICE_UUID);
-        if (device->pRemoteService == nullptr) 
-        {
-          Serial.print("[CONNECTION]: Failed to find our service UUID: ");
-          Serial.println(SERVICE_UUID.toString().c_str());
-          
-          device->pClient->disconnect();
-          device->deviceFound = false;
-          
-          return device;
-        }
-      
-        Serial.println("[CONNECTION]: - Found our service");
-  
-        delay(500);
-        device->pRemoteCharacteristic = device->pRemoteService->getCharacteristic(CHARACTERISTIC_UUID);
-        if (device->pRemoteCharacteristic == nullptr) 
-        {
-          Serial.print("[CONNECTION]: Failed to find our characteristic UUID: ");
-          Serial.println(CHARACTERISTIC_UUID.toString().c_str());
-          
-          device->pClient->disconnect();
-          device->deviceFound = false;
-          
-          return device;
-        }
-      
-        Serial.println("[CONNECTION]: - Found our characteristic");
-      
-        if (validateConnection)
-        {     
-              Serial.println("[CONNECTION]: - Valid connection");  
-              delay(500);
-              if(device->pRemoteCharacteristic->canRead())
-              {
-                  Serial.println("[CONNECTION]: - Characteristic read");  
-                  delay(500);
-                  std::string value = device->pRemoteCharacteristic->readValue();
-
-                  Serial.println();
-                  Serial.print("[CONNECTION]: uuid pesquisado: ");
-                  Serial.println(value.c_str());
-      
-                  if(!isAtuador(value.c_str()) && !isSensor(value.c_str()))
-                  {
-                     Serial.println("[CONNECTION]: device not found ");
-                     device->pClient->disconnect();
-                     device->deviceFound = false;
-                     
-                     return device;
-                  }
-      
-                  device->uuid = value.c_str();
-                  Serial.println();
-                  Serial.print("[CONNECTION]: uuid the device: ");
-                  Serial.println(device->uuid.c_str());
-              }
-              else
-              {
-                 Serial.println("[CONNECTION]: device not found ");      
-                 device->pClient->disconnect();
-                 device->deviceFound = false;
-                          
-                 return device;
-              }  
-        } 
-      
-        if(device->pRemoteCharacteristic->canNotify())
-          device->pRemoteCharacteristic->registerForNotify(notifyCallback);
+    device->pRemoteService = device->pClient->getService(SERVICE_UUID);
         
-        Serial.println("[CONNECTION]: dispositivo conectado ");
-        Serial.print("[CONNECTION]: ");
-        Serial.println(CHARACTERISTIC_UUID.toString().c_str());
-        Serial.print("[CONNECTION]: ");
-        Serial.println(myDevice->getAddress().toString().c_str());
-  
-        Serial.print("[CONNID]: ");
-        Serial.println(device->pClient->getConnId());
-        Serial.print("[RSSI]: ");
-        Serial.println(device->pClient->getRssi());
+    if (device->pRemoteService == nullptr) 
+    {
+      Serial.print("[CONNECTION]: Failed to find our service UUID: ");
+      Serial.println(SERVICE_UUID.toString().c_str());
+          
+      device->pClient->disconnect();
+      device->deviceFound = false;
+          
+      return device;
     }
-    else
-        device->deviceFound = false; 
+      
+    Serial.println("[CONNECTION]: - Found our service");
+  
+    device->pRemoteCharacteristic = device->pRemoteService->getCharacteristic(CHARACTERISTIC_UUID);
+        
+    if (device->pRemoteCharacteristic == nullptr) 
+    {
+      Serial.print("[CONNECTION]: Failed to find our characteristic UUID: ");
+      Serial.println(CHARACTERISTIC_UUID.toString().c_str());
+          
+      device->pClient->disconnect();
+      device->deviceFound = false;
+          
+      return device;
+    }
+      
+    Serial.println("[CONNECTION]: - Found our characteristic");
+      
+    if (validateConnection)
+    {     
+      Serial.println("[CONNECTION]: - Valid connection");  
+      delay(500);
+      if(device->pRemoteCharacteristic->canRead())
+      {
+        Serial.println("[CONNECTION]: - Characteristic read");  
+        delay(500);
+        std::string value = device->pRemoteCharacteristic->readValue();
+
+        Serial.print("[CONNECTION]: uuid pesquisado: ");
+        Serial.println(value.c_str());
+      
+        if(!isAtuador(value.c_str()) && !isSensor(value.c_str()))
+        {
+          Serial.println("[CONNECTION]: device not found ");
+          device->pClient->disconnect();
+          device->deviceFound = false;
+                     
+          return device;
+        }
+      
+        device->uuid = value.c_str();
+        Serial.print("[CONNECTION]: uuid the device: ");
+        Serial.println(device->uuid.c_str());
+      }
+      else
+      {
+        Serial.println("[CONNECTION]: device not found ");      
+        device->pClient->disconnect();
+        device->deviceFound = false;
+                          
+        return device;
+      }  
+    } 
+      
+    if(device->pRemoteCharacteristic->canNotify())
+      device->pRemoteCharacteristic->registerForNotify(notifyCallback);
+        
+    Serial.println("[CONNECTION]: dispositivo conectado ");
+    Serial.print("[CONNECTION]: ");
+    Serial.println(CHARACTERISTIC_UUID.toString().c_str());
+    Serial.print("[CONNECTION]: ");
+    Serial.println(myDevice->getAddress().toString().c_str());
+  
+    Serial.print("[CONNID]: ");
+    Serial.println(device->pClient->getConnId());
+    Serial.print("[RSSI]: ");
+    Serial.println(device->pClient->getRssi());
   
     return device;
 }
@@ -162,8 +160,12 @@ void BLEServerService::initBLE()
 {
     Serial.println("================================================");
     Serial.println("[BLEServerService] Iniciando configuracoes BLE");
-    BLEDevice::init("ESP32_CONTROLLER");    
+    BLEDevice::init("");    
     Serial.println("[BLEServerService] Init device");
+}
+
+void BLEServerService::activeBLEScan() 
+{
     __pBLEScan = BLEDevice::getScan();
     Serial.println("[BLEServerService] new Scan");
     __pBLEScan->setInterval(1349);
@@ -173,17 +175,30 @@ void BLEServerService::initBLE()
     __pBLEScan->setActiveScan(true);
     Serial.println("[BLEServerService] Active scan");
 }
+
+void BLEServerService::deinitBLE() 
+{
+    Serial.println("================================================");
+    BLEDevice::deinit(false);    
+    Serial.println("[BLEServerService] Desligando BLE");
+}
   
 void BLEServerService::scanDevices() 
 {
     BLEScanResults foundDevices = __pBLEScan->start(5, false);
-  
+
     for (int i = 0; i < foundDevices.getCount(); i++)
       __filteredDevices.push_back(new BLEAdvertisedDevice(foundDevices.getDevice(i)));
   
     BLEAdvertisedDevice* disp;
     for (disp : __filteredDevices)
-      Serial.println(disp->toString().c_str());
+      Serial.println(disp->toString().c_str());    
+}
+
+void BLEServerService::stopScan() 
+{
+    __pBLEScan->setActiveScan(false);
+    __pBLEScan->stop();
 }
   
 /*
@@ -328,7 +343,6 @@ void BLEServerService::disconnectToActuator()
 
 bool BLEServerService::connectToActuator(String uuidDevice) 
 {    
-    //Dispositivo disp;
     Hardware disp;
     bool connected = false;
 
@@ -359,94 +373,122 @@ bool BLEServerService::connectToActuator(String uuidDevice)
   
 void BLEServerService::continuousConnectionTask() 
 {  
+  WiFiService wifiService;
+  bool longTimeWithoutConnections = false;
+
+  while (true)
+  {
+    longTimeWithoutConnections = (millis() - __lastTimeConnectionCycle) >= TIME_WAITING_CONNECTION;
+
+    if(longTimeWithoutConnections) 
+    {
+      Serial.println("=========================================================");
+      Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
+
+      wifiService.disconnect();
+
+      newCicle();      
+        
+      setLastTimeConnectionCycle(millis());
+
+      wifiService.connect();
+    }
+
+    vTaskDelay(500);
+  }
+}
+
+void BLEServerService::newCicle()
+{
     BLEDeviceConnect *deviceConnected;
-    vector <BLEDeviceConnect*> aux;
-    bool allDisconected = true;
+    vector<BLEDeviceConnect*> aux;
+    bool isDeviceConected = false;
     Hardware disp;
     int count = 0;
 
-    while (true)
-    {
-        Serial.println("=================================");
-        Serial.println("[CONTINUOUS_CONNECTION] NEW CICLE");
-        for (auto item : __devicesMapped) 
-        {
-            if (__configuration.isDebug())
-            {
-                Serial.println("=================================");
-                Serial.println("[CONTINUOUS_CONNECTION] Receive Request: " + String(__receivedRequest));
-
-                Serial.println("[CONTINUOUS_CONNECTION] In Class: " + String(__environmentVariables.getInClass()));
-            }
-           
-            if(!__receivedRequest && __environmentVariables.getInClass())
-            {
-                disp = item.second;
-                
-                if(disp.getTypeDisp() == TYPE_SENSOR)
-                {
-                    if (__configuration.isDebug())
-                    { 
-                        Serial.println("================================");
-                        Serial.println("[CONTINUOUS_CONNECTION] UUID: " + String(disp.getUuid()));
-      
-                        Serial.println("[CONTINUOUS_CONNECTION] ADDRESS: " + String(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str()));
-                    }
-                    
-                    deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
-                    aux.push_back(deviceConnected);
-                    count++;
-                  
-                    if ((count % 3) == 0 || __countTypeSensor == count)
-                    {
-                        for (auto deviceCon : aux)
-                        {
-                          if(deviceCon->pClient->isConnected())
-                          {
-                            String data = "GET_DATA";
-                            deviceCon->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
-                            allDisconected = false;
-                          }
-                        }
-                         
-                        // timer
-                        if(!allDisconected)
-                          timer();
-                        
-                        allDisconected = true;
-                        
-                        Serial.println();
-                        for (auto deviceCon : aux) 
-                        {
-                            Serial.println();
-                            Serial.print("[DISCONNECT]: ");
-                            Serial.println(deviceCon->pClient->getPeerAddress().toString().c_str());
-                            
-                            delay(300);
-                            if(deviceCon->pClient->isConnected())
-                              deviceCon->pClient->disconnect();
-                              
-                            delay(300);  
-                            free(deviceCon->pClient);
-                            free(deviceCon->pRemoteCharacteristic);
-                            free(deviceCon->pRemoteService);
-                            
-                            delete deviceCon;
-                        }
-      
-                        aux.clear();
-                    }
-                }
-            }
-            else
-            {
-               Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
-            }
-        }
-        count = 0;
+    Serial.println("=================================");
+    Serial.println("[CONTINUOUS_CONNECTION] NEW CICLE");
         
-        delay(500);
+    for (auto item : __devicesMapped) 
+    {
+          if (__configuration.isDebug())
+          {
+            Serial.println("=================================");
+            Serial.println("[CONTINUOUS_CONNECTION] Receive Request: " + String(__receivedRequest));
+            Serial.println("[CONTINUOUS_CONNECTION] In Class: " + String(__environmentVariables.getInClass()));
+          }
+           
+          if(!__receivedRequest && __environmentVariables.getInClass())
+          {
+            disp = item.second;
+                
+            if(disp.getTypeDisp() == TYPE_SENSOR)
+            {
+              if (__configuration.isDebug())
+              { 
+                Serial.println("================================");
+                Serial.println("[CONTINUOUS_CONNECTION] UUID: " + String(disp.getUuid()));
+                Serial.println("[CONTINUOUS_CONNECTION] ADDRESS: " + String(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str()));
+              }
+                    
+              deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
+              
+              if(deviceConnected->pClient->isConnected())
+              {
+                String data = "GET_DATA";
+                deviceConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
+                isDeviceConected = true;
+              }
+              
+              aux.push_back(deviceConnected);
+              
+              count++;
+                  
+              if ((count % 3) == 0 || __countTypeSensor == count)
+              {
+                if(isDeviceConected)
+                  timer();
+                                                
+                closeConnections(aux);
+                aux.clear();
+              }
+            }
+          }
+          else
+          {
+            if(!aux.empty()) 
+            {
+              closeConnections(aux);
+              aux.clear();
+            }
+
+            Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
+          }
     }
+
+    setLastTimeConnectionCycle(millis());
+}
+
+
+void BLEServerService::closeConnections(vector<BLEDeviceConnect*> aux)
+{
+  for (auto deviceCon : aux) 
+  {
+    Serial.println();
+    Serial.print("[DISCONNECT]: ");
+    Serial.println(deviceCon->pClient->getPeerAddress().toString().c_str());
+                            
+    delay(300);
+    if(deviceCon->pClient->isConnected())
+      deviceCon->pClient->disconnect();
+                              
+    delay(300);  
+    free(deviceCon->pClient);
+    free(deviceCon->pRemoteCharacteristic);
+    free(deviceCon->pRemoteService);
+                            
+    delete deviceCon;
+  }
 }
 
 vector<String> BLEServerService::getSensors()
@@ -539,3 +581,13 @@ void BLEServerService::startTaskBLE()
 {
     xTaskCreate(this->startTaskBLEImpl, "Task", 8192, this, 5, NULL);
 }
+
+unsigned long BLEServerService::getLastTimeConnectionCycle()
+{
+  return __lastTimeConnectionCycle;
+}
+
+void BLEServerService::setLastTimeConnectionCycle(unsigned long time)
+{
+  __lastTimeConnectionCycle = time;
+} 

@@ -15,8 +15,8 @@ Config::Config(){
     __debug     = true;
     //__ssid      = "TransmissaoAula";
     //__password  = "#ufstransmissao#";
-    // __ssid      = "Josiely";
-    // __password  = "JOIBSN12";
+    //__ssid      = "Josiely";
+    //__password  = "JOIBSN12";
     __ssid      = "Apartamento 201-2.4";
     __password  = "Ald50983021";
     __basetime  = 180000;

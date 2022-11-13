@@ -1,6 +1,5 @@
 #include "BLEServerService.h"
 
-unsigned long BLEServerService::__lastTimeConnectionCycle;
 int BLEServerService::__countTypeSensor = 0;
 int BLEServerService::__countTypeActuator = 0;
 std::vector<String> BLEServerService::__sensors;
@@ -594,15 +593,5 @@ void BLEServerService::startTaskBLEImpl(void* _this)
 
 void BLEServerService::startTaskBLE()
 {
-    xTaskCreate(this->startTaskBLEImpl, "Task", 8192, this, 5, NULL);
+    xTaskCreate(this->startTaskBLEImpl, "Task", 8192, this, 4, NULL);
 }
-
-unsigned long BLEServerService::getLastTimeConnectionCycle()
-{
-  return __lastTimeConnectionCycle;
-}
-
-void BLEServerService::setLastTimeConnectionCycle(unsigned long time)
-{
-  __lastTimeConnectionCycle = time;
-} 

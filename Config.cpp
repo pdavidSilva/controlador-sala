@@ -21,11 +21,12 @@ Config::Config(){
     __password  = "Ald50983021";
     __basetime  = 180000;
     __ledStatus = 2;
-    __type  = TYPE_CONTROLLER;
+    __type  = TYPE_SENSOR;
     __route = 2;
     __wifiFailAttempts = 30;
     __commandSendAttempts = 3;
-
+    __timesToHasOne = 3;
+    
     pinMode(__ledStatus, OUTPUT);
 }
 
@@ -82,4 +83,9 @@ int Config::getCommandSendAttempts()
 bool Config::isDebug() 
 {
 	return __debug;
+}
+
+int Config::getTimesToHasOne()
+{
+  return __timesToHasOne;
 }

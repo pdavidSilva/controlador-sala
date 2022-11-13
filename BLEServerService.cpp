@@ -406,8 +406,6 @@ void BLEServerService::continuousConnectionTask()
 
     newCicle();      
         
-    setLastTimeConnectionCycle(millis());
-
     wifiService.connect();
   }
 }

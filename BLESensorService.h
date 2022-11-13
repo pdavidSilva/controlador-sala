@@ -34,7 +34,7 @@ void sendDataToServer(String data)
       {
         pCharacteristicSensor->setValue(data.c_str());
         pCharacteristicSensor->notify();
-        delay(1500); 
+        delay(100); 
       }
   }
 }
@@ -57,7 +57,7 @@ class MyServerCallbacks:
       Serial.println("===============================================");
       Serial.println("[BLESensorService] CONECTADO");
             
-      delay(1000);
+      delay(100);
     };
 
     void onDisconnect(BLEServer* pServer) {
@@ -88,12 +88,9 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         Serial.println("===============================================");
         Serial.println("[BLESensorService] ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
-        HAS_IR_TO_SEND = true;
-        COMMAND_IR = receivedData;
-        //equipmentState = equipmentService.executeActionFromController(receivedData);
-        //sendData = true;
-        //sendDataToServer(equipmentState.c_str());
-        //sendData = false;
+        SEND_DATA = true;
+        COMMAND = receivedData;
+        
         equipmentState = "";
         receivedData = "";
       }
@@ -101,6 +98,11 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         receivedData = receivedData + response.c_str();
       }
+    } else if(deviceType != NULL && deviceType == SENSOR) {
+        if(sendData) {
+          Serial.println("[BLESensorService] SENSOR - (ONWRITE) DATA ENSORIAMENTO");
+          SEND_DATA = true;
+        }
     }
   }
 };

@@ -82,16 +82,11 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 
  void Controller::sendDataOfMonitoring(MonitoringRecord monitoringRecord)
 {
-    DynamicJsonDocument doc(2048);
     String data;
-    doc['temperature'] = monitoringRecord.temperature;
-    doc['hasPresent'] = monitoringRecord.hasPresent;
-    Serial.println("[Controller] sendDataOfMonitoring");
-    serializeJson(doc, data);
+    data = __utilService.mountDataMonitoring(monitoringRecord);
     EnabledToSend(true);
     sendDataToServer(data);
     EnabledToSend(false);
-    delay(3000);
 }
 
 void Controller::startTaskHttp()
@@ -143,7 +138,6 @@ bool Controller::loadedDevices()
 void Controller::ExecuteCommandIR(String command) 
 {
   EnabledToSend(true);
-  Serial.println("[CONTROLLER] FOWARD TO SEND IR COMMAND: " + command); 
   String response = __equipmentService.executeActionFromController(command);
   sendDataToServer(response);
   EnabledToSend(false);

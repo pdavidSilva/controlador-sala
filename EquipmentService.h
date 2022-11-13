@@ -30,7 +30,7 @@ class EquipmentService
     void turnOnLights();
     void turnOffLights();
     String executeActionFromController(String data);
-    String executeActionConditioner(String command, String state);
+    String executeActionIntoConditioner(String command, String state);
 };
 
 #endif

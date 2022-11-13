@@ -189,7 +189,7 @@ String EquipmentService::executeActionFromController(String data) {
   return "ERROR";
 }
 
-String EquipmentService::executeActionConditioner(String command, String state){
+String EquipmentService::executeActionIntoConditioner(String command, String state){
   
   Config config;
   vector <int> codigo;

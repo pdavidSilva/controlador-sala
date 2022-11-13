@@ -127,6 +127,9 @@ void EnvironmentVariablesService::setLastTimeLoadReservations(unsigned long time
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
+  if(!__bleServerConfig->isSensorListed(uuid, TYPE_ACTUATOR))
+    return;
+
   Serial.println("==================================");
   Serial.println("[ENVIRONMENT_VARIABLES]: CONECTANDO AO ATUADOR");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");

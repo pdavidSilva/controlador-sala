@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -41,24 +41,26 @@ void setup() {
 }
 
 void loop() {
-	Serial.println("[INO]: loop");
+  	Serial.println("[INO]: loop");
     
 	bool leitura = digitalRead(portaPresenca);
 	temperature = dht.readTemperature();
 
 	if(leitura) {
-    qtdDetectouPresenca++;
-  }
+    	qtdDetectouPresenca++;
+  	}
 
-  if(SEND_DATA) {
-    monitoringRecord.hasPresent = qtdDetectouPresenca >= conf.getTimesToHasOne() ? "S" : "N";
-    monitoringRecord.temperature = temperature;
+  	if(SEND_DATA) {
+    	monitoringRecord.hasPresent = qtdDetectouPresenca >= conf.getTimesToHasOne() ? "S" : "N";
+    	
+		monitoringRecord.temperature = temperature;
   
-    controller.sendDataOfMonitoring(monitoringRecord);
-    SEND_DATA = false;
-    qtdDetectouPresenca = 0;
-  }
+    	controller.sendDataOfMonitoring(monitoringRecord);
+    	
+		SEND_DATA = false;
+    	
+		qtdDetectouPresenca = 0;
+  	}
 
-	delay(1000);
-
-}*/
+  delay(1000);
+}

@@ -31,7 +31,7 @@ void AwaitHttpService::setMessageReturned(bool messageReturned) {
 
 void AwaitHttpService::startAwait()
 {
-    xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 5, NULL);
+    xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 8, NULL);
 }
 
 void AwaitHttpService::awaitSolicitation(void* _this)
@@ -62,12 +62,8 @@ void AwaitHttpService::awaitSolicitation(void* _this)
             }
         }
         
-        Serial.print("[AwaitHttpService] value:");
-        Serial.println(portTICK_PERIOD_MS);
-
         vTaskDelay(1000/portTICK_PERIOD_MS);
     }
-    
 }
 
 bool AwaitHttpService::connectToActuator(String uuidDevice) 

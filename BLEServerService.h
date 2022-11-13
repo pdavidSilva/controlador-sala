@@ -70,6 +70,8 @@ class BLEServerService
 
     void closeConnections(vector<BLEDeviceConnect*> aux);
 
+    bool isSensorListed(String uuid, int typeDisp);
+
     // metods task
     void continuousConnectionTask();
     static void startTaskBLEImpl(void*);

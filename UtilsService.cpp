@@ -73,11 +73,11 @@ std::vector<String> UtilsService::splitPayload(String payload, int maxSize)
 
 String UtilsService::mountDataMonitoring(MonitoringRecord record) 
 {
-    DynamicJsonDocument doc(2048);
-    String data;
-    doc['temperature'] = (!isnan(record.temperature) && record.temperature > 0 && record.temperature != NULL) ? record.temperature : -1;
-    doc['hasPresent'] = record.hasPresent;
     Serial.println("[UtilsService] mountDataMonitoring");
+    DynamicJsonDocument doc(512);
+    String data;
+    doc["temperature"] = (!isnan(record.temperature) && record.temperature > 0 && record.temperature != NULL) ? record.temperature : -1;
+    doc["hasPresent"] = record.hasPresent;
     serializeJson(doc, data);
     return data;
 }

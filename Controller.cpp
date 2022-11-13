@@ -83,8 +83,7 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 
  void Controller::sendDataOfMonitoring(MonitoringRecord monitoringRecord)
 {
-    String data;
-    data = __utilService.mountDataMonitoring(monitoringRecord);
+    String data = __utilService.mountDataMonitoring(monitoringRecord);
     sendDataToServer(data);
 }
 

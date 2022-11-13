@@ -51,6 +51,9 @@ void loop() {
   	}
 
   	if(SEND_DATA) {
+		
+		Serial.println("[INO]: data solicited ");
+
     	monitoringRecord.hasPresent = qtdDetectouPresenca >= conf.getTimesToHasOne() ? "S" : "N";
     	
 		monitoringRecord.temperature = temperature;

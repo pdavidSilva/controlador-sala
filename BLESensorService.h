@@ -75,7 +75,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
     if(String(GET_DATA).equals(response.c_str())) 
     {
-        SEND_DATA = true;
+      SEND_DATA = true;
     } 
     else if(deviceType != NULL && deviceType == ATUADOR)
     {

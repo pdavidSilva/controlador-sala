@@ -183,7 +183,7 @@ String EquipmentService::executeActionFromController(String data) {
   }
   else if (type.equals("AC"))
   {
-    return executeActionConditioner(command, state);
+    return executeActionIntoConditioner(command, state);
   }
 
   return "ERROR";

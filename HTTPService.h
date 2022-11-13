@@ -15,7 +15,7 @@ class HTTPService
         struct HardwareRecord deserializeDevice(JsonVariant sensor);
         bool getMaster(struct HardwareRecord, String &);
         bool putMonitoring(struct Monitoramento monitoring);
-        std::vector<Reserva> GetReservationsWeek();
+        std::vector<Reserva> GetReservationsToday();
         struct Reserva deserializeReserve(JsonVariant reserve);
         struct Monitoramento getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
         String getComandosIrByIdSalaAndOperacao(String uuid);

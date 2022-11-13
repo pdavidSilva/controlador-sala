@@ -30,7 +30,7 @@ void setup() {
 		}
 	} while( !init ); 
 
-  controller.configureClient("ESP_ATUADOR", ATUADOR);  
+  controller.setupBLEClient("ESP_ATUADOR", ATUADOR);  
 }
 
 void loop() {

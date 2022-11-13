@@ -23,7 +23,6 @@
 #include "Hardware.h"
 #include "DHT.h"
 #include "BLEServerService.h"
-#include "ClientSocketService.h"
 #include "AwaitHttpService.h"
 #include "EnvironmentVariablesService.h"
 #include "UtilsService.h"

@@ -8,7 +8,8 @@
 #include <BLEDevice.h>
 #include "Structs.h"
 
-#define TIME_CONNECTION  30000 
+#define TIME_CONNECTION  8000 
+#define TIME_WAITING_CONNECTION 60000
 
 static BLEUUID CHARACTERISTIC_UUID("beb5483e-36e1-4688-b7f5-ea07361b26a8");
 static BLEUUID SERVICE_UUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
@@ -35,8 +36,11 @@ class BLEServerService
     static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify); 
     BLEDeviceConnect* connectToDevice(BLEAdvertisedDevice* myDevice, bool validateConnection); 
     void initBLE(); 
+    void stopScan(); 
+    void deinitBLE(); 
     void scanDevices(); 
     void populateMap(); 
+    void activeBLEScan(); 
     bool isSensor(String uuid);
     bool isAtuador(String uuid);
     bool connectMyDisp(BLEAdvertisedDevice* device); 
@@ -53,6 +57,8 @@ class BLEServerService
     void addActuator(HardwareRecord act);
     void setReceivedRequest(bool receivedRequest);
     bool getReceivedRequest();
+
+    void newCicle();
     
     static void setCountTypeSensor(int count);
     static void setCounttypeActuator(int count);
@@ -62,10 +68,18 @@ class BLEServerService
     bool getEnvironmentSolicitation();
     void setEnvironmentSolicitation(bool environmentSolicitation);
 
+    void closeConnections(vector<BLEDeviceConnect*> aux);
+
     // metods task
     void continuousConnectionTask();
     static void startTaskBLEImpl(void*);
     void startTaskBLE();
+
+  private:
+    static unsigned long __lastTimeConnectionCycle;
+
+    unsigned long getLastTimeConnectionCycle();
+    void setLastTimeConnectionCycle(unsigned long time); 
   
 };
 

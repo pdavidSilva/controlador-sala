@@ -402,12 +402,8 @@ void BLEServerService::continuousConnectionTask()
 
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
-
-    wifiService.disconnect();
-
-    newCicle();      
-        
-    wifiService.connect();
+  
+    newCicle();              
   }
 }
 
@@ -433,6 +429,9 @@ void BLEServerService::newCicle()
            
           if(!__receivedRequest && __environmentVariables.getInClass())
           {
+            if(WiFi.status() == WL_CONNECTED))
+              wifiService.disconnect();
+
             disp = item.second;
                 
             if(disp.getTypeDisp() == TYPE_SENSOR)
@@ -464,6 +463,9 @@ void BLEServerService::newCicle()
                                                 
                 closeConnections(aux);
                 aux.clear();
+
+                if(WiFi.status() != WL_CONNECTED))
+                  wifiService.connect();
               }
             }
           }
@@ -474,6 +476,9 @@ void BLEServerService::newCicle()
               closeConnections(aux);
               aux.clear();
             }
+
+            if(WiFi.status() != WL_CONNECTED))
+              wifiService.connect();
 
             Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
           }

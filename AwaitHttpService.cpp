@@ -134,6 +134,8 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
 
     __utils.updateMonitoring(__message);
 
+    __httpService.putSolicitacao(request.id);
+
     if (__configAcess.isDebug())
     {
         Serial.println("==================================");

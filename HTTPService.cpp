@@ -686,19 +686,15 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
     String route;
     EnvironmentVariablesService environment;
     
-    route = "/Solicitacao/finalizar/";
+    route = "/Solicitacao/finalizar-solicitacao-by-id/";
 
     String routeService;
     String type = "PUT";
-    String params = "";
     String response;
     String id = String(idSolicitacao);
-    String horaFinalizacao = environment.getNow();
-
-    params.concat("\"" + horaFinalizacao + "\"");
 
     routeService.concat(route + id);
-    response = http.request(routeService, type, params);
+    response = http.request(routeService, type, "");
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
@@ -713,6 +709,7 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
                 Serial.println("[HTTPService] Falha no parse JSON.......");
                 Serial.println(error.f_str());
             }
+            
             delay(5000);
         }
 

@@ -13,6 +13,7 @@ BLEDeviceConnect* BLEServerService::__actuatorConnected;
 AwaitHttpService __clientAwaitHttpService;
 EnvironmentVariablesService __environmentVariables;
 Config __configuration;
+WiFiService __wfService;
 
 BLEServerService::BLEServerService()
 {
@@ -393,7 +394,6 @@ bool BLEServerService::connectToActuator(String uuidDevice)
   
 void BLEServerService::continuousConnectionTask() 
 {  
-  WiFiService wifiService;
   bool longTimeWithoutConnections = false;
 
   while (true)
@@ -430,7 +430,7 @@ void BLEServerService::newCicle()
           if(!__receivedRequest && __environmentVariables.getInClass())
           {
             if(WiFi.status() == WL_CONNECTED)
-              wifiService.disconnect();
+              __wfService.disconnect();
 
             disp = item.second;
                 
@@ -465,7 +465,7 @@ void BLEServerService::newCicle()
                 aux.clear();
 
                 if(WiFi.status() != WL_CONNECTED)
-                  wifiService.connect();
+                  __wfService.connect();
               }
             }
           }
@@ -478,7 +478,7 @@ void BLEServerService::newCicle()
             }
 
             if(WiFi.status() != WL_CONNECTED)
-              wifiService.connect();
+              __wfService.connect();
 
             Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
           }

@@ -474,8 +474,7 @@ void BLEServerService::newCicle()
               closeConnections(aux);
               aux.clear();
             }
-              __wifiService.connect();
-
+            
             Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
           }
     }

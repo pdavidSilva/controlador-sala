@@ -694,11 +694,11 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
     String id = String(idSolicitacao);
 
     routeService.concat(route + id);
-    response = http.request(routeService, type, "");
+    response = http.request(routeService, type, "{}");
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(2048);
+        DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)

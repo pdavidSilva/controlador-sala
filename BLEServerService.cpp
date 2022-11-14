@@ -403,11 +403,11 @@ void BLEServerService::continuousConnectionTask()
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
 
-    __wifiService.disconnect();
+    __wfService.disconnect();
 
     newCicle();  
 
-    __wifiService.connect();
+    __wfService.connect();
   }
 }
 
@@ -474,7 +474,7 @@ void BLEServerService::newCicle()
               closeConnections(aux);
               aux.clear();
             }
-            
+
             Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
           }
     }

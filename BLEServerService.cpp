@@ -429,7 +429,7 @@ void BLEServerService::newCicle()
            
           if(!__receivedRequest && __environmentVariables.getInClass())
           {
-            if(WiFi.status() == WL_CONNECTED))
+            if(WiFi.status() == WL_CONNECTED)
               wifiService.disconnect();
 
             disp = item.second;

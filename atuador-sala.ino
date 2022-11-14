@@ -9,14 +9,15 @@ String master = "";
 bool SEND_DATA = false;
 String COMMAND;
 const uint16_t kIrLed = 12;
-IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
+IRsend irsend(kIrLed); 
 
 void setup() {
+
 	Serial.begin(115200);
 	irsend.begin();
 	bool init = false;
 
-  wiFiService.connect();
+	wiFiService.connect();
 
 	do {
 		if ( controller.start(hardware) ) {
@@ -37,12 +38,13 @@ void setup() {
 }
 
 void loop() {
+  
   Serial.println("[Loop] Await message"); 
   
   if(SEND_DATA) {
     Serial.println("[Loop] FOWARD TO SEND IR"); 
-    SEND_DATA = false;
     controller.ExecuteCommandIR(COMMAND);
+	SEND_DATA = false;
   }
 
   delay(200);

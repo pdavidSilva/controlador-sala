@@ -13,6 +13,7 @@ BLEDeviceConnect* BLEServerService::__actuatorConnected;
 AwaitHttpService __clientAwaitHttpService;
 EnvironmentVariablesService __environmentVariables;
 Config __configuration;
+WiFiService __wfService;
 
 BLEServerService::BLEServerService()
 {
@@ -393,7 +394,6 @@ bool BLEServerService::connectToActuator(String uuidDevice)
   
 void BLEServerService::continuousConnectionTask() 
 {  
-  WiFiService wifiService;
   bool longTimeWithoutConnections = false;
 
   while (true)
@@ -403,11 +403,11 @@ void BLEServerService::continuousConnectionTask()
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
 
-    wifiService.disconnect();
+    __wfService.disconnect();
 
-    newCicle();      
-        
-    wifiService.connect();
+    newCicle();  
+
+    __wfService.connect();
   }
 }
 

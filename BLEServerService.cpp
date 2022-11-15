@@ -160,7 +160,7 @@ void BLEServerService::initBLE()
 {
     Serial.println("================================================");
     Serial.println("[BLEServerService] Iniciando configuracoes BLE");
-    BLEDevice::init("");    
+    BLEDevice::init("ESP32_CONTROLLER");    
     Serial.println("[BLEServerService] Init device");
 }
 
@@ -174,13 +174,6 @@ void BLEServerService::activeBLEScan()
     Serial.println("[BLEServerService] Set window");
     __pBLEScan->setActiveScan(true);
     Serial.println("[BLEServerService] Active scan");
-}
-
-void BLEServerService::deinitBLE() 
-{
-    Serial.println("================================================");
-    BLEDevice::deinit(false);    
-    Serial.println("[BLEServerService] Desligando BLE");
 }
   
 void BLEServerService::scanDevices() 

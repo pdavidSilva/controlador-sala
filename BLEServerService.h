@@ -37,7 +37,6 @@ class BLEServerService
     BLEDeviceConnect* connectToDevice(BLEAdvertisedDevice* myDevice, bool validateConnection); 
     void initBLE(); 
     void stopScan(); 
-    void deinitBLE(); 
     void scanDevices(); 
     void populateMap(); 
     void activeBLEScan(); 

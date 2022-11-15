@@ -17,53 +17,54 @@ int qtdDetectouPresenca = 0;
 
 void setup() {
 	
-	Serial.begin(115200);
-	bool init = false;
+  Serial.begin(115200);
+  bool init = false;
 
   wiFiService.connect();
 
-	do {
-		if ( controller.start(hardwareSensor) ) {
-			if ( controller.registerHardware(hardwareSensor) ) {
-				if(controller.getMaster(hardwareSensor, master))
-				{
-					Serial.print("master: ");
-					Serial.println(master);
-					init = true;
-				}
-        controller.setHardwareConfig(hardwareSensor);
-
+  do {
+	if ( controller.start(hardwareSensor) ) {
+		if ( controller.registerHardware(hardwareSensor) ) {
+			if(controller.getMaster(hardwareSensor, master))
+			{
+				Serial.print("master: ");
+				Serial.println(master);
+				init = true;
 			}
+			
+			controller.setHardwareConfig(hardwareSensor);
+
 		}
-	} while( !init );
+	}
+  } while( !init );
   
   controller.setupBLEClient("ESP_SENSOR_" + hardwareSensor.id, SENSOR);
 }
 
 void loop() {
-  	Serial.println("[INO]: loop");
+  Serial.println("[INO]: loop");
     
-	bool leitura = digitalRead(portaPresenca);
-	temperature = dht.readTemperature();
+  bool leitura = digitalRead(portaPresenca);
+  temperature = dht.readTemperature();
 
-	if(leitura) {
-    	qtdDetectouPresenca++;
-  	}
+  if(leitura) {
+    qtdDetectouPresenca++;
+  }
 
-  	if(SEND_DATA) {
+  if(SEND_DATA) {
 		
-		Serial.println("[INO]: data solicited ");
+	Serial.println("[INO]: data solicited ");
 
-    	monitoringRecord.hasPresent = qtdDetectouPresenca >= conf.getTimesToHasOne() ? "S" : "N";
+    monitoringRecord.hasPresent = qtdDetectouPresenca >= conf.getTimesToHasOne() ? "S" : "N";
     	
-		monitoringRecord.temperature = temperature;
+	monitoringRecord.temperature = temperature;
   
-    	controller.sendDataOfMonitoring(monitoringRecord);
+    controller.sendDataOfMonitoring(monitoringRecord);
     	
-		SEND_DATA = false;
+	SEND_DATA = false;
     	
-		qtdDetectouPresenca = 0;
-  	}
+	qtdDetectouPresenca = 0;
+  }
 
   delay(1000);
 }

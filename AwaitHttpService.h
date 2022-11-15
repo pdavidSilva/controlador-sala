@@ -26,7 +26,7 @@ class AwaitHttpService
     bool getMessageReturned();
     void setMessageReturned(bool messageReturned);
 
-    static void awaitSolicitation(void* _this);
+    static void awaitSolicitation();
     static void executeSolicitation(Solicitacao solicitacao); 
 
     // Solicitacao

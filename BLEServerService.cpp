@@ -10,6 +10,7 @@ BLEScan* BLEServerService::__pBLEScan;
 vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
 unordered_map<string, Hardware> BLEServerService::__devicesMapped;
 BLEDeviceConnect* BLEServerService::__actuatorConnected;
+unsigned long BLEServerService::__lastTimeConnectSensors;
 AwaitHttpService __clientAwaitHttpService;
 EnvironmentVariablesService __environmentVariables;
 Config __configuration;
@@ -21,6 +22,7 @@ BLEServerService::BLEServerService()
     __countTypeActuator = 0;
     __receivedRequest = false;
     __environmentSolicitation = false;
+    __lastTimeConnectSensors = millis();
 }
 
 void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) 
@@ -347,7 +349,7 @@ void BLEServerService::sendMessageToActuator(String data)
 
 void BLEServerService::disconnectToActuator() 
 {    
-    delay(5000);
+    delay(3000);
     
     if(__actuatorConnected->pClient->isConnected())
       __actuatorConnected->pClient->disconnect();
@@ -359,6 +361,9 @@ bool BLEServerService::connectToActuator(String uuidDevice)
 {    
     Hardware disp;
     bool connected = false;
+
+    //if(__actuatorConnected != NULL)
+    //  return connected;
 
     Serial.println("==========================================");
     for (auto item : __devicesMapped) 
@@ -389,9 +394,9 @@ void BLEServerService::continuousConnectionTask()
 {  
   bool longTimeWithoutConnections = false;
 
-  while (true)
-  {
-    vTaskDelay(TIME_WAITING_CONNECTION/portTICK_PERIOD_MS);
+ // while (true)
+  //{
+    //vTaskDelay(TIME_WAITING_CONNECTION/portTICK_PERIOD_MS);
 
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
@@ -401,7 +406,9 @@ void BLEServerService::continuousConnectionTask()
     newCicle();  
 
     __wfService.connect();
-  }
+
+    setLastTimeConnectSensors(millis());
+  //}
 }
 
 void BLEServerService::newCicle()
@@ -555,6 +562,14 @@ void BLEServerService::addActuator(HardwareRecord act)
   __actuators.push_back(act);
 }
   
+void BLEServerService::setLastTimeConnectSensors(unsigned long time){
+  __lastTimeConnectSensors = time;
+}
+
+unsigned long BLEServerService::getLastTimeConnectSensors() {
+  return __lastTimeConnectSensors;
+}
+
 void BLEServerService::timer()
 {     
    unsigned long tempoLimite = millis() + TIME_CONNECTION;

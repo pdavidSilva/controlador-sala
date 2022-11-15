@@ -30,6 +30,7 @@ class BLEServerService
     static unordered_map<string, Hardware> __devicesMapped;
     static BLEDeviceConnect* __actuatorConnected;
     static bool __receivedData;
+    static unsigned long __lastTimeConnectSensors;
     
     BLEServerService();
     
@@ -56,6 +57,8 @@ class BLEServerService
     void addActuator(HardwareRecord act);
     void setReceivedRequest(bool receivedRequest);
     bool getReceivedRequest();
+    void setLastTimeConnectSensors(unsigned long time);
+    unsigned long getLastTimeConnectSensors();
 
     void newCicle();
     

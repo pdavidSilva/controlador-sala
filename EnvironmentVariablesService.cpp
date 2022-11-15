@@ -1,6 +1,6 @@
 #include "EnvironmentVariablesService.h"
 
-String __currentTime;
+String EnvironmentVariablesService::__currentTime;
 struct Monitoramento EnvironmentVariablesService::__monitoringConditioner;
 struct Monitoramento EnvironmentVariablesService::__monitoringLight;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
@@ -147,12 +147,12 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
       Serial.println("==================================");         
       Serial.println("[ENVIRONMENT_VARIABLES] Sendig packet: " + packet);
       __bleServerConfig->sendMessageToActuator(packet);
-    }
-        
-    awaitsReturn();
+    }  
 
-    __bleServerConfig->disconnectToActuator();
+    awaitsReturn();
   }
+  
+  __bleServerConfig->disconnectToActuator();
 
   __utilsService.updateMonitoring(__message);
 
@@ -386,25 +386,38 @@ struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String mess
   return environmentVariables;
 }
 
+void EnvironmentVariablesService::startValidationTaskImpl(void* _this)
+{
+    EnvironmentVariablesService* envSettings = (EnvironmentVariablesService*)_this;
+    envSettings->continuousValidation();
+}
+
+void EnvironmentVariablesService::startValidation()
+{
+    xTaskCreate(this->startValidationTaskImpl, "continuousValidation", 8192, this, 16, NULL);
+}
 
 void EnvironmentVariablesService::continuousValidation()
 {
-  if(__config.isDebug())
+  while(true)
   {
-    Serial.println("==================================");
-    Serial.print("[ENVIRONMENT_VARIABLES]: ");
-    Serial.println(__currentTime);
+    if(__config.isDebug())
+    {
+      Serial.println("==================================");
+      Serial.print("[ENVIRONMENT_VARIABLES]: ");
+      Serial.println(__currentTime);
+    }
+
+    __inClass = getRoomDuringClassTime();
+    
+    checkTimeToLoadReservations();
+
+    checkEnvironmentVariables();
+
+    turnOffManagedDevices();
+        
+    turnOnManagedDevices();
+
+    vTaskDelay(3000/portTICK_PERIOD_MS);
   }
-
-  __inClass = getRoomDuringClassTime();
-  
-  checkTimeToLoadReservations();
-
-  checkEnvironmentVariables();
-
-  turnOffManagedDevices();
-      
-  turnOnManagedDevices();
-
-  vTaskDelay(1000/portTICK_PERIOD_MS);
 }

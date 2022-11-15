@@ -1,4 +1,4 @@
-/*#include "Config.h"
+#include "Config.h"
 
 BLEServerService* bleConfig; 
 
@@ -29,17 +29,20 @@ void setup() {
 
   // Configure BLE Service
   controller.setupBLEServer();
-  controller.startBLETaskServer();	
 
   // Configure Socket Service
-  // controller.initServerSocket();    
-  // controller.startTaskWebSocket();
   //controller.startTaskHttp();
 
   // Configure Environment Variables Service
-  //controller.initEnvironmentVariables();
+  controller.setupEnvironmentVariables();
+  controller.startEnvVariablesTask();
 }
 
 void loop() {
-  //controller.environmentVariablesContinuousValidation(); 
-}*/
+   
+  if(controller.isTimeConnectSensors())
+    controller.startBLETaskServer();
+  else
+    controller.startTaskHttp();
+
+}

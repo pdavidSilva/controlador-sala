@@ -16,7 +16,7 @@ using namespace std;
 class EnvironmentVariablesService 
 {
   private: 
-    String __currentTime;
+    static String __currentTime;
     static vector<struct Reserva> __reservations; 
     static struct HardwareRecord __hardware; 
     static bool __receivedData;
@@ -44,8 +44,6 @@ class EnvironmentVariablesService
 
     struct Monitoramento getMonitoringConditioner();
     void setMonitoringConditioner(struct Monitoramento monitoramento);
-
-    String getNtpFormatedTime();
     
     std::vector<struct Reserva> getReservations();
     void  setReservations(std::vector<struct Reserva> reservations);
@@ -76,6 +74,9 @@ class EnvironmentVariablesService
 
     void turnOnConditioner();
     void turnOfConditioner();
+    
+    void startValidation();
+    static void startValidationTaskImpl(void* _this);
 
     void continuousValidation();
     void checkTimeToLoadReservations();
@@ -87,9 +88,9 @@ class EnvironmentVariablesService
 
     void initEnvironmentVariables(); 
 
-    unsigned long getLastTimeLoadReservations();
+    static unsigned long getLastTimeLoadReservations();
 
-    void setLastTimeLoadReservations(unsigned long time);
+    static void setLastTimeLoadReservations(unsigned long time);
 
 };
 

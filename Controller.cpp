@@ -49,10 +49,20 @@ bool Controller::notificateServer() const
     return true;
 }
 
+bool Controller::isTimeConnectSensors()
+{
+    return (millis() - __bleConfig->getLastTimeConnectSensors()) >= TIME_WAITING_CONNECTION;
+}
+
+void Controller::updateLastTimeConnection()
+{
+    __bleConfig->setLastTimeConnectSensors(millis());
+}
+
 void Controller::startBLETaskServer()
 {
-    delay(2000);
-    __bleConfig->startTaskBLE();
+    //delay(2000);
+    __bleConfig->continuousConnectionTask();
 }
 
 void Controller::setupBLEServer()
@@ -89,7 +99,7 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 
 void Controller::startTaskHttp()
 {  
-    __awaitHttpService.startAwait();
+    __awaitHttpService.awaitSolicitation();//startAwait();
 }
 
 HardwareRecord Controller::getHardwareConfig()
@@ -102,12 +112,7 @@ void Controller::setHardwareConfig(HardwareRecord hardware)
     __environmentService.setHardware(hardware);
 }
 
-void Controller::environmentVariablesContinuousValidation()
-{
-    __environmentService.continuousValidation();
-}
-
-void Controller::initEnvironmentVariables()
+void Controller::setupEnvironmentVariables()
 {
     __environmentService.initEnvironmentVariables();
 }
@@ -137,4 +142,9 @@ void Controller::ExecuteCommandIR(String command)
 {
   String response = __equipmentService.executeActionFromController(command);
   sendDataToServer(response);
+}
+
+void Controller::startEnvVariablesTask()
+{  
+    __environmentService.startValidation();
 }

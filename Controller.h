@@ -35,8 +35,11 @@ class Controller
         void setHardwareConfig(HardwareRecord hardware);
 
         // Validacao continua de variaveis de ambiente
-        void environmentVariablesContinuousValidation();
-        void initEnvironmentVariables();
+        void startEnvVariablesTask();
+        void setupEnvironmentVariables();
+
+        void updateLastTimeConnection();
+        bool isTimeConnectSensors();
 
         // Send Commands
         void ExecuteCommandIR(String command);

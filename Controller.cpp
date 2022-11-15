@@ -4,13 +4,11 @@
 
 Controller::Controller(){}
 HTTPService __http;
-ClientSocketService __clientSocketService;
 AwaitHttpService __awaitHttpService;
 BLEServerService* __bleConfig; 
 EnvironmentVariablesService __environmentService;
 EquipmentService __equipmentService;
-
-Config __config; 
+UtilsService __utilService;
 
 bool Controller::start(HardwareRecord &record) const 
 {   
@@ -51,20 +49,22 @@ bool Controller::notificateServer() const
     return true;
 }
 
-void Controller::initBLETaskServer()
+void Controller::startBLETaskServer()
 {
     delay(2000);
     __bleConfig->startTaskBLE();
 }
 
-void Controller::configureBLEServer()
+void Controller::setupBLEServer()
 {
     __bleConfig->initBLE();  
+    __bleConfig->activeBLEScan();
     __bleConfig->scanDevices();
+    __bleConfig->stopScan();
     __bleConfig->populateMap();
 }
 
-void Controller::configureClient(String deviceName, DeviceType deviceType)
+void Controller::setupBLEClient(String deviceName, DeviceType deviceType)
 {
    initBLEClient(deviceName, deviceType);  
 }
@@ -79,32 +79,12 @@ bool Controller::getMaster(HardwareRecord hardware, String &master)
 {
     __http.getMaster(hardware, master);
     return !master.equals("") ? true : false;
-
-
 }
 
  void Controller::sendDataOfMonitoring(MonitoringRecord monitoringRecord)
 {
-    DynamicJsonDocument doc(2048);
-    String data;
-    doc['temperature'] = monitoringRecord.temperature;
-    doc['hasPresent'] = monitoringRecord.hasPresent;
-    Serial.println("[Controller] sendDataOfMonitoring");
-    serializeJson(doc, data);
-    EnabledToSend(true);
+    String data = __utilService.mountDataMonitoring(monitoringRecord);
     sendDataToServer(data);
-    EnabledToSend(false);
-    delay(3000);
-  }
-
-void Controller::initServerSocket()
-{
-  __clientSocketService.initServer();
-}
-
-void Controller::startTaskWebSocket()
-{  
-    __clientSocketService.startTaskWebSocket();
 }
 
 void Controller::startTaskHttp()
@@ -155,9 +135,6 @@ bool Controller::loadedDevices()
 
 void Controller::ExecuteCommandIR(String command) 
 {
-  EnabledToSend(true);
-  Serial.println("[CONTROLLER] FOWARD TO SEND IR COMMAND: " + command); 
   String response = __equipmentService.executeActionFromController(command);
   sendDataToServer(response);
-  EnabledToSend(false);
 }

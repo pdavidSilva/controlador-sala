@@ -150,7 +150,6 @@ void EquipmentService::turnOffLights() {
 }
 
 String EquipmentService::executeActionFromController(String data) {
-  Config config;
 
   Serial.println("==================================");
   Serial.print("[EquipmentService] executar comando recebidos do controlador : ");
@@ -179,22 +178,27 @@ String EquipmentService::executeActionFromController(String data) {
   }
   else if (type.equals("LZ"))
   {
-
     checkOperationLights(state);
     return state.equals("ON") ? LZ_ON : LZ_OFF;
-
   }
   else if (type.equals("AC"))
   {
+    return executeActionIntoConditioner(command, state);
+  }
 
-      vector <int> codigo;
-      SplitIrComands(command, codigo);
-    int attempt = 0;
+  return "ERROR";
+}
 
-    bool isSuccessful;
-    bool isOn;
-    do
-    {
+String EquipmentService::executeActionIntoConditioner(String command, String state){
+  
+  Config config;
+  vector <int> codigo;
+  SplitIrComands(command, codigo);
+  int attempt = 0;
+  bool isSuccessful, isOn;
+
+  do
+  {
       Serial.println("[EquipmentService] Enviando comando, tentativa: " + attempt);
 
       SendIrComand(codigo);
@@ -203,12 +207,9 @@ String EquipmentService::executeActionFromController(String data) {
       isSuccessful = (isOn == state.equals("ON") ? AC_ON : AC_OFF);
       attempt++;
 
-    } while (!isSuccessful && attempt < config.getCommandSendAttempts());
+  } while (!isSuccessful && attempt < config.getCommandSendAttempts());
 
-    Serial.println("[EquipmentService] Comando finalizado, Sucesso: " + isSuccessful);
+  Serial.println("[EquipmentService] Comando finalizado, Sucesso: " + isSuccessful);
 
-    return isOn ? AC_ON : AC_OFF;
-  }
-
-  return "ERROR";
+  return isOn ? AC_ON : AC_OFF;
 }

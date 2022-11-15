@@ -7,36 +7,33 @@ vector<struct Reserva> EnvironmentVariablesService::__reservations;
 HardwareRecord EnvironmentVariablesService::__hardware; 
 String __startTimeLoadReservations;
 String __endTimeLoadReservations;
-bool EnvironmentVariablesService::__uploadedToday;
 bool EnvironmentVariablesService::__receivedData;
 bool EnvironmentVariablesService::__hasMovement;
 bool EnvironmentVariablesService::__inClass;
 String EnvironmentVariablesService::__message;
 unsigned long EnvironmentVariablesService::__lastTimeAttended;
-WiFiUDP __udp;
-NTPClient __ntp(__udp, "a.st1.ntp.br", -3 * 3600, 60000);
-
+unsigned long EnvironmentVariablesService::__lastTimeLoadReservations;
 BLEServerService* __bleServerConfig;
 HTTPService __httpRequestService;
 WiFiService __wifiService;
 UtilsService __utilsService;
+Config __config;
 
 EnvironmentVariablesService::EnvironmentVariablesService()
 {
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
-    __uploadedToday = false;
     __hasMovement = false;
     __inClass = false;
 }
 
 void EnvironmentVariablesService::initEnvironmentVariables() 
 {
-    __ntp.begin();
-    __ntp.forceUpdate();
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
-    __reservations = __httpRequestService.GetReservationsWeek();
+    __reservations = __httpRequestService.getReservationsToday();
+    __lastTimeLoadReservations = millis();
+    __lastTimeAttended = millis();
 }
 
 unsigned long EnvironmentVariablesService::getLastTimeAttended() 
@@ -81,9 +78,8 @@ bool EnvironmentVariablesService::setInClass(bool inClass)
 
 bool EnvironmentVariablesService::getInClass()
 {
-    return __inClass;
+    return true;
 }
-
 
 void EnvironmentVariablesService::setReservations(std::vector<struct Reserva> reservations)
 {
@@ -98,16 +94,6 @@ struct HardwareRecord EnvironmentVariablesService::getHardware()
 void EnvironmentVariablesService::setHardware(HardwareRecord hardware)
 {
     __hardware = hardware;
-}
-
-String EnvironmentVariablesService::getCurrentTime()
-{
-    return __currentTime;
-}
-
-String EnvironmentVariablesService::setCurrentTime(String currentTime)
-{
-  __currentTime = currentTime;
 }
 
 struct Monitoramento EnvironmentVariablesService::getMonitoringLight()
@@ -129,6 +115,16 @@ void EnvironmentVariablesService::setMonitoringConditioner(struct Monitoramento 
 {
   __monitoringConditioner = monitoring;
 }
+
+unsigned long EnvironmentVariablesService::getLastTimeLoadReservations()
+{
+  return __lastTimeLoadReservations;
+}
+
+void EnvironmentVariablesService::setLastTimeLoadReservations(unsigned long time)
+{
+  __lastTimeLoadReservations = time;
+} 
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
@@ -166,16 +162,22 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
 {
+  String uuid = getUuidActuator(typeEquipment);
+
+  if(!__bleServerConfig->isSensorListed(uuid, TYPE_ACTUATOR))
+  {
+    Serial.println("==================================");         
+    Serial.println("[ENVIRONMENT_VARIABLES]: No matching actuator with this uuid: " + uuid);
+
+    return;
+  }
+
   __bleServerConfig->setReceivedRequest(true);
   __bleServerConfig->setEnvironmentSolicitation(true);
 
   delay(1000);
   
-  for(struct HardwareRecord r : __bleServerConfig->getActuators())
-  {
-    if(r.typeEquipment == typeEquipment)
-      sendDataToActuator(r.uuid, message);
-  }
+  sendDataToActuator(uuid, message);
 
   __bleServerConfig->setReceivedRequest(false);
   __bleServerConfig->setEnvironmentSolicitation(false);
@@ -238,7 +240,7 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
  */
 void EnvironmentVariablesService::turnOffManagedDevices() {
 
-  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > CHECK_TIME_TO_TURN_OFF;
+  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > TIME_TO_TURN_OFF;
 
   if (!__inClass || (__inClass && longTimeWithoutMovement)) 
   {
@@ -321,53 +323,33 @@ void EnvironmentVariablesService::turnOfLight(){
 
 void EnvironmentVariablesService::awaitsReturn()
 {
-  
-  unsigned long tempoLimite = millis() + 15000;
-  while(millis() <= tempoLimite && !__receivedData)
-  { 
-      delay(1000);
-      //if (configuration.isDebug())
-      //{    
-      //  Serial.print("[ENVIRONMENT_VARIABLES]: TIME AWAITS: ");
-      //  Serial.println(millis());
-      //}
-  }    
+  unsigned long tempoLimite = millis() + TIME_TO_AWAIT_RETURN;
+  while(millis() <= tempoLimite && !__receivedData) {}    
 }
-
-String EnvironmentVariablesService::getNow()
-{
-  return "2022-09-09T09:15:00";
-}
-
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()
 {
-  __wifiService.connect();
-    
-  __currentTime = __ntp.getFormattedTime();
+  if(WiFi.status() != WL_CONNECTED)   
+    return;
 
-  __wifiService.disconnect();
+  __currentTime = __httpRequestService.getTime(GET_TIME);
+  
+  bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= TIME_TO_LOAD;
 
-  if (__currentTime >= __startTimeLoadReservations && __currentTime <= __endTimeLoadReservations)
+  if (timeToLoadReservations)
   {
-       
-       if(!__uploadedToday)
-       {
-           __reservations = __httpRequestService.GetReservationsWeek();
-
-          if(!__uploadedToday)
-            __reservations.clear();
-       }
-
-  } else 
-      __uploadedToday = false; 
+    __reservations = __httpRequestService.getReservationsToday();
+    setLastTimeLoadReservations(millis());
+  } 
 }
 
 void EnvironmentVariablesService::checkEnvironmentVariables()
 {
   if (__receivedData) 
   {
-    if (__message.equals("S") == 0) 
+    struct MonitoringRecord variables = deserealizeData(__message);
+
+    if (variables.hasPresent.equals("S") == 0) 
     {
       __hasMovement = true;
       __lastTimeAttended = millis();
@@ -382,37 +364,47 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
   }
 }
 
+struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String message)
+{
+  struct MonitoringRecord environmentVariables = {"", 0.0};
+  
+  DynamicJsonDocument doc(512);
+  DeserializationError error = deserializeJson(doc, message);
+  
+  if (!error)
+  {
+    environmentVariables.temperature = doc["temperature"].as<int>();
+    environmentVariables.hasPresent = doc["hasPresent"].as<String>();
+  }
+  else if(__config.isDebug())
+  {
+    Serial.println("==================================");
+    Serial.println("[HTTPService] Falha no parse JSON.......");
+    Serial.println(error.f_str());
+  }
+
+  return environmentVariables;
+}
+
+
 void EnvironmentVariablesService::continuousValidation()
 {
-  Config config;
-  int checkTimeToLoad = 0;
-  __reservations = __httpRequestService.GetReservationsWeek();
-
-  while(true)
-  {    
-      if(config.isDebug())
-      {
-        Serial.println("==================================");
-        Serial.print("[ENVIRONMENT_VARIABLES]: ");
-        Serial.println(__currentTime);
-      }
-
-      __inClass = getRoomDuringClassTime();
-      
-      checkEnvironmentVariables();
-
-      turnOffManagedDevices();
-      
-      turnOnManagedDevices();
-
-      if(checkTimeToLoad == CHECK_TIME_TO_LOAD)
-      {
-        __reservations = __httpRequestService.GetReservationsWeek();
-        checkTimeToLoad = 0;
-      }
-      
-      checkTimeToLoad++;
-
-      delay(1000);
+  if(__config.isDebug())
+  {
+    Serial.println("==================================");
+    Serial.print("[ENVIRONMENT_VARIABLES]: ");
+    Serial.println(__currentTime);
   }
+
+  __inClass = getRoomDuringClassTime();
+  
+  checkTimeToLoadReservations();
+
+  checkEnvironmentVariables();
+
+  turnOffManagedDevices();
+      
+  turnOnManagedDevices();
+
+  vTaskDelay(1000/portTICK_PERIOD_MS);
 }

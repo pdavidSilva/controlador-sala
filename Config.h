@@ -12,8 +12,6 @@
 #include <IRsend.h>
 #include "EmonLib.h"
 #include <ArduinoJson.h>
-#include <NTPClient.h>
-#include <WiFiUDP.h>
 #include "Controller.h"
 #include "WiFiService.h"
 #include "HTTP.h"
@@ -23,7 +21,6 @@
 #include "Hardware.h"
 #include "DHT.h"
 #include "BLEServerService.h"
-#include "ClientSocketService.h"
 #include "AwaitHttpService.h"
 #include "EnvironmentVariablesService.h"
 #include "UtilsService.h"
@@ -42,6 +39,7 @@ class Config
         int    __route;
         int    __wifiFailAttempts;
         int    __commandSendAttempts;
+        int    __timesToHasOne;
     public : 
         
         Config();
@@ -57,6 +55,7 @@ class Config
         int    getRoute();        
         int    getWifiFailAttempts();
         int    getCommandSendAttempts();
+        int    getTimesToHasOne();
 };
 
 #endif

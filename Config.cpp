@@ -15,17 +15,18 @@ Config::Config(){
     __debug     = true;
     //__ssid      = "TransmissaoAula";
     //__password  = "#ufstransmissao#";
-    // __ssid      = "Josiely";
-    // __password  = "JOIBSN12";
-    __ssid      = "Apartamento 201-2.4";
-    __password  = "Ald50983021";
+    __ssid      = "Josiely";
+    __password  = "JOIBSN12";
+    //__ssid      = "Apartamento 201-2.4";
+    //__password  = "Ald50983021";
     __basetime  = 180000;
     __ledStatus = 2;
-    __type  = TYPE_ACTUATOR;
+    __type  = TYPE_SENSOR;
     __route = 2;
     __wifiFailAttempts = 30;
     __commandSendAttempts = 3;
-
+    __timesToHasOne = 3;
+    
     pinMode(__ledStatus, OUTPUT);
 }
 
@@ -82,4 +83,9 @@ int Config::getCommandSendAttempts()
 bool Config::isDebug() 
 {
 	return __debug;
+}
+
+int Config::getTimesToHasOne()
+{
+  return __timesToHasOne;
 }

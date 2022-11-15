@@ -1,7 +1,6 @@
 /*#include "Config.h"
 
 BLEServerService* bleConfig; 
-//EnvironmentVariablesService environment;
 
 HardwareRecord hardware;
 Controller controller;
@@ -29,19 +28,18 @@ void setup() {
 	} while( !init ); 
 
   // Configure BLE Service
-  controller.configureBLEServer();
-  controller.initBLETaskServer();	
+  controller.setupBLEServer();
+  controller.startBLETaskServer();	
 
   // Configure Socket Service
   // controller.initServerSocket();    
   // controller.startTaskWebSocket();
-  controller.startTaskHttp();
-
+  //controller.startTaskHttp();
 
   // Configure Environment Variables Service
   //controller.initEnvironmentVariables();
 }
 
 void loop() {
-  controller.environmentVariablesContinuousValidation(); 
+  //controller.environmentVariablesContinuousValidation(); 
 }*/

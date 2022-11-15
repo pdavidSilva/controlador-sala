@@ -31,37 +31,39 @@ void AwaitHttpService::setMessageReturned(bool messageReturned) {
 
 void AwaitHttpService::startAwait()
 {
-    xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 5, NULL);
+    xTaskCreate(this->awaitSolicitation, "awaitSolicitation", 8192, this, 8, NULL);
 }
 
 void AwaitHttpService::awaitSolicitation(void* _this)
 {
-    Solicitacao solicitacao;
-    while (true)
-    {
-        if (__configAcess.isDebug())
-        {
-            Serial.println("=======================================");
-            Serial.println("[AwaitHttpService] Start");
-        }
-
-        solicitacao = __httpService.getSolicitacao(LUZES);
-        if (solicitacao.id != 0){
-            executeSolicitation(solicitacao);
-        }
-        solicitacao = __httpService.getSolicitacao(CONDICIONADOR);
-        if (solicitacao.id != 0){
-            executeSolicitation(solicitacao);
-        }
-
-        if (__configAcess.isDebug())
-        {
-            Serial.println("=======================================");
-            Serial.println("[AwaitHttpService] End");
-        }
-        delay(500);
-    }
+    std::vector<Solicitacao> solicitacao;
     
+    while(true)
+    {
+        if(WiFi.status() == WL_CONNECTED)
+        {
+            if (__configAcess.isDebug())
+            {
+                Serial.println("\n=======================================");
+                Serial.println("[AwaitHttpService] Start");
+            }
+
+            solicitacao = __httpService.getSolicitacao(MONITORAMENTO);
+            
+            for (Solicitacao s : solicitacao)
+            {
+                executeSolicitation(s);
+            }
+
+            if (__configAcess.isDebug())
+            {
+                Serial.println("\n=======================================");
+                Serial.println("[AwaitHttpService] End");
+            }
+        }
+        
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+    }
 }
 
 bool AwaitHttpService::connectToActuator(String uuidDevice) 
@@ -85,7 +87,9 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
     
     if(deviceConnected)
       break;
-    delay(2000);  
+
+    delay(2000);
+
   } while(i < count);
 
   if( i >= count && !deviceConnected)
@@ -96,8 +100,12 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
 
 void AwaitHttpService::executeSolicitation(Solicitacao request) 
 {
+    if(!__bleConfiguration->isSensorListed(request.uuid, TYPE_ACTUATOR))
+        return; 
+
     __bleConfiguration->setReceivedRequest(true);
-    delay(1500);
+
+    vTaskDelay(1500/portTICK_PERIOD_MS);
     
     bool dispConnected = connectToActuator(request.uuid);
 
@@ -125,6 +133,8 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
     __bleConfiguration->setReceivedRequest(false);
 
     __utils.updateMonitoring(__message);
+
+    __httpService.putSolicitacao(request.id);
 
     if (__configAcess.isDebug())
     {
@@ -161,7 +171,6 @@ String AwaitHttpService::getMessageToSend(Solicitacao request)
 
 void AwaitHttpService::awaitsReturn()
 {
-  
   unsigned long tempoLimite = millis() + 15000;
   while(millis() <= tempoLimite && !__messageReturned)
   { 

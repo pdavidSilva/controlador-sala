@@ -1,19 +1,23 @@
-#include "Global.h"
+/*#include "Global.h"
 #include "Config.h"
 
 HardwareRecord hardware;
+WiFiService wiFiService;
 Controller controller;
 String master = "";
 
-bool HAS_IR_TO_SEND = false;
-String COMMAND_IR;
+bool SEND_DATA = false;
+String COMMAND;
 const uint16_t kIrLed = 12;
-IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
+IRsend irsend(kIrLed); 
 
 void setup() {
+
 	Serial.begin(115200);
 	irsend.begin();
 	bool init = false;
+
+	wiFiService.connect();
 
 	do {
 		if ( controller.start(hardware) ) {
@@ -30,16 +34,18 @@ void setup() {
 		}
 	} while( !init ); 
 
-  controller.configureClient("ESP_ATUADOR", ATUADOR);  
+  controller.setupBLEClient("ESP_ATUADOR", ATUADOR);  
 }
 
 void loop() {
+  
   Serial.println("[Loop] Await message"); 
-  if(HAS_IR_TO_SEND) {
+  
+  if(SEND_DATA) {
     Serial.println("[Loop] FOWARD TO SEND IR"); 
-    HAS_IR_TO_SEND = false;
-    controller.ExecuteCommandIR(COMMAND_IR);
+    controller.ExecuteCommandIR(COMMAND);
+	SEND_DATA = false;
   }
 
-  delay(2000);
-}
+  delay(200);
+}*/

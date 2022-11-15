@@ -33,6 +33,7 @@ void EnvironmentVariablesService::initEnvironmentVariables()
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
     __reservations = __httpRequestService.getReservationsToday();
     __lastTimeLoadReservations = millis();
+    __lastTimeAttended = millis();
 }
 
 unsigned long EnvironmentVariablesService::getLastTimeAttended() 
@@ -324,11 +325,6 @@ void EnvironmentVariablesService::awaitsReturn()
 {
   unsigned long tempoLimite = millis() + TIME_TO_AWAIT_RETURN;
   while(millis() <= tempoLimite && !__receivedData) {}    
-}
-
-String EnvironmentVariablesService::getNow()
-{
-  return "2022-09-09T09:15:00";
 }
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()

@@ -46,8 +46,7 @@ class EnvironmentVariablesService
     void setMonitoringConditioner(struct Monitoramento monitoramento);
 
     String getNtpFormatedTime();
-    String getNow();
-
+    
     std::vector<struct Reserva> getReservations();
     void  setReservations(std::vector<struct Reserva> reservations);
     struct HardwareRecord getHardware();

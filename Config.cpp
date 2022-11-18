@@ -93,10 +93,10 @@ int Config::getTimesToHasOne()
 
 void Config::lock() 
 {
-	return __bleActuatorMutex.lock();
+	__bleActuatorMutex.lock();
 }
 
 void Config::unlock()
 {
-  return __bleActuatorMutex.unlock();
+  __bleActuatorMutex.unlock();
 }

@@ -1,4 +1,4 @@
-#include "Config.h"
+/*#include "Config.h"
 
 HardwareRecord hardwareSensor;
 MonitoringRecord monitoringRecord;
@@ -67,4 +67,4 @@ void loop() {
   }
 
   delay(1000);
-}
+}*/

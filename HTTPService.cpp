@@ -308,6 +308,9 @@ String HTTPService::getTime(String identifier)
   
     String response = http.request(routeService, "GET", "");
 
+    if (strstr(response.c_str(), "[ERROR]") != NULL)
+        return "";
+
     return response;
 }
 
@@ -516,6 +519,8 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
 
     routeService.concat(route);
     response = http.request(routeService, type, params);
+
+    Serial.println("Params: " + params);
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {

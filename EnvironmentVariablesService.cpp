@@ -134,6 +134,8 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
   Serial.println(uuid);
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
   Serial.println(message);
+  
+  __config.lock();
 
   bool dispConnected = __bleServerConfig->connectToActuator(uuid);
                 
@@ -150,14 +152,18 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
     }
         
     awaitsReturn();
-
-    __bleServerConfig->disconnectToActuator();
   }
+
+  __bleServerConfig->disconnectToActuator();
+   
+  delay(2000);
 
   __utilsService.updateMonitoring(__message);
 
   __receivedData = false;
   __message = ""; 
+
+  __config.unlock();
 }
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
@@ -332,7 +338,10 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
   if(WiFi.status() != WL_CONNECTED)   
     return;
 
-  __currentTime = __httpRequestService.getTime(GET_TIME);
+  String currentTime = __httpRequestService.getTime(GET_TIME);
+
+  if(!currentTime.equals(""))
+    __currentTime = currentTime;
   
   bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= TIME_TO_LOAD;
 
@@ -406,5 +415,5 @@ void EnvironmentVariablesService::continuousValidation()
       
   turnOnManagedDevices();
 
-  vTaskDelay(1000/portTICK_PERIOD_MS);
+  vTaskDelay(10000/portTICK_PERIOD_MS);
 }

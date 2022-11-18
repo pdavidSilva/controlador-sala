@@ -6,6 +6,8 @@ BLEServerService* __bleConfiguration;
 HTTPService __httpService;
 EnvironmentVariablesService __environment;
 UtilsService __utils;
+WiFiService __wifi;
+
 
 bool AwaitHttpService::__messageReturned = false;
 String AwaitHttpService::__message = "";
@@ -62,7 +64,7 @@ void AwaitHttpService::awaitSolicitation(void* _this)
             }
         }
         
-        vTaskDelay(1000/portTICK_PERIOD_MS);
+        vTaskDelay(3000/portTICK_PERIOD_MS);
     }
 }
 
@@ -100,8 +102,14 @@ bool AwaitHttpService::connectToActuator(String uuidDevice)
 
 void AwaitHttpService::executeSolicitation(Solicitacao request) 
 {
-    if(!__bleConfiguration->isSensorListed(request.uuid, TYPE_ACTUATOR))
+    __configAcess.lock();
+
+    if(!__bleConfiguration->isSensorListed(request.uuid, TYPE_ACTUATOR)) {
+        
+        __httpService.putSolicitacao(request.id);
+        
         return; 
+    }
 
     __bleConfiguration->setReceivedRequest(true);
 
@@ -126,11 +134,13 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
         }
 
         awaitsReturn();
-
-        __bleConfiguration->disconnectToActuator();
     }
 
+    __bleConfiguration->disconnectToActuator();
+    
     __bleConfiguration->setReceivedRequest(false);
+    
+    delay(2000);
 
     __utils.updateMonitoring(__message);
 
@@ -147,6 +157,7 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
     __messageReturned = false;
     __message = "";  
 
+    __configAcess.unlock();
 }
 
 String AwaitHttpService::getMessageToSend(Solicitacao request)

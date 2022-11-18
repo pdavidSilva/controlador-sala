@@ -19,7 +19,6 @@ String UtilsService::mountPayload(String deviceType, String state, String comman
 
 void UtilsService::updateMonitoring(String message)
 {
-    
     if(message == LZ_ON || message == LZ_OFF)
     {
         Monitoramento monitoringLight = __environmentVariablesService.getMonitoringLight();

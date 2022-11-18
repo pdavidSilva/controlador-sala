@@ -308,6 +308,9 @@ String HTTPService::getTime(String identifier)
   
     String response = http.request(routeService, "GET", "");
 
+    if (strstr(response.c_str(), "[ERROR]") != NULL)
+        return "";
+
     return response;
 }
 

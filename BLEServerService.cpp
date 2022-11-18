@@ -35,16 +35,15 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
       Serial.print("[BLEServerService] data: ");
       String data = String(((char*)pData));
       Serial.println(data.substring(0, length));
-      
       Serial.print("[BLEServerService] receive request enabled: ");
       Serial.println(__receivedRequest);
 
-      if(__receivedRequest && !__environmentSolicitation)
+      if(__receivedRequest)
       {   
         __clientAwaitHttpService.setMessageReturned(true);
         __clientAwaitHttpService.setMessage(data.substring(0, length));
       }
-      else
+      else if(__environmentSolicitation)
       {
         __environmentVariables.setReceivedData(true);
         __environmentVariables.setMessage(data.substring(0, length));  
@@ -60,7 +59,6 @@ BLEDeviceConnect* BLEServerService::connectToDevice(BLEAdvertisedDevice* myDevic
     device->deviceFound = true;
 
     Serial.println("[CONNECTION]: - Create client");
-    
     device->pClient = BLEDevice::createClient();
       
     bool ok = device->pClient->connect(myDevice);
@@ -71,8 +69,9 @@ BLEDeviceConnect* BLEServerService::connectToDevice(BLEAdvertisedDevice* myDevic
       return device;
     } 
     
+    delay(200);
+
     Serial.println("[CONNECTION]: - Connected to disp");
-  
     device->pRemoteService = device->pClient->getService(SERVICE_UUID);
         
     if (device->pRemoteService == nullptr) 
@@ -85,9 +84,10 @@ BLEDeviceConnect* BLEServerService::connectToDevice(BLEAdvertisedDevice* myDevic
           
       return device;
     }
-      
+    
+    delay(200);
+
     Serial.println("[CONNECTION]: - Found our service");
-  
     device->pRemoteCharacteristic = device->pRemoteService->getCharacteristic(CHARACTERISTIC_UUID);
         
     if (device->pRemoteCharacteristic == nullptr) 
@@ -148,9 +148,9 @@ BLEDeviceConnect* BLEServerService::connectToDevice(BLEAdvertisedDevice* myDevic
     Serial.print("[CONNECTION]: ");
     Serial.println(myDevice->getAddress().toString().c_str());
   
-    Serial.print("[CONNID]: ");
+    Serial.print("[CONNECTION]: connId ");
     Serial.println(device->pClient->getConnId());
-    Serial.print("[RSSI]: ");
+    Serial.print("[CONNECTION]: RSSI");
     Serial.println(device->pClient->getRssi());
   
     return device;
@@ -347,7 +347,7 @@ void BLEServerService::sendMessageToActuator(String data)
 
 void BLEServerService::disconnectToActuator() 
 {    
-    delay(5000);
+    delay(1000);
     
     if(__actuatorConnected->pClient->isConnected())
       __actuatorConnected->pClient->disconnect();
@@ -356,7 +356,7 @@ void BLEServerService::disconnectToActuator()
 }
 
 bool BLEServerService::connectToActuator(String uuidDevice) 
-{    
+{        
     Hardware disp;
     bool connected = false;
 
@@ -396,11 +396,14 @@ void BLEServerService::continuousConnectionTask()
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
 
-    __wfService.disconnect();
+    if(!__receivedRequest && __environmentVariables.getInClass())
+    {
+      __wfService.disconnect();
 
-    newCicle();  
+        newCicle();  
 
-    __wfService.connect();
+      __wfService.connect();
+    }
   }
 }
 
@@ -417,59 +420,59 @@ void BLEServerService::newCicle()
         
     for (auto item : __devicesMapped) 
     {
-          if (__configuration.isDebug())
-          {
+      if (__configuration.isDebug())
+      {
             Serial.println("=================================");
             Serial.println("[CONTINUOUS_CONNECTION] Receive Request: " + String(__receivedRequest));
             Serial.println("[CONTINUOUS_CONNECTION] In Class: " + String(__environmentVariables.getInClass()));
-          }
+      }
            
-          if(!__receivedRequest && __environmentVariables.getInClass())
-          {
-            disp = item.second;
-                
-            if(disp.getTypeDisp() == TYPE_SENSOR)
-            {
-              if (__configuration.isDebug())
-              { 
-                Serial.println("================================");
-                Serial.println("[CONTINUOUS_CONNECTION] UUID: " + String(disp.getUuid()));
-                Serial.println("[CONTINUOUS_CONNECTION] ADDRESS: " + String(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str()));
-              }
-                    
-              deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
-              
-              if(deviceConnected->pClient->isConnected())
-              {
-                String data = "GET_DATA";
-                deviceConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
-                isDeviceConected = true;
-              }
-              
-              aux.push_back(deviceConnected);
-              
-              count++;
-                  
-              if ((count % 3) == 0 || __countTypeSensor == count)
-              {
-                if(isDeviceConected)
-                  timer();
-                                                
-                closeConnections(aux);
-                aux.clear();
-              }
-            }
-          }
-          else
-          {
-            if(!aux.empty()) 
-            {
-              closeConnections(aux);
-              aux.clear();
-            }
+      if(__receivedRequest)
+      {
+        if(!aux.empty()) 
+        {
+          closeConnections(aux);
+          aux.clear();
+        }
 
-            Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
-          }
+        Serial.println("[CONTINUOUS_CONNECTION] Request Enabled or No Class");
+
+        return;
+      }
+            
+      disp = item.second;
+                
+      if(disp.getTypeDisp() == TYPE_SENSOR)
+      {
+        if (__configuration.isDebug())
+        { 
+          Serial.println("================================");
+          Serial.println("[CONTINUOUS_CONNECTION] UUID: " + String(disp.getUuid()));
+          Serial.println("[CONTINUOUS_CONNECTION] ADDRESS: " + String(disp.getBLEAdvertisedDevice()->getAddress().toString().c_str()));
+        }
+                    
+        deviceConnected = connectToDevice(disp.getBLEAdvertisedDevice(), false);
+              
+        if(deviceConnected->pClient->isConnected())
+        {
+          String data = "GET_DATA";
+          deviceConnected->pRemoteCharacteristic->writeValue(data.c_str(), data.length());
+          isDeviceConected = true;
+        }
+              
+        aux.push_back(deviceConnected);
+              
+        count++;
+                  
+        if ((count % 3) == 0 || __countTypeSensor == count)
+        {
+          if(isDeviceConected)
+            timer();
+                                                
+            closeConnections(aux);
+            aux.clear();
+        }
+      } 
     }
 }
 

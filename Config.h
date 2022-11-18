@@ -24,6 +24,7 @@
 #include "AwaitHttpService.h"
 #include "EnvironmentVariablesService.h"
 #include "UtilsService.h"
+#include <mutex>
 
 class Config 
 {
@@ -40,6 +41,8 @@ class Config
         int    __wifiFailAttempts;
         int    __commandSendAttempts;
         int    __timesToHasOne;
+        static std::mutex __bleActuatorMutex;
+
     public : 
         
         Config();
@@ -56,6 +59,8 @@ class Config
         int    getWifiFailAttempts();
         int    getCommandSendAttempts();
         int    getTimesToHasOne();
+        void   lock();
+        void   unlock();
 };
 
 #endif

@@ -8,6 +8,7 @@ int    __basetime;
 int    __type;
 int    __route;
 bool   __debug;
+std::mutex Config::__bleActuatorMutex;
 
 Config::Config(){
     __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
@@ -21,7 +22,7 @@ Config::Config(){
     //__password  = "Ald50983021";
     __basetime  = 180000;
     __ledStatus = 2;
-    __type  = TYPE_SENSOR;
+    __type  = TYPE_CONTROLLER;
     __route = 2;
     __wifiFailAttempts = 30;
     __commandSendAttempts = 3;
@@ -88,4 +89,14 @@ bool Config::isDebug()
 int Config::getTimesToHasOne()
 {
   return __timesToHasOne;
+}
+
+void Config::lock() 
+{
+	__bleActuatorMutex.lock();
+}
+
+void Config::unlock()
+{
+  __bleActuatorMutex.unlock();
 }

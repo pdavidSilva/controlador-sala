@@ -135,8 +135,6 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
   Serial.println(message);
   
-  __config.lock();
-
   bool dispConnected = __bleServerConfig->connectToActuator(uuid);
                 
   if(dispConnected)
@@ -162,8 +160,6 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
 
   __receivedData = false;
   __message = ""; 
-
-  __config.unlock();
 }
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
@@ -178,6 +174,8 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String m
     return;
   }
 
+  __config.lock();
+
   __bleServerConfig->setReceivedRequest(true);
   __bleServerConfig->setEnvironmentSolicitation(true);
 
@@ -187,6 +185,8 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String m
 
   __bleServerConfig->setReceivedRequest(false);
   __bleServerConfig->setEnvironmentSolicitation(false);
+
+  __config.unlock();
 }
 
 String EnvironmentVariablesService::getUuidActuator(int typeEquipment)

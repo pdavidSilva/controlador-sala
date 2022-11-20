@@ -391,7 +391,7 @@ void BLEServerService::continuousConnectionTask()
 
   while (true)
   {
-    vTaskDelay(TIME_WAITING_CONNECTION/portTICK_PERIOD_MS);
+    vTaskDelay(pdMS_TO_TICKS(TIME_WAITING_CONNECTION));
 
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));

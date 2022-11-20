@@ -37,7 +37,7 @@ void setup() {
   controller.startTaskHttp();
 
   // Configure Environment Variables Service
-  controller.initEnvironmentVariables();
+  controller.setupEnvironmentVariables();
 }
 
 void loop() {

@@ -78,7 +78,7 @@ bool EnvironmentVariablesService::setInClass(bool inClass)
 
 bool EnvironmentVariablesService::getInClass()
 {
-    return true;
+    return __inClass;
 }
 
 void EnvironmentVariablesService::setReservations(std::vector<struct Reserva> reservations)
@@ -215,7 +215,7 @@ bool EnvironmentVariablesService::getRoomDuringClassTime() {
     horaInicio = r.horarioInicio;
     horaFim = r.horarioFim;
     
-    if (__currentTime >= r.horarioInicio && __currentTime < r.horarioFim)
+    if (__currentTime >= horaInicio && __currentTime < horaFim)
       inClass = true;
   }
 
@@ -228,7 +228,7 @@ bool EnvironmentVariablesService::getRoomDuringClassTime() {
  */
 void EnvironmentVariablesService::turnOnManagedDevices() {
     
-    if (__inClass && __hasMovement) 
+    if (getInClass() && __hasMovement) 
     {
 
       if (!__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0)
@@ -248,7 +248,7 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
 
   bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > TIME_TO_TURN_OFF;
 
-  if (!__inClass || (__inClass && longTimeWithoutMovement)) 
+  if (!getInClass() || (getInClass() && longTimeWithoutMovement)) 
   {
     if (__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0) 
       turnOfConditioner();
@@ -395,7 +395,6 @@ struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String mess
   return environmentVariables;
 }
 
-
 void EnvironmentVariablesService::continuousValidation()
 {
   if(__config.isDebug())
@@ -404,16 +403,16 @@ void EnvironmentVariablesService::continuousValidation()
     Serial.print("[ENVIRONMENT_VARIABLES]: ");
     Serial.println(__currentTime);
   }
-
-  __inClass = getRoomDuringClassTime();
   
   checkTimeToLoadReservations();
 
+  setInClass(getRoomDuringClassTime());
+  
   checkEnvironmentVariables();
 
   turnOffManagedDevices();
       
   turnOnManagedDevices();
 
-  vTaskDelay(10000/portTICK_PERIOD_MS);
+  vTaskDelay(pdMS_TO_TICKS(10000));
 }

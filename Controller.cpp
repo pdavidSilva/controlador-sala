@@ -107,7 +107,7 @@ void Controller::environmentVariablesContinuousValidation()
     __environmentService.continuousValidation();
 }
 
-void Controller::initEnvironmentVariables()
+void Controller::setupEnvironmentVariables()
 {
     __environmentService.initEnvironmentVariables();
 }

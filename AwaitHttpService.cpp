@@ -49,7 +49,7 @@ void AwaitHttpService::awaitSolicitation(void* _this)
                 Serial.println("\n=======================================");
                 Serial.println("[AwaitHttpService] Start");
             }
-
+            
             solicitacao = __httpService.getSolicitacao(MONITORAMENTO);
             
             for (Solicitacao s : solicitacao)
@@ -64,7 +64,7 @@ void AwaitHttpService::awaitSolicitation(void* _this)
             }
         }
         
-        vTaskDelay(3000/portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

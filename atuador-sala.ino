@@ -1,4 +1,4 @@
-/*#include "Global.h"
+#include "Global.h"
 #include "Config.h"
 
 HardwareRecord hardware;
@@ -34,6 +34,8 @@ void setup() {
 		}
 	} while( !init ); 
 
+	wiFiService.disconnect();
+
   controller.setupBLEClient("ESP_ATUADOR", ATUADOR);  
 }
 
@@ -48,4 +50,4 @@ void loop() {
   }
 
   delay(200);
-}*/
+}

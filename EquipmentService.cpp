@@ -3,7 +3,7 @@
 bool __lightOn;
 EnergyMonitor __sct13;
 
-EquipmentService::EquipmentService() {}
+EquipmentService::EquipmentService() {  __sct13.current(pinSCT, 6.0606); }
 
 bool EquipmentService::getLightOn() {
   return __lightOn;
@@ -205,6 +205,7 @@ String EquipmentService::executeActionIntoConditioner(String command, String sta
       isOn = checkIrms();
 
       isSuccessful = (isOn == state.equals("ON") ? AC_ON : AC_OFF);
+  
       attempt++;
 
   } while (!isSuccessful && attempt < config.getCommandSendAttempts());

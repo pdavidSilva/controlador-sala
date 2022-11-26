@@ -75,7 +75,7 @@ void ClientSocketService::serverListener() {
             
             if (request.type == CONDICIONADOR || request.type == LUZES) { 
 
-                __bleClientConfiguration->setReceivedRequest(true);
+                //__bleClientConfiguration->setReceivedRequest(true);
 
                 bool dispConnected = connectToActuator(request.uuid);
                 
@@ -89,7 +89,7 @@ void ClientSocketService::serverListener() {
                   __bleClientConfiguration->disconnectToActuator();
                 }
                 
-                __bleClientConfiguration->setReceivedRequest(false);
+                //__bleClientConfiguration->setReceivedRequest(false);
 
                 if(__messageReturned)   
                   client.println(__message);

@@ -23,9 +23,7 @@ class BLEServerService
     static int __countTypeActuator;
     static vector<String> __sensors;
     static vector<struct HardwareRecord> __actuators;
-    static bool __receivedRequest;
     static BLEScan* __pBLEScan;
-    static bool __environmentSolicitation;
     static vector<BLEAdvertisedDevice*> __filteredDevices;
     static unordered_map<string, Hardware> __devicesMapped;
     static BLEDeviceConnect* __actuatorConnected;
@@ -54,18 +52,12 @@ class BLEServerService
     vector<struct HardwareRecord> getActuators();
     void addSensor(String uuid);
     void addActuator(HardwareRecord act);
-    void setReceivedRequest(bool receivedRequest);
-    bool getReceivedRequest();
-
     void newCicle();
     
     static void setCountTypeSensor(int count);
     static void setCounttypeActuator(int count);
     static int getCountTypeSensor();
     static int getCounttypeActuator();
-    
-    bool getEnvironmentSolicitation();
-    void setEnvironmentSolicitation(bool environmentSolicitation);
 
     void closeConnections(vector<BLEDeviceConnect*> aux);
 

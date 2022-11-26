@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "AwaitHttpService.h"
+#include "Global.h"
 
 Config __configAcess;
 BLEServerService* __bleConfiguration; 
@@ -8,28 +9,7 @@ EnvironmentVariablesService __environment;
 UtilsService __utils;
 WiFiService __wifi;
 
-
-bool AwaitHttpService::__messageReturned = false;
-String AwaitHttpService::__message = "";
-
 AwaitHttpService::AwaitHttpService() {}
-
-String AwaitHttpService::getMessage() {
-    return  __message;
-}
-
-void AwaitHttpService::setMessage(String message) {
-    __message = message;
-}
-
-bool AwaitHttpService::getMessageReturned() {
-    return  __messageReturned;
-}
-
-void AwaitHttpService::setMessageReturned(bool messageReturned) {
-    __messageReturned = messageReturned;
-}
-
 
 void AwaitHttpService::startAwait()
 {
@@ -111,7 +91,7 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
         return; 
     }
 
-    __bleConfiguration->setReceivedRequest(true);
+    HTTP_REQUEST = true;
 
     vTaskDelay(1500/portTICK_PERIOD_MS);
     
@@ -138,11 +118,11 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
 
     __bleConfiguration->disconnectToActuator();
     
-    __bleConfiguration->setReceivedRequest(false);
+    HTTP_REQUEST = false;
     
     delay(2000);
 
-    __utils.updateMonitoring(__message);
+    __utils.updateMonitoring(HTTP_MESSAGE);
 
     __httpService.putSolicitacao(request.id);
 
@@ -150,12 +130,12 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
     {
         Serial.println("==================================");
         Serial.println("[AwaitHttpService] Resposta BLE");
-        Serial.println("[AwaitHttpService] recebeu retorno: " + __messageReturned);
-        Serial.println("[AwaitHttpService] mensagem: " + __message);
+        Serial.println("[AwaitHttpService] recebeu retorno: " + HTTP_RECEIVED_DATA);
+        Serial.println("[AwaitHttpService] mensagem: " + HTTP_MESSAGE);
     }
 
-    __messageReturned = false;
-    __message = "";  
+    HTTP_RECEIVED_DATA = false;
+    HTTP_MESSAGE = "";  
 
     __configAcess.unlock();
 }
@@ -183,7 +163,7 @@ String AwaitHttpService::getMessageToSend(Solicitacao request)
 void AwaitHttpService::awaitsReturn()
 {
   unsigned long tempoLimite = millis() + 15000;
-  while(millis() <= tempoLimite && !__messageReturned)
+  while(millis() <= tempoLimite && !HTTP_RECEIVED_DATA)
   { 
       delay(1000);
       if (__configAcess.isDebug())

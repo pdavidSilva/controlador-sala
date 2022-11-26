@@ -23,21 +23,22 @@ void setup() {
   wiFiService.connect();
 
   do {
-	if ( controller.start(hardwareSensor) ) {
-		if ( controller.registerHardware(hardwareSensor) ) {
-			if(controller.getMaster(hardwareSensor, master))
-			{
-				Serial.print("master: ");
-				Serial.println(master);
-				init = true;
-			}
-			
-			controller.setHardwareConfig(hardwareSensor);
-
-		}
-	}
+    if ( controller.start(hardwareSensor) ) {
+      if ( controller.registerHardware(hardwareSensor) ) {
+        if(controller.getMaster(hardwareSensor, master))
+        {
+          Serial.print("master: ");
+          Serial.println(master);
+          init = true;
+        }
+        
+        controller.setHardwareConfig(hardwareSensor);
+      }
+    }
   } while( !init );
   
+  wiFiService.connect();
+
   controller.setupBLEClient("ESP_SENSOR_" + hardwareSensor.id, SENSOR);
 }
 
@@ -53,17 +54,17 @@ void loop() {
 
   if(SEND_DATA) {
 		
-	Serial.println("[INO]: data solicited ");
+    Serial.println("[INO]: data solicited ");
 
     monitoringRecord.hasPresent = qtdDetectouPresenca >= conf.getTimesToHasOne() ? "S" : "N";
-    	
-	monitoringRecord.temperature = temperature;
-  
+        
+    monitoringRecord.temperature = temperature;
+    
     controller.sendDataOfMonitoring(monitoringRecord);
-    	
-	SEND_DATA = false;
-    	
-	qtdDetectouPresenca = 0;
+        
+    SEND_DATA = false;
+        
+    qtdDetectouPresenca = 0;
   }
 
   delay(1000);

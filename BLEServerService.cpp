@@ -1,26 +1,34 @@
 #include "BLEServerService.h"
+#include "Global.h"
 
 int BLEServerService::__countTypeSensor = 0;
 int BLEServerService::__countTypeActuator = 0;
 std::vector<String> BLEServerService::__sensors;
 std::vector<struct HardwareRecord> BLEServerService::__actuators;
-bool BLEServerService::__receivedRequest = false;
-bool BLEServerService::__environmentSolicitation = false;
 BLEScan* BLEServerService::__pBLEScan;
 vector<BLEAdvertisedDevice*> BLEServerService::__filteredDevices;
 unordered_map<string, Hardware> BLEServerService::__devicesMapped;
 BLEDeviceConnect* BLEServerService::__actuatorConnected;
-AwaitHttpService __clientAwaitHttpService;
 EnvironmentVariablesService __environmentVariables;
+AwaitHttpService __clientAwaitHttpService;
 Config __configuration;
 WiFiService __wfService;
+
+bool IN_CLASS = false; 
+
+bool HTTP_RECEIVED_DATA = false;
+String HTTP_MESSAGE = "";
+
+bool ENV_RECEIVED_DATA = false;
+String ENV_MESSAGE = "";
+
+bool HTTP_REQUEST = false;
+bool ENV_REQUEST = false;
 
 BLEServerService::BLEServerService()
 {
     __countTypeSensor = 0;
     __countTypeActuator = 0;
-    __receivedRequest = false;
-    __environmentSolicitation = false;
 }
 
 void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) 
@@ -35,18 +43,16 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
       Serial.print("[BLEServerService] data: ");
       String data = String(((char*)pData));
       Serial.println(data.substring(0, length));
-      Serial.print("[BLEServerService] receive request enabled: ");
-      Serial.println(__receivedRequest);
 
-      if(__receivedRequest)
-      {   
-        __clientAwaitHttpService.setMessageReturned(true);
-        __clientAwaitHttpService.setMessage(data.substring(0, length));
+      if(HTTP_REQUEST)
+      {         
+        HTTP_RECEIVED_DATA = true;
+        HTTP_MESSAGE = data.substring(0, length);
       }
-      else if(__environmentSolicitation)
+      else if(ENV_REQUEST)
       {
-        __environmentVariables.setReceivedData(true);
-        __environmentVariables.setMessage(data.substring(0, length));  
+        ENV_RECEIVED_DATA = true;
+        ENV_MESSAGE = data.substring(0, length);  
       }
 
     }
@@ -391,12 +397,10 @@ void BLEServerService::continuousConnectionTask()
 
   while (true)
   {
-    vTaskDelay(pdMS_TO_TICKS(TIME_WAITING_CONNECTION));
-
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
 
-    if(!__receivedRequest && __environmentVariables.getInClass())
+    if(!HTTP_REQUEST && !ENV_REQUEST)
     {
       __wfService.disconnect();
 
@@ -404,6 +408,8 @@ void BLEServerService::continuousConnectionTask()
 
       __wfService.connect();
     }
+
+    vTaskDelay(pdMS_TO_TICKS(TIME_WAITING_CONNECTION));
   }
 }
 
@@ -423,11 +429,12 @@ void BLEServerService::newCicle()
       if (__configuration.isDebug())
       {
             Serial.println("=================================");
-            Serial.println("[CONTINUOUS_CONNECTION] Receive Request: " + String(__receivedRequest));
-            Serial.println("[CONTINUOUS_CONNECTION] In Class: " + String(__environmentVariables.getInClass()));
+            Serial.println("[CONTINUOUS_CONNECTION] Receive Request: " + String(HTTP_REQUEST));
+            Serial.println("[CONTINUOUS_CONNECTION] Env Request: " + String(ENV_REQUEST));
+            Serial.println("[CONTINUOUS_CONNECTION] In Class: " + String(IN_CLASS));
       }
            
-      if(__receivedRequest)
+      if(HTTP_REQUEST || ENV_REQUEST)
       {
         if(!aux.empty()) 
         {
@@ -508,26 +515,6 @@ vector<struct HardwareRecord> BLEServerService::getActuators()
   return __actuators;
 }
 
-void BLEServerService::setEnvironmentSolicitation(bool environmentSolicitation)
-{
-   __environmentSolicitation = environmentSolicitation;
-}
-
-bool BLEServerService::getEnvironmentSolicitation()
-{
-  return __environmentSolicitation;
-}
-
-void BLEServerService::setReceivedRequest(bool receivedRequest)
-{
-   __receivedRequest = receivedRequest;
-}
-
-bool BLEServerService::getReceivedRequest()
-{
-  return __receivedRequest;
-}
-
 void BLEServerService::setCountTypeSensor(int count)
 {
   __countTypeSensor = count;
@@ -562,7 +549,7 @@ void BLEServerService::timer()
 {     
    unsigned long tempoLimite = millis() + TIME_CONNECTION;
     
-   while(millis() <= tempoLimite && !__receivedRequest){
+   while(millis() <= tempoLimite && !HTTP_REQUEST && !ENV_REQUEST){
      
      if((millis() % 5000) == 0)
      {

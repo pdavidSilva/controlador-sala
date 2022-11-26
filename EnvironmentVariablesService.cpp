@@ -1,4 +1,5 @@
 #include "EnvironmentVariablesService.h"
+#include "Global.h"
 
 String __currentTime;
 struct Monitoramento EnvironmentVariablesService::__monitoringConditioner;
@@ -7,10 +8,7 @@ vector<struct Reserva> EnvironmentVariablesService::__reservations;
 HardwareRecord EnvironmentVariablesService::__hardware; 
 String __startTimeLoadReservations;
 String __endTimeLoadReservations;
-bool EnvironmentVariablesService::__receivedData;
 bool EnvironmentVariablesService::__hasMovement;
-bool EnvironmentVariablesService::__inClass;
-String EnvironmentVariablesService::__message;
 unsigned long EnvironmentVariablesService::__lastTimeAttended;
 unsigned long EnvironmentVariablesService::__lastTimeLoadReservations;
 BLEServerService* __bleServerConfig;
@@ -24,7 +22,6 @@ EnvironmentVariablesService::EnvironmentVariablesService()
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
     __hasMovement = false;
-    __inClass = false;
 }
 
 void EnvironmentVariablesService::initEnvironmentVariables() 
@@ -46,39 +43,9 @@ void EnvironmentVariablesService::setLastTimeAttended(unsigned long time)
     __lastTimeAttended = time;
 }
 
-String EnvironmentVariablesService::getMessage() 
-{
-    return __message;
-}
-
-void EnvironmentVariablesService::setMessage(String message) 
-{
-    __message = message;
-}
-
-bool EnvironmentVariablesService::getReceivedData() 
-{
-    return __receivedData;
-}
-
-void EnvironmentVariablesService::setReceivedData(bool receivedData) 
-{
-    __receivedData = receivedData;
-}
-
 std::vector<struct Reserva> EnvironmentVariablesService::getReservations()
 {
     return __reservations;
-}
-
-bool EnvironmentVariablesService::setInClass(bool inClass)
-{
-    __inClass = inClass;
-}
-
-bool EnvironmentVariablesService::getInClass()
-{
-    return __inClass;
 }
 
 void EnvironmentVariablesService::setReservations(std::vector<struct Reserva> reservations)
@@ -156,10 +123,10 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
    
   delay(2000);
 
-  __utilsService.updateMonitoring(__message);
+  __utilsService.updateMonitoring(ENV_MESSAGE);
 
-  __receivedData = false;
-  __message = ""; 
+  ENV_RECEIVED_DATA = false;
+  ENV_MESSAGE = ""; 
 }
 
 void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
@@ -176,15 +143,13 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String m
 
   __config.lock();
 
-  __bleServerConfig->setReceivedRequest(true);
-  __bleServerConfig->setEnvironmentSolicitation(true);
+  ENV_REQUEST = true;
 
   delay(1000);
   
   sendDataToActuator(uuid, message);
 
-  __bleServerConfig->setReceivedRequest(false);
-  __bleServerConfig->setEnvironmentSolicitation(false);
+  ENV_REQUEST = false;
 
   __config.unlock();
 }
@@ -228,7 +193,7 @@ bool EnvironmentVariablesService::getRoomDuringClassTime() {
  */
 void EnvironmentVariablesService::turnOnManagedDevices() {
     
-    if (getInClass() && __hasMovement) 
+    if (IN_CLASS && __hasMovement) 
     {
 
       if (!__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0)
@@ -248,7 +213,7 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
 
   bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > TIME_TO_TURN_OFF;
 
-  if (!getInClass() || (getInClass() && longTimeWithoutMovement)) 
+  if (!IN_CLASS || (IN_CLASS && longTimeWithoutMovement)) 
   {
     if (__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0) 
       turnOfConditioner();
@@ -330,7 +295,7 @@ void EnvironmentVariablesService::turnOfLight(){
 void EnvironmentVariablesService::awaitsReturn()
 {
   unsigned long tempoLimite = millis() + TIME_TO_AWAIT_RETURN;
-  while(millis() <= tempoLimite && !__receivedData) {}    
+  while(millis() <= tempoLimite && !ENV_RECEIVED_DATA) {}    
 }
 
 void EnvironmentVariablesService::checkTimeToLoadReservations()
@@ -354,9 +319,9 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
 
 void EnvironmentVariablesService::checkEnvironmentVariables()
 {
-  if (__receivedData) 
+  if (ENV_RECEIVED_DATA) 
   {
-    struct MonitoringRecord variables = deserealizeData(__message);
+    struct MonitoringRecord variables = deserealizeData(ENV_MESSAGE);
 
     if (variables.hasPresent.equals("S") == 0) 
     {
@@ -368,8 +333,8 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
       __hasMovement = false;
     }
 
-    __message = "";
-    __receivedData = false; 
+    ENV_MESSAGE = "";
+    ENV_RECEIVED_DATA = false; 
   }
 }
 
@@ -406,8 +371,8 @@ void EnvironmentVariablesService::continuousValidation()
   
   checkTimeToLoadReservations();
 
-  setInClass(getRoomDuringClassTime());
-  
+  IN_CLASS = getRoomDuringClassTime();
+
   checkEnvironmentVariables();
 
   turnOffManagedDevices();

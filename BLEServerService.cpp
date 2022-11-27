@@ -49,7 +49,7 @@ void BLEServerService::notifyCallback(BLERemoteCharacteristic* pBLERemoteCharact
         HTTP_RECEIVED_DATA = true;
         HTTP_MESSAGE = data.substring(0, length);
       }
-      else if(ENV_REQUEST)
+      else
       {
         ENV_RECEIVED_DATA = true;
         ENV_MESSAGE = data.substring(0, length);  
@@ -397,19 +397,23 @@ void BLEServerService::continuousConnectionTask()
 
   while (true)
   {
+    vTaskDelay(pdMS_TO_TICKS(TIME_WAITING_CONNECTION));
+
     Serial.println("=========================================================");
     Serial.println("[CONTINUOUS_CONNECTION] Actual Time: " + String(millis()));
 
     if(!HTTP_REQUEST && !ENV_REQUEST)
     {
+      __configuration.lockEnvVariablesMutex();
+
       __wfService.disconnect();
 
-        newCicle();  
+      newCicle();  
 
       __wfService.connect();
-    }
 
-    vTaskDelay(pdMS_TO_TICKS(TIME_WAITING_CONNECTION));
+      __configuration.unlockEnvVariablesMutex();
+    }
   }
 }
 

@@ -9,6 +9,7 @@ int    __type;
 int    __route;
 bool   __debug;
 std::mutex Config::__bleActuatorMutex;
+std::mutex Config::__envVariablesMutex;
 
 Config::Config(){
     __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
@@ -100,3 +101,14 @@ void Config::unlock()
 {
   __bleActuatorMutex.unlock();
 }
+
+void Config::lockEnvVariablesMutex() 
+{
+	__envVariablesMutex.lock();
+}
+
+void Config::unlockEnvVariablesMutex()
+{
+  __envVariablesMutex.unlock();
+}
+

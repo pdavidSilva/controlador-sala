@@ -228,10 +228,15 @@ void EnvironmentVariablesService::turnOffManagedDevices() {
  */
 void EnvironmentVariablesService::turnOnConditioner(){
 
+  __config.lockEnvVariablesMutex();
+
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
   Serial.println(__monitoringConditioner.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO CONDICIONADOR");
+
+  if(WiFi.status() != WL_CONNECTED)
+    return;
 
   String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
@@ -239,6 +244,9 @@ void EnvironmentVariablesService::turnOnConditioner(){
   String payload = __utilsService.mountPayload("AC", "ON", codigos);
   sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------
+
+  __config.unlockEnvVariablesMutex();
+
 }
 
 /*
@@ -246,23 +254,33 @@ void EnvironmentVariablesService::turnOnConditioner(){
  */
 void EnvironmentVariablesService::turnOfConditioner(){
   
+  __config.lockEnvVariablesMutex();
+
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
   Serial.println(__monitoringConditioner.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO CONDICIONADOR");
 
+  if(WiFi.status() != WL_CONNECTED)
+    return;
+    
   String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
 
   //------------------------------------------------------    
   String payload = __utilsService.mountPayload("AC", "OFF", codigos);
   sendDataToActuator(TYPE_CONDITIONER, payload);
   //------------------------------------------------------    
+
+  __config.unlockEnvVariablesMutex();
+
 }
 
 /*
  * <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
 void EnvironmentVariablesService::turnOnLight(){
+  
+  __config.lockEnvVariablesMutex();
 
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
@@ -273,12 +291,16 @@ void EnvironmentVariablesService::turnOnLight(){
   String payload = __utilsService.mountPayload("LZ", "ON", "null");
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
+
+  __config.unlockEnvVariablesMutex();
 }
 
 /*
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
 void EnvironmentVariablesService::turnOfLight(){
+
+  __config.lockEnvVariablesMutex();
 
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
@@ -290,6 +312,7 @@ void EnvironmentVariablesService::turnOfLight(){
   sendDataToActuator(TYPE_LIGHT, payload);  
   // ----------------------------------------------------------
 
+  __config.unlockEnvVariablesMutex();
 }
 
 void EnvironmentVariablesService::awaitsReturn()
@@ -323,7 +346,7 @@ void EnvironmentVariablesService::checkEnvironmentVariables()
   {
     struct MonitoringRecord variables = deserealizeData(ENV_MESSAGE);
 
-    if (variables.hasPresent.equals("S") == 0) 
+    if (variables.hasPresent == "S") 
     {
       __hasMovement = true;
       __lastTimeAttended = millis();
@@ -353,7 +376,7 @@ struct MonitoringRecord EnvironmentVariablesService::deserealizeData(String mess
   else if(__config.isDebug())
   {
     Serial.println("==================================");
-    Serial.println("[HTTPService] Falha no parse JSON.......");
+    Serial.println("[ENVIRONMENT_VARIABLES] Falha no parse JSON.......");
     Serial.println(error.f_str());
   }
 

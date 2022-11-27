@@ -42,6 +42,7 @@ class Config
         int    __commandSendAttempts;
         int    __timesToHasOne;
         static std::mutex __bleActuatorMutex;
+        static std::mutex __envVariablesMutex;
 
     public : 
         
@@ -61,6 +62,8 @@ class Config
         int    getTimesToHasOne();
         void   lock();
         void   unlock();
+        void   lockEnvVariablesMutex();
+        void   unlockEnvVariablesMutex();
 };
 
 #endif

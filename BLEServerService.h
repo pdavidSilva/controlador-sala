@@ -8,7 +8,7 @@
 #include <BLEDevice.h>
 #include "Structs.h"
 
-#define TIME_CONNECTION  8000 
+#define TIME_CONNECTION  5000 
 #define TIME_WAITING_CONNECTION 180000
 
 static BLEUUID CHARACTERISTIC_UUID("beb5483e-36e1-4688-b7f5-ea07361b26a8");

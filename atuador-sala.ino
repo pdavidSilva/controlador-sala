@@ -1,6 +1,8 @@
 /*#include "Global.h"
 #include "Config.h"
 
+#define RELE 19
+
 HardwareRecord hardware;
 WiFiService wiFiService;
 Controller controller;
@@ -14,6 +16,7 @@ IRsend irsend(kIrLed);
 void setup() {
 
 	Serial.begin(115200);
+  pinMode(RELE, OUTPUT);
 	irsend.begin();
 	bool init = false;
 
@@ -44,10 +47,10 @@ void loop() {
   Serial.println("[Loop] Await message"); 
   
   if(SEND_DATA) {
-    Serial.println("[Loop] FOWARD TO SEND IR"); 
-    controller.ExecuteCommandIR(COMMAND);
-	SEND_DATA = false;
+    Serial.println("[Loop] FOWARD TO SEND COMMAND"); 
+    controller.ExecuteCommand(COMMAND);
+    SEND_DATA = false;
   }
 
   delay(200);
-}*/
+} */

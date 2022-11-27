@@ -133,7 +133,7 @@ bool Controller::loadedDevices()
     return false;
 }
 
-void Controller::ExecuteCommandIR(String command) 
+void Controller::ExecuteCommand(String command) 
 {
   String response = __equipmentService.executeActionFromController(command);
   sendDataToServer(response);

@@ -29,7 +29,7 @@ void AwaitHttpService::awaitSolicitation(void* _this)
                 Serial.println("\n=======================================");
                 Serial.println("[AwaitHttpService] Start");
             }
-            
+
             solicitacao = __httpService.getSolicitacao(MONITORAMENTO);
             
             for (Solicitacao s : solicitacao)

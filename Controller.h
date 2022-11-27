@@ -39,7 +39,7 @@ class Controller
         void setupEnvironmentVariables();
 
         // Send Commands
-        void ExecuteCommandIR(String command);
+        void ExecuteCommand(String command);
 };
 
 #endif

@@ -3,7 +3,9 @@
 bool __lightOn;
 EnergyMonitor __sct13;
 
-EquipmentService::EquipmentService() {  __sct13.current(pinSCT, 6.0606); }
+EquipmentService::EquipmentService() {  
+  __sct13.current(pinSCT, 6.0606); 
+}
 
 bool EquipmentService::getLightOn() {
   return __lightOn;
@@ -114,10 +116,7 @@ bool EquipmentService::checkIrms() {
    <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
 */
 void EquipmentService::checkOperationLights(String msg) {
-
-  String operationTurnOnOff = SplitGetIndex(msg, ';', 1);
-
-  if (operationTurnOnOff == "True;")
+  if (msg == "ON")
     turnOnLights();
   else
     turnOffLights();
@@ -160,7 +159,7 @@ String EquipmentService::executeActionFromController(String data) {
   if (error)
   {
     Serial.println("==================================");
-    Serial.print("[EquipmentService] Erro ao deserializar objeto ");
+    Serial.println("[EquipmentService] Erro ao deserializar objeto ");
 
     return "ERROR";
   }
@@ -169,8 +168,6 @@ String EquipmentService::executeActionFromController(String data) {
   String command = doc["command"].as<String>();
   String state = doc["state"].as<String>();
 
-  Serial.println("==================================");
-  Serial.print("[EquipmentService] Command: " + String(command));
 
   if (type == NULL)
   {
@@ -183,6 +180,8 @@ String EquipmentService::executeActionFromController(String data) {
   }
   else if (type.equals("AC"))
   {
+    Serial.print("[EquipmentService] Command: " + String(command));
+    Serial.println("==================================");
     return executeActionIntoConditioner(command, state);
   }
 

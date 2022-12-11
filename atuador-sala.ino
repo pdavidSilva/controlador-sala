@@ -36,7 +36,7 @@ void setup() {
 
 	wiFiService.disconnect();
 
-  controller.setupBLEClient("ESP_ATUADOR", ATUADOR);  
+    controller.setupBLEClient("ESP_ATUADOR", ATUADOR);  
 }
 
 void loop() {

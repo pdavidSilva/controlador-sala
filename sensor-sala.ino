@@ -37,7 +37,9 @@ void setup() {
     }
   } while( !init );
   
-  wiFiService.connect();
+  wiFiService.disconnect();
+
+  pinMode(portaPresenca, INPUT);
 
   controller.setupBLEClient("ESP_SENSOR_" + hardwareSensor.id, SENSOR);
 }

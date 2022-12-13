@@ -18,7 +18,7 @@ void AwaitHttpService::startAwait()
 
 void AwaitHttpService::awaitSolicitation(void* _this)
 {
-    std::vector<Solicitacao> solicitacao;
+    std::vector<Solicitacao> solicitacoes;
     
     while(true)
     {
@@ -30,9 +30,9 @@ void AwaitHttpService::awaitSolicitation(void* _this)
                 Serial.println("[AwaitHttpService] Start");
             }
 
-            solicitacao = __httpService.getSolicitacao(MONITORAMENTO);
+            solicitacoes = __httpService.getSolicitacao(MONITORAMENTO);
             
-            for (Solicitacao s : solicitacao)
+            for (Solicitacao s : solicitacoes)
             {
                 executeSolicitation(s);
             }
@@ -122,7 +122,7 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
     
     delay(2000);
 
-    __utils.updateMonitoring(HTTP_MESSAGE);
+    __utils.updateMonitoring(HTTP_MESSAGE, request.uuid);
 
     __httpService.putSolicitacao(request.id);
 

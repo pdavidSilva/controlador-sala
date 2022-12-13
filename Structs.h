@@ -72,6 +72,7 @@ typedef struct Reserva {
 struct Monitoramento {
   int id;
   bool estado;
+  String uuid;
   int equipamentoId;
 };
 

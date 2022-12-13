@@ -96,7 +96,7 @@ void ClientSocketService::serverListener() {
                 else
                   client.println("NOT-AVALIABLE");
 
-                __utilsClient.updateMonitoring(__message);
+                __utilsClient.updateMonitoring(__message, request.uuid);
 
                 if (configuration.isDebug())
                 {
@@ -111,7 +111,7 @@ void ClientSocketService::serverListener() {
 
             }  else if(request.type == ATUALIZAR) {
                   
-                __env.setReservations(__httpClientService.getReservationsToday());
+                __env.setReservations(__httpClientService.getReservationsWeek());
 
                 client.println("OK");
             }

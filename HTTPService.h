@@ -15,12 +15,12 @@ class HTTPService
         struct HardwareRecord deserializeDevice(JsonVariant sensor);
         bool getMaster(struct HardwareRecord, String &);
         bool putMonitoring(struct Monitoramento monitoring);
-        std::vector<Reserva> getReservationsToday();
+        std::vector<Reserva> getReservationsWeek();
         struct Reserva deserializeReserve(JsonVariant reserve);
         std::vector<struct Monitoramento> getMonitoringByIdSalaAndEquipamento(String tipoEquipamento);
         String getComandosIrByUuidAndOperacao(String uuid, int operacao);
-        struct Solicitacao getSolicitacao(String tipoEquipamento);
-        struct Solicitacao deserializeSolicitacao(int idSolicitacao,String payload);
+        std::vector<Solicitacao> getSolicitacao(String tipoEquipamento);
+        struct Solicitacao deserializeSolicitacao(int idSolicitacao, String payload);
         bool putSolicitacao(int idSolicitacao);
         String getTime(String identifier);
 };

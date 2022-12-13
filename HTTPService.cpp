@@ -318,7 +318,7 @@ String HTTPService::getTime(String identifier)
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-std::vector<struct Reserva> HTTPService::getReservationsToday() {
+std::vector<struct Reserva> HTTPService::getReservationsWeek() {
     
     HTTP http;
     String route;
@@ -626,7 +626,7 @@ struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamen
     
     HTTP http;
     Config config;
-    std::vector<Solicitacao> solicitacao;
+    std::vector<Solicitacao> solicitacoes;
     EnvironmentVariablesService environment;
 
     String route = "/Solicitacao";
@@ -657,16 +657,14 @@ struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamen
             }
             delay(5000);
         }
-
-
-
+  
         if (doc["httpCode"].as<int>() == 200)
         {
             JsonArray solicitacoesJson = doc["result"].as<JsonArray>();
 
             for (JsonVariant sol : solicitacoesJson)
             {
-                solicitacao.push_back(deserializeSolicitacao(sol["id"].as<int>(), sol["payload"].as<String>()));
+                solicitacoes.push_back(deserializeSolicitacao(sol["id"].as<int>(), sol["payload"].as<String>()));
             }
         }
         else
@@ -682,7 +680,7 @@ struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamen
         }
     }
 
-    return solicitacao;
+    return solicitacoes;
 }
 
 /**

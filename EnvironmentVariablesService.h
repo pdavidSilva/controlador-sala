@@ -11,6 +11,8 @@ using namespace std;
 #define TURN_OFF  2 
 #define CHECK_TIME_TO_LOAD  600
 #define CHECK_TIME_TO_TURN_OFF  900000 // 15 MINUTOS
+#define CHECK_TIME_TO_AWAIT_RETURN  15000 
+#define GET_TIME "GETTIME" 
 
 class EnvironmentVariablesService 
 {
@@ -71,6 +73,10 @@ class EnvironmentVariablesService
     void checkEnvironmentVariables();
 
     void awaitsReturn();
+
+    unsigned long getLastTimeLoadReservations();
+
+    void setLastTimeLoadReservations(unsigned long time);
 
     struct MonitoringRecord deserealizeData(String message);
 

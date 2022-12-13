@@ -22,7 +22,6 @@ EnvironmentVariablesService::EnvironmentVariablesService()
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
     __hasMovement = false;
-    __inClass = false;
     __lastTimeAttended = millis();
 }
 
@@ -30,7 +29,7 @@ void EnvironmentVariablesService::initEnvironmentVariables()
 {
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
-    __reservations = __httpRequestService.GetReservationsWeek();
+    __reservations = __httpRequestService.getReservationsWeek();
     __lastTimeLoadReservations = millis();
     __lastTimeAttended = millis();
 }
@@ -236,6 +235,7 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String u
     if(r.uuid.equals(uuid) && typeEquipment == r.typeEquipment)
       sendDataToActuator(r.uuid, message);
   }
+
   ENV_REQUEST = false;
 
   __config.unlock();
@@ -297,8 +297,8 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
     {
       if(hasConditionerTurnOff() || hasLightTurnOff())
       {
-          __bleServerConfig->setReceivedRequest(true);
-          __bleServerConfig->setEnvironmentSolicitation(true);
+          //__bleServerConfig->setReceivedRequest(true);
+          //__bleServerConfig->setEnvironmentSolicitation(true);
 
           struct Monitoramento monitoring = {0, false, "", 0};
 
@@ -312,8 +312,8 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
               turnOnLight(monitoring.uuid);
           }
           
-          __bleServerConfig->setReceivedRequest(false);
-          __bleServerConfig->setEnvironmentSolicitation(false);
+          //__bleServerConfig->setReceivedRequest(false);
+          //__bleServerConfig->setEnvironmentSolicitation(false);
       }
     }  
 }
@@ -324,31 +324,31 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
  */
 void EnvironmentVariablesService::turnOffManagedDevices() {
 
-  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > TIME_TO_TURN_OFF;
+  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > CHECK_TIME_TO_TURN_OFF;
 
   if (!IN_CLASS || (IN_CLASS && longTimeWithoutMovement)) 
   {
     if(hasConditionerTurnOn() || hasLightTurnOn())
     {
-      __bleServerConfig->setReceivedRequest(true);
-      __bleServerConfig->setEnvironmentSolicitation(true);
+      //__bleServerConfig->setReceivedRequest(true);
+      //__bleServerConfig->setEnvironmentSolicitation(true);
 
       struct Monitoramento monitoring = {0, false, "", 0};
 
       for(monitoring : __monitoringConditioner) {
         if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0) {
-          turnOfConditioner(monitoring.uuid);
+          turnOffConditioner(monitoring.uuid);
         }
       }
 
       for(monitoring : __monitoringLight) {
         if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0) {
-          turnOfLight(monitoring.uuid);
+          turnOffLight(monitoring.uuid);
         }
       }
 
-      __bleServerConfig->setReceivedRequest(false);
-      __bleServerConfig->setEnvironmentSolicitation(false);
+      //__bleServerConfig->setReceivedRequest(false);
+      //__bleServerConfig->setEnvironmentSolicitation(false);
     }
   }
 }
@@ -367,14 +367,14 @@ void EnvironmentVariablesService::turnOnConditioner(String uuid) {
   if(WiFi.status() != WL_CONNECTED)
     return;
 
-  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
-
+  String codigos = __httpRequestService.getComandosIrByUuidAndOperacao(uuid, TURN_ON);
+  
+  //------------------------------------------------------
   String payload = __utilsService.mountPayload("AC", "ON", codigos);
   sendDataToActuator(TYPE_CONDITIONER, uuid, payload);
   //------------------------------------------------------
 
   __config.unlockEnvVariablesMutex();
-
 }
 
 /*
@@ -399,7 +399,6 @@ void EnvironmentVariablesService::turnOffConditioner(String uuid) {
   //------------------------------------------------------    
 
   __config.unlockEnvVariablesMutex();
-
 }
 
 /*
@@ -442,7 +441,7 @@ void EnvironmentVariablesService::turnOffLight(String uuid){
 
 void EnvironmentVariablesService::awaitsReturn()
 {
-  unsigned long tempoLimite = millis() + TIME_TO_AWAIT_RETURN;
+  unsigned long tempoLimite = millis() + CHECK_TIME_TO_AWAIT_RETURN;
   while(millis() <= tempoLimite && !ENV_RECEIVED_DATA) {}    
 }
 
@@ -456,11 +455,11 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
   if(!currentTime.equals(""))
     __currentTime = currentTime;
   
-  bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= TIME_TO_LOAD;
+  bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= CHECK_TIME_TO_LOAD;
 
   if (timeToLoadReservations)
   {
-    __reservations = __httpRequestService.GetReservationsWeek();
+    __reservations = __httpRequestService.getReservationsWeek();
     setLastTimeLoadReservations(millis());
   } 
 }

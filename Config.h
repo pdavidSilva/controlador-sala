@@ -12,8 +12,6 @@
 #include <IRsend.h>
 #include "EmonLib.h"
 #include <ArduinoJson.h>
-#include <NTPClient.h>
-#include <WiFiUDP.h>
 #include "Controller.h"
 #include "WiFiService.h"
 #include "HTTP.h"
@@ -23,10 +21,10 @@
 #include "Hardware.h"
 #include "DHT.h"
 #include "BLEServerService.h"
-#include "ClientSocketService.h"
 #include "AwaitHttpService.h"
 #include "EnvironmentVariablesService.h"
 #include "UtilsService.h"
+#include <mutex>
 
 class Config 
 {
@@ -42,6 +40,10 @@ class Config
         int    __route;
         int    __wifiFailAttempts;
         int    __commandSendAttempts;
+        int    __timesToHasOne;
+        static std::mutex __bleActuatorMutex;
+        static std::mutex __envVariablesMutex;
+
     public : 
         
         Config();
@@ -57,6 +59,11 @@ class Config
         int    getRoute();        
         int    getWifiFailAttempts();
         int    getCommandSendAttempts();
+        int    getTimesToHasOne();
+        void   lock();
+        void   unlock();
+        void   lockEnvVariablesMutex();
+        void   unlockEnvVariablesMutex();
 };
 
 #endif

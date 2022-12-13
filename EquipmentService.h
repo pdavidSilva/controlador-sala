@@ -4,7 +4,7 @@
 #include "Config.h"
 #include "Global.h"
 #define RELE 19
-#define pinSCT 14 
+#define pinSCT 34 
 #define tensao 127
 #define MAX_SIZE_COMMAND 400
 
@@ -30,6 +30,7 @@ class EquipmentService
     void turnOnLights();
     void turnOffLights();
     String executeActionFromController(String data);
+    String executeActionIntoConditioner(String command, String state);
 };
 
 #endif

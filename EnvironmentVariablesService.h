@@ -18,18 +18,17 @@ class EnvironmentVariablesService
     String __currentTime;
     static vector<struct Reserva> __reservations; 
     static struct HardwareRecord __hardware; 
-    static bool __receivedData;
-    static String __message;
     String __startTimeLoadReservations;
     String __endTimeLoadReservations;
     static vector<struct Monitoramento> __monitoringConditioner;
     static vector<struct Monitoramento> __monitoringLight;
     static bool __uploadedToday;
     static bool __hasMovement;
-    static bool __inClass;
     static unsigned long __lastTimeAttended;
+    static unsigned long __lastTimeLoadReservations;
 
   public: 
+
     EnvironmentVariablesService();
 
     unsigned long getLastTimeAttended();
@@ -45,21 +44,11 @@ class EnvironmentVariablesService
     void setMonitoringConditioner(std::vector<struct Monitoramento>  monitoramento);
 
     String getNtpFormatedTime();
-    String getNow();
-
+    
     std::vector<struct Reserva> getReservations();
     void  setReservations(std::vector<struct Reserva> reservations);
     struct HardwareRecord getHardware();
     void setHardware(HardwareRecord hardware);
-
-    static bool getInClass();
-    bool setInClass(bool inClass);
-
-    String getMessage();
-    void setMessage(String message);
-
-    bool getReceivedData();
-    void setReceivedData(bool receivedData);
     
     String getUuidActuator(int typeEquipment);
 
@@ -82,6 +71,8 @@ class EnvironmentVariablesService
     void checkEnvironmentVariables();
 
     void awaitsReturn();
+
+    struct MonitoringRecord deserealizeData(String message);
 
     void initEnvironmentVariables(); 
 

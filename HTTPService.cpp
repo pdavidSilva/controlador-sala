@@ -106,8 +106,6 @@ bool HTTPService::registerHardware(HardwareRecord hardware)
 
     params.concat("{");
     params.concat("\"id\":" + id + ", ");
-    // params.concat("\"uuid\":\"" + hardware.uuid + "\", ");
-    // params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"token\":\"" + hardware.token + "\", ");
     params.concat("\"tipo_hardware_id\": " + tipo_hardware_id);
     params.concat("}");
@@ -225,90 +223,6 @@ struct Solicitacao HTTPService::deserializeSolicitacao(int idSolicitacao, String
    return solicitacao;
 }
 
-/*void HTTPService::getSensors(HardwareRecord hardware, String sensors[], int &indexSensors)
-{
-
-    //hardware/{uuid}/get-sensors?token=TOKEN
-
-    Config config;
-    HTTP http;
-    String route;
-
-    if (config.getRoute() == 1)
-        route = "/hardware/";
-    else
-        route = "/hardwaredesala/";
-
-    String routeService;
-    String type = "GET";
-    String params = "";
-    String response;
-
-    String uuid = String(hardware.uuid);
-    String token = hardware.token;
-
-    routeService.concat(route);
-    routeService.concat(uuid);
-    routeService.concat("/get-sensors");
-    routeService.concat("?token=");
-    routeService.concat(token);
-
-    response = http.request(routeService, type, params);
-
-    if (strstr(response.c_str(), "[ERROR]") == NULL)
-    {
-        DynamicJsonDocument doc(2048);
-        DeserializationError error = deserializeJson(doc, response);
-
-        if (error)
-        {
-            if (config.isDebug())
-            {
-                Serial.println("==================================");
-                Serial.println("[HTTPService] Falha no parse JSON.......");
-                Serial.println(error.f_str());
-            }
-            delay(5000);
-
-            return;
-        }
-
-        if (doc["httpCode"].as<int>() == 200)
-        {
-
-            JsonArray jsonSensors = doc["result"]["sensores"].as<JsonArray>();
-
-            int i = 0;
-            for (JsonVariant sensor : jsonSensors)
-            {
-                sensors[i] = sensor["uuid"].as<char *>();
-                i++;
-            }
-
-            indexSensors = doc["result"]["length"].as<int>();
-
-            return;
-        }
-        else
-        {
-            if (config.isDebug())
-            {
-                Serial.println("==================================");
-                Serial.print("[HTTPService] Mensagem: ");
-                Serial.println(doc["message"].as<char *>());
-            }
-            return;
-        }
-    }
-    else
-    {
-        return;
-    }
-
-    return;
-}
-*/
-
 bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
 {
     //hardware/{uuid}/get-master?token=TOKEN
@@ -377,11 +291,34 @@ bool HTTPService::getMaster(struct HardwareRecord hardware, String &master)
     return false;
 }
 
+String HTTPService::getTime(String identifier)
+{
+    Config config;
+    HTTP http;
+    String route;
+
+    if (config.getRoute() == 1)
+        route = "";
+    else
+        route = "/Time/";
+
+    String routeService;
+    routeService.concat(route);
+    routeService.concat(identifier);
+  
+    String response = http.request(routeService, "GET", "");
+
+    if (strstr(response.c_str(), "[ERROR]") != NULL)
+        return "";
+
+    return response;
+}
+
 
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-std::vector<struct Reserva> HTTPService::GetReservationsWeek() {
+std::vector<struct Reserva> HTTPService::getReservationsToday() {
     
     HTTP http;
     String route;
@@ -685,11 +622,11 @@ String HTTPService::getComandosIrByUuidAndOperacao(String uuid, int operacao) {
  * <parametros> tipo Tipo de Equipamento: LUZES, CONDICIONADOR</parametros>
  * <retorno> struct Solicitacao referente a solicitação existente para o hardware </retorno>
 */
-struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
+struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamento){
     
     HTTP http;
     Config config;
-    struct Solicitacao solicitacao = {0,"","","",""};
+    std::vector<Solicitacao> solicitacao;
     EnvironmentVariablesService environment;
 
     String route = "/Solicitacao";
@@ -721,9 +658,16 @@ struct Solicitacao HTTPService::getSolicitacao(String tipoEquipamento){
             delay(5000);
         }
 
+
+
         if (doc["httpCode"].as<int>() == 200)
         {
-            solicitacao = deserializeSolicitacao(doc["result"][0]["id"].as<int>(), doc["result"][0]["payload"].as<String>());
+            JsonArray solicitacoesJson = doc["result"].as<JsonArray>();
+
+            for (JsonVariant sol : solicitacoesJson)
+            {
+                solicitacao.push_back(deserializeSolicitacao(sol["id"].as<int>(), sol["payload"].as<String>()));
+            }
         }
         else
         {
@@ -753,23 +697,19 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
     String route;
     EnvironmentVariablesService environment;
     
-    route = "/Solicitacao/finalizar/";
+    route = "/Solicitacao/finalizar-solicitacao-by-id/";
 
     String routeService;
     String type = "PUT";
-    String params = "";
     String response;
     String id = String(idSolicitacao);
-    String horaFinalizacao = environment.getNow();
-
-    params.concat("\"" + horaFinalizacao + "\"");
 
     routeService.concat(route + id);
-    response = http.request(routeService, type, params);
+    response = http.request(routeService, type, "{}");
 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(2048);
+        DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
 
         if (error)
@@ -780,6 +720,7 @@ bool HTTPService::putSolicitacao(int idSolicitacao) {
                 Serial.println("[HTTPService] Falha no parse JSON.......");
                 Serial.println(error.f_str());
             }
+            
             delay(5000);
         }
 

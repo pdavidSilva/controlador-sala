@@ -8,7 +8,8 @@
 #include <BLEDevice.h>
 #include "Structs.h"
 
-#define TIME_CONNECTION  30000 
+#define TIME_CONNECTION  5000 
+#define TIME_WAITING_CONNECTION 180000
 
 static BLEUUID CHARACTERISTIC_UUID("beb5483e-36e1-4688-b7f5-ea07361b26a8");
 static BLEUUID SERVICE_UUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
@@ -22,9 +23,7 @@ class BLEServerService
     static int __countTypeActuator;
     static vector<String> __sensors;
     static vector<struct HardwareRecord> __actuators;
-    static bool __receivedRequest;
     static BLEScan* __pBLEScan;
-    static bool __environmentSolicitation;
     static vector<BLEAdvertisedDevice*> __filteredDevices;
     static unordered_map<string, Hardware> __devicesMapped;
     static BLEDeviceConnect* __actuatorConnected;
@@ -35,8 +34,10 @@ class BLEServerService
     static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify); 
     BLEDeviceConnect* connectToDevice(BLEAdvertisedDevice* myDevice, bool validateConnection); 
     void initBLE(); 
+    void stopScan(); 
     void scanDevices(); 
     void populateMap(); 
+    void activeBLEScan(); 
     bool isSensor(String uuid);
     bool isAtuador(String uuid);
     bool connectMyDisp(BLEAdvertisedDevice* device); 
@@ -51,16 +52,16 @@ class BLEServerService
     vector<struct HardwareRecord> getActuators();
     void addSensor(String uuid);
     void addActuator(HardwareRecord act);
-    void setReceivedRequest(bool receivedRequest);
-    bool getReceivedRequest();
+    void newCicle();
     
     static void setCountTypeSensor(int count);
     static void setCounttypeActuator(int count);
     static int getCountTypeSensor();
     static int getCounttypeActuator();
-    
-    bool getEnvironmentSolicitation();
-    void setEnvironmentSolicitation(bool environmentSolicitation);
+
+    void closeConnections(vector<BLEDeviceConnect*> aux);
+
+    bool isSensorListed(String uuid, int typeDisp);
 
     // metods task
     void continuousConnectionTask();

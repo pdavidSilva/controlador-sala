@@ -24,9 +24,7 @@ String HTTP::request(String resource, String type, String params) const{
         }
         return "Tipo de requisição inválido";
     }
-    
-    wifi.connect();
-    
+        
     if (WiFi.status() == WL_CONNECTED) {
       
         HTTPClient http;
@@ -96,8 +94,6 @@ String HTTP::request(String resource, String type, String params) const{
         Serial.println("==================================");  
         Serial.println("[HTTP] HTTP FINALIZADO: " + String(httpCode));
     }
-
-    wifi.disconnect();
     
     if(config.isDebug()){
         Serial.println("==================================");  

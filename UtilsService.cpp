@@ -19,7 +19,6 @@ String UtilsService::mountPayload(String deviceType, String state, String comman
 
 void UtilsService::updateMonitoring(String message, String uuid)
 {
-    
     if(message == LZ_ON || message == LZ_OFF)
     {
         Monitoramento monitoringLight = __environmentVariablesService.getMonitoringLightByUuid(uuid);
@@ -71,4 +70,15 @@ std::vector<String> UtilsService::splitPayload(String payload, int maxSize)
     subStrings.push_back(END_DATA);
  
     return subStrings;  
+}
+
+String UtilsService::mountDataMonitoring(MonitoringRecord record) 
+{
+    Serial.println("[UtilsService] mountDataMonitoring");
+    DynamicJsonDocument doc(512);
+    String data;
+    doc["temperature"] = (!isnan(record.temperature) && record.temperature > 0 && record.temperature != NULL) ? record.temperature : -1;
+    doc["hasPresent"] = record.hasPresent;
+    serializeJson(doc, data);
+    return data;
 }

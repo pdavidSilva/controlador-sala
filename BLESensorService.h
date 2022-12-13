@@ -19,7 +19,6 @@
 static BLECharacteristic* pCharacteristicSensor;  
 static bool deviceConnected;
 static BLEServer* pServer;
-static bool sendData;
 EnvironmentVariablesService __environmentVariableService;
 static DeviceType deviceType;
 EquipmentService equipmentService;
@@ -30,17 +29,13 @@ void sendDataToServer(String data)
 {
   if (deviceConnected) 
   {
-      if(sendData)
+      if(SEND_DATA)
       {
         pCharacteristicSensor->setValue(data.c_str());
         pCharacteristicSensor->notify();
-        delay(1500); 
+        delay(100); 
       }
   }
-}
-
-void EnabledToSend(bool enabledToSend) {
-  sendData = enabledToSend;
 }
 
 class MyServerCallbacks: 
@@ -52,12 +47,12 @@ class MyServerCallbacks:
       pCharacteristicSensor->notify();
       
       deviceConnected = true;
-      sendData = false;
+      SEND_DATA = false;
 
       Serial.println("===============================================");
       Serial.println("[BLESensorService] CONECTADO");
             
-      delay(1000);
+      delay(100);
     };
 
     void onDisconnect(BLEServer* pServer) {
@@ -80,7 +75,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
     if(String(GET_DATA).equals(response.c_str())) 
     {
-       sendData = true;       
+      SEND_DATA = true;
     } 
     else if(deviceType != NULL && deviceType == ATUADOR)
     {
@@ -88,12 +83,9 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         Serial.println("===============================================");
         Serial.println("[BLESensorService] ATUADOR - (ONWRITE) COMMANDO PARA O EQUIPAMENTO");
-        HAS_IR_TO_SEND = true;
-        COMMAND_IR = receivedData;
-        //equipmentState = equipmentService.executeActionFromController(receivedData);
-        //sendData = true;
-        //sendDataToServer(equipmentState.c_str());
-        //sendData = false;
+        SEND_DATA = true;
+        COMMAND = receivedData;
+        
         equipmentState = "";
         receivedData = "";
       }
@@ -101,7 +93,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       {
         receivedData = receivedData + response.c_str();
       }
-    }
+    } 
   }
 };
 

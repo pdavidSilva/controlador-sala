@@ -20,17 +20,15 @@ class Controller
         bool loadedDevices();
 
         // BLE
-        void configureClient(String deviceName, DeviceType deviceType);   
-        void configureBLEServer();   
-        void initBLETaskServer();    
+        void setupBLEClient(String deviceName, DeviceType deviceType);   
+        void setupBLEServer();   
+        void startBLETaskServer();    
         bool notificateServer() const;       
 
         //send Data Monitoring
         void sendDataOfMonitoring(struct MonitoringRecord);
 
         // WEB SOCKET
-        void initServerSocket();    
-        void startTaskWebSocket();
         void startTaskHttp();
 
         HardwareRecord getHardwareConfig();
@@ -38,10 +36,10 @@ class Controller
 
         // Validacao continua de variaveis de ambiente
         void environmentVariablesContinuousValidation();
-        void initEnvironmentVariables();
+        void setupEnvironmentVariables();
 
         // Send Commands
-        void ExecuteCommandIR(String command);
+        void ExecuteCommand(String command);
 };
 
 #endif

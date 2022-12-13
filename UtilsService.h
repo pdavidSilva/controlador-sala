@@ -21,6 +21,7 @@ class UtilsService
         String mountPayload(String deviceType, String state, String command);
         void updateMonitoring(String message, String uuid);
         std::vector<String> splitPayload(String payload, int maxSize);
+        String mountDataMonitoring(MonitoringRecord record);
 };
 
 #endif

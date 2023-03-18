@@ -61,9 +61,11 @@ A step by step series of examples that tell you how to get a development env run
 
 Say what the step will be
 
-```
-First, go to file Config.cpp and change the variables __ssid and the __password to the environment's WIFI. Then verify if the variable __url is the endpoint correctly from the Salas UFS API. Then choose the module which you want to compile, it's needed to change the variable __type, there are 3 types: TYPE_CONTROLLER, TYPE_ACTUATOR, and TYPE_SENSOR, the next step it's comment content from the files of (ino) from other modules when one is selected to don't conflict with the module chose to run. Finally, it's ready to compile and run.
-```
+- Go to file Config.cpp and change the variables __ssid and the __password to the environment's WIFI.
+- Verify if the variable __url is the endpoint correctly from the Salas UFS API.
+- Choose the module which you want to compile, it's needed to change the variable __type, there are 3 types: TYPE_CONTROLLER, TYPE_ACTUATOR, and TYPE_SENSOR, the next step it's comment content from the files of (ino) from other modules when one is selected to don't conflict with the module chose to run. 
+
+Finally, it's ready to compile and run.
 
 ## 🔧 Running the tests <a name = "tests"></a>
 

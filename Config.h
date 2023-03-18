@@ -16,7 +16,6 @@
 #include "WiFiService.h"
 #include "HTTP.h"
 #include "Structs.h"
-#include "Defines.h"
 #include "HTTPService.h"
 #include "Hardware.h"
 #include "DHT.h"

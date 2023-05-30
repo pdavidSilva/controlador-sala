@@ -84,12 +84,15 @@ void update(String url, int port) {
     String bin = getBinName(url);
     String host = getHostName(url);
 
+    String message = "```Connecting to: " + host + '```';
+    logDiscord.sendLog(message);
     Serial.println("Connecting to: " + host);
     if (client.connect(host.c_str(), port)) {
         // Connection Succeed.
         // Fecthing the bin
         Serial.println("Fetching Bin: " + bin);
-
+        String message = "Fetching Bin: " + bin;
+        logDiscord.sendLog(message);
         // Get the contents of the bin file
         client.print(String("GET ") + bin + " HTTP/1.1\r\n" +
                         "Host: " + host + "\r\n" +
@@ -151,6 +154,8 @@ void update(String url, int port) {
         // Connect to S3 failed
         // May be try?
         // Probably a choppy network?
+        String message = "Connection to " + host + " failed. Please check your setup";
+        logDiscord.sendLog(message);
         Serial.println("Connection to " + host + " failed. Please check your setup");
         // retry??
     }
@@ -163,6 +168,8 @@ void update(String url, int port) {
         // Check if there is enough to OTA Update
         bool canBegin = Update.begin(contentLength);
         if (canBegin) {
+            String message = "Comecando atualizacao";
+            logDiscord.sendLog(message);
             Serial.println("Begin OTA. This may take 2 - 5 mins to complete. Things might be quite for a while.. Patience!");
             size_t written = Update.writeStream(client);
 
@@ -177,6 +184,8 @@ void update(String url, int port) {
             if (Update.end()) {
                 Serial.println("OTA done!");
                 if (Update.isFinished()) {
+                    String message = "Atualizado com sucesso, reiniciando";
+                    logDiscord.sendLog(message);
                     Serial.println("Update successfully completed. Rebooting.");
                     ESP.restart();
                 }
@@ -197,6 +206,8 @@ void update(String url, int port) {
         }
     }
     else {
+        String message = "Erro ao tentar baixar arquivo de atualizacao";
+        logDiscord.sendLog(message);
         Serial.println("There was no content in the response");
         client.flush();
     }
@@ -207,24 +218,30 @@ void callback(char* topic, byte* payload, unsigned int length) {
     String _message = String((char*)payload);
     String _topic = String(topic);
 
-    if (_topic.equals("/update/url/") == 1) {
+    if (_topic.equals("/update/controlador/beta/") == 1) {
+        Serial.println(_message);
         update(_message, 80);
     }
 }
 
 void reconnect() {
+    int countReconnect = 0;
     while (!mqtt.connected()) {
         Serial.print("Attempting MQTT connection...");
         if (mqtt.connect("ESP32Client")) {
             Serial.println("connected");
             mqtt.subscribe("/update/controlador/beta/");
         }
-        else {
+        else if (countReconnect < 20){
+            String message = "Desconectou do MQTT";
+            logDiscord.sendLog(message);            
             Serial.print("failed, rc=");
             Serial.print(mqtt.state());
             Serial.println(" try again in 5 seconds");
             // Wait 5 seconds before retrying
             delay(5000);
+        } else{
+          esp_restart();
         }
     }
     LogConectado();
@@ -360,13 +377,13 @@ void loop() {
   server.handleClient();
   contador_ms++;
 
-  if (contador_ms%30000 == 0) {
+  if (contador_ms > 600) {
     logDiscord.log_vida();
     //Serial.println("Programa antes da atualizacao OTA");
     contador_ms = 0;
   }
 
-  Serial.print(".");
+  //Serial.print(contador_ms);
   
   
   if (!mqtt.connected()) {

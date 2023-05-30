@@ -18,6 +18,11 @@ void WiFiService::connect()
     WiFi.begin(config.getSSID().c_str(), config.getPassword().c_str());
     while (WiFi.status() != WL_CONNECTED && attempt < config.getWifiFailAttempts())
     {
+      if(WiFi.status() == WL_NO_SSID_AVAIL) Serial.println("Rede não encontrada");
+      if(WiFi.status() == WL_CONNECT_FAILED) Serial.println("Tentativas de conexões falhadas");
+      if(WiFi.status() == WL_CONNECTION_LOST) Serial.println("Conexão perdida");
+      if(WiFi.status() == WL_IDLE_STATUS) Serial.println("Limite de tentativas alcançado");
+
         digitalWrite(config.getLedStatus(), HIGH);
         delay(1000);
         digitalWrite(config.getLedStatus(), LOW); 

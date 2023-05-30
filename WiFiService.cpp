@@ -1,13 +1,19 @@
 #include "Config.h"
 #include "WiFiService.h"
+#include "LogDiscord.h"
 
-WiFiService::WiFiService(){}
+
+WiFiService::WiFiService(){};
+
 Config config;
+
+DiscordLogService discordLogService;
+
 
 void WiFiService::connect()  
 {   
     delay(4000);
-    
+
     int attempt = 0;
     WiFi.begin(config.getSSID().c_str(), config.getPassword().c_str());
     while (WiFi.status() != WL_CONNECTED && attempt < config.getWifiFailAttempts())
@@ -41,6 +47,14 @@ void WiFiService::connect()
         Serial.println("[WiFiService] Conectado a rede: " + config.getSSID());
         Serial.print("[WiFiService] Ip: ");
         Serial.println(ip);
+        
+        String mensagem;
+        mensagem.concat("```IP: ");
+        mensagem.concat(ip.toString());
+        mensagem.concat("```");
+
+        // snprintf(mensagem, sizeof(String), "```IP: %s```",ip.toString());
+        discordLogService.sendLog(mensagem);
     }
    
     return;

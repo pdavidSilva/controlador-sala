@@ -1,14 +1,17 @@
 #include "Config.h"
 #include "Controller.h"
 #include "BLESensorService.h"
+#include "LogDiscord.h"
 
-Controller::Controller(){}
+Controller::Controller(){};
+
 HTTPService __http;
 AwaitHttpService __awaitHttpService;
 BLEServerService* __bleConfig; 
 EnvironmentVariablesService __environmentService;
 EquipmentService __equipmentService;
 UtilsService __utilService;
+DiscordLogService __DiscordLogService;
 
 bool Controller::start(HardwareRecord &record) const 
 {   
@@ -137,4 +140,9 @@ void Controller::ExecuteCommand(String command)
 {
   String response = __equipmentService.executeActionFromController(command);
   sendDataToServer(response);
+}
+
+void Controller::SendLogDiscord(String message)
+{
+  __DiscordLogService.sendLog(message);
 }

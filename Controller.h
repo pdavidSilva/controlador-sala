@@ -40,6 +40,9 @@ class Controller
 
         // Send Commands
         void ExecuteCommand(String command);
+
+        // Logs
+        void SendLogDiscord(String message);
 };
 
 #endif

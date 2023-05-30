@@ -17,10 +17,8 @@ Config::Config(){
     __debug     = true;
     //__ssid      = "TransmissaoAula";
     //__password  = "#ufstransmissao#";
-    __ssid      = "Josiely";
-    __password  = "JOIBSN12";
-    //__ssid      = "Apartamento 201-2.4";
-    //__password  = "Ald50983021";
+    __ssid      = "Kevenny";
+    __password  = "MainWarwick";
     __basetime  = 180000;
     __ledStatus = 2;
     __type  = TYPE_CONTROLLER;

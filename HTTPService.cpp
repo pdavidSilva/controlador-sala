@@ -5,6 +5,7 @@ const size_t CAPACITY = JSON_ARRAY_SIZE(12);
 
 HTTPService::HTTPService() {}
 
+
 void HTTPService::getInfoHardware(HardwareRecord &record)
 {
 

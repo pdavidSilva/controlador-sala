@@ -3,7 +3,7 @@
 DiscordLogService::DiscordLogService(){};
 
 void DiscordLogService::sendLog(String mensagem) {
-  String webhookURL = "https://discord.com/api/webhooks/1099336388714971178/t5Gpqm4DQikw0EjCO4QW53Qvpfv8pqYg3vAUilo7Lh3YMXX5LVodqlojo3Yjcy4i7NQg";
+  String webhookURL = "https://discord.com/api/webhooks/1113132271625568368/xOBmpzrNDQKsUUZQMf6AFes0WQWITPioPKK-NjkFGHSOeZc1Wt5qL7-id_v2pR5g2vrO";
 
   HTTPClient http;
 

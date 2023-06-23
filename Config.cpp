@@ -15,8 +15,8 @@ Config::Config(){
     __tokenApp  = "594ac3eb82b5080393ad5c426f61c1ed5ac53f90e1abebc15316888cf1c8f5fe";
     __url       = "http://marcosdosea-002-site2.itempurl.com/api";
     __debug     = true;
-    // __ssid      = "TransmissaoAula";
-    // __password  = "#ufstransmissao#";
+    // __ssid      = "xiaomi";
+    // __password  = "12345678";
    __ssid      = "MERCUSYS_26C5";
    __password  = "69059292";
     __basetime  = 180000;

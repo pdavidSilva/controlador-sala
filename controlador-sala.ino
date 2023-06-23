@@ -233,16 +233,18 @@ void reconnect() {
             mqtt.subscribe("/update/controlador/beta/");
         }
         else if (countReconnect < 20){
-            String message = "Desconectou do MQTT";
-            logDiscord.sendLog(message);            
+            countReconnect = 0;
+            // String message = "Desconectou do MQTT";
+            // logDiscord.sendLog(message);            
             Serial.print("failed, rc=");
             Serial.print(mqtt.state());
-            Serial.println(" try again in 5 seconds");
+            Serial.println("try again in 5 seconds");
             // Wait 5 seconds before retrying
             delay(5000);
-        } else{
-          esp_restart();
-        }
+        } 
+        // else{
+          // esp_restart();
+        // }
     }
     LogConectado();
 }
@@ -337,7 +339,7 @@ void setup() {
   );
 	 
 
-  server.on("/ota", HTTP_GET, []() {
+  server.on("/", HTTP_GET, []() {
     server.sendHeader("Connection", "close");
     server.send(200, "text/html", ota_html);
   });
@@ -345,53 +347,57 @@ void setup() {
 
   server.begin();
 
-  mqtt.setServer(MQTT_SERVER, 1883);
-  mqtt.setCallback(callback);
+  // mqtt.setServer(MQTT_SERVER, 1883);
+  // mqtt.setCallback(callback);
 
-  //do {
-	//	if ( controller.start(hardware) ) {
-	//		if ( controller.registerHardware(hardware) ) {
-//
+  // do {
+	// 	if ( controller.start(hardware) ) {
+	// 		if ( controller.registerHardware(hardware) ) {
+
   //      controller.setHardwareConfig(hardware);
   //      controller.fillHardwares(hardware);
-//
-	//			if ( controller.loadedDevices() )				
-	//				init = true;
-//
-	//		}
-	//	}
-	//} while( !init );
+
+	// 			if ( controller.loadedDevices() )				
+	// 				init = true;
+
+	// 		}
+	// 	}
+	// } while( !init );
 
   // Configure BLE Service
-  //controller.setupBLEServer();
-  //controller.startBLETaskServer();	
+  // controller.setupBLEServer();
+  // controller.startBLETaskServer();	
 
-  // Configure Http Service
-  //controller.startTaskHttp();
+  // // Configure Http Service
+  // controller.startTaskHttp();
 
-  // Configure Environment Variables Service
-  //controller.setupEnvironmentVariables();
+  // // Configure Environment Variables Service
+  // controller.setupEnvironmentVariables();
 }
 
 void loop() {
   server.handleClient();
   contador_ms++;
 
-  if (contador_ms > 600) {
+  if (contador_ms > 6000) {
     logDiscord.log_vida();
+    if(!mqtt.connected()){
+      String message = "ESP DESCONECTADO DO MQTT";
+      logDiscord.sendLog(message);  
+    }
     //Serial.println("Programa antes da atualizacao OTA");
     contador_ms = 0;
   }
 
-  //Serial.print(contador_ms);
+  Serial.print(contador_ms);
   
   
-  if (!mqtt.connected()) {
-       reconnect();
-   }
-   delay(1000);
-  mqtt.loop();
+  // if (!mqtt.connected()) {
+  //      reconnect();
+  //  }
+  //  delay(1000);
+  // mqtt.loop();
 //
   //delay(1);
-  //controller.environmentVariablesContinuousValidation(); 
+  // controller.environmentVariablesContinuousValidation(); 
 }

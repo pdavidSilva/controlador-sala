@@ -104,20 +104,20 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
   
   bool dispConnected = __bleServerConfig->connectToActuator(uuid);
                 
-  if(dispConnected)
-  {
-    std::vector<String> subStrings = __utilsService.splitPayload(message, MAX_LENGTH_PACKET);
+  // if(dispConnected)
+  // {
+  //   std::vector<String> subStrings = __utilsService.splitPayload(message, MAX_LENGTH_PACKET);
 
-    String packet;
-    for (packet : subStrings)
-    {
-      Serial.println("==================================");         
-      Serial.println("[ENVIRONMENT_VARIABLES] Sendig packet: " + packet);
-      __bleServerConfig->sendMessageToActuator(packet);
-    }
+  //   String packet;
+  //   for (packet : subStrings)
+  //   {
+  //     Serial.println("==================================");         
+  //     Serial.println("[ENVIRONMENT_VARIABLES] Sendig packet: " + packet);
+  //     __bleServerConfig->sendMessageToActuator(packet);
+  //   }
         
-    awaitsReturn();
-  }
+  //   awaitsReturn();
+  // }
 
   __bleServerConfig->disconnectToActuator();
    
@@ -175,7 +175,7 @@ bool EnvironmentVariablesService::getRoomDuringClassTime() {
   bool inClass = false;
   struct Reserva r;
   
-  for (r: __reservations) {
+  for (Reserva r: __reservations) {
 
     horaInicio = r.horarioInicio;
     horaFim = r.horarioFim;

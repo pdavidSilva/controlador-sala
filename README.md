@@ -43,6 +43,7 @@ Which software must you be to install.
 ```
 Arduino IDE v1.8.18
 ```
+- Version IDE v1.8.18
 
 Then it must install the libraries
 

@@ -80,27 +80,28 @@ String getHostName(String url) {
     return hostName;
 }
 
-void relay(int port) {
-  pinMode(port, OUTPUT);
-  for (int i = 1; i <= 10; i++) {
-    digitalWrite(port, HIGH);
-    delay(1000);  // Corrigido para 1000 milissegundos (1 segundo)
-    digitalWrite(port, LOW);
-    delay(1000);  // Corrigido para 1000 milissegundos (1 segundo)
-  }
-  Serial.println("Concluiu o relay");  // Corrigido para Serial.println e adicionado ponto e vírgula
-}
+void relay_off(int port1, int port2, int port3) {
+  pinMode(port1, OUTPUT);
+  pinMode(port2, OUTPUT);
+  pinMode(port3, OUTPUT);
 
-void relay_desligado(int port) {
-  pinMode(port, OUTPUT);
-  digitalWrite(port, HIGH);
+  digitalWrite(port1, HIGH);
+  digitalWrite(port2, HIGH);
+  digitalWrite(port3, HIGH);
+
   delay(1000);
   Serial.println("Relay desligado");
 }
 
-void relay_ligado(int port) {
-  pinMode(port, OUTPUT);
-  digitalWrite(port, LOW);
+void relay_on(int port1, int port2, int port3) {
+  pinMode(port1, OUTPUT);
+  pinMode(port2, OUTPUT);
+  pinMode(port3, OUTPUT);
+
+  digitalWrite(port1, LOW);
+  digitalWrite(port2, LOW);
+  digitalWrite(port3, LOW);
+
   delay(1000);
   Serial.println("Relay ligado");
 }
@@ -402,7 +403,8 @@ void setup() {
 }
 
 void loop() {
-  relay(33);
+  relay_on(33, 24, 26);
+  relay_off(33, 24, 26);
   // server.handleClient();
   // contador_ms++;
 

@@ -41,7 +41,7 @@ These instructions will get you a copy of the project up and running on your loc
 Which software must you be to install.
 
 ```
-Arduino IDE
+Arduino IDE v1.8.18
 ```
 
 Then it must install the libraries

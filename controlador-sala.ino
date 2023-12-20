@@ -80,6 +80,33 @@ String getHostName(String url) {
     return hostName;
 }
 
+void relay_off(int port1, int port2, int port3) {
+  pinMode(port1, OUTPUT);
+  pinMode(port2, OUTPUT);
+  pinMode(port3, OUTPUT);
+
+  digitalWrite(port1, HIGH);
+  digitalWrite(port2, HIGH);
+  digitalWrite(port3, HIGH);
+
+  delay(1000);
+  Serial.println("Relay desligado");
+}
+
+void relay_on(int port1, int port2, int port3) {
+  pinMode(port1, OUTPUT);
+  pinMode(port2, OUTPUT);
+  pinMode(port3, OUTPUT);
+
+  digitalWrite(port1, LOW);
+  digitalWrite(port2, LOW);
+  digitalWrite(port3, LOW);
+
+  delay(1000);
+  Serial.println("Relay ligado");
+}
+
+
 void update(String url, int port) {
     String bin = getBinName(url);
     String host = getHostName(url);
@@ -218,7 +245,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     String _message = String((char*)payload);
     String _topic = String(topic);
 
-    if (_topic.equals("/update/controlador/beta/") == 1) {
+    if (_topic.equals("/update/movimentodois/beta/") == 1) {
         Serial.println(_message);
         update(_message, 80);
     }
@@ -230,7 +257,7 @@ void reconnect() {
         Serial.print("Attempting MQTT connection...");
         if (mqtt.connect("ESP32Client")) {
             Serial.println("connected");
-            mqtt.subscribe("/update/controlador/beta/");
+            mqtt.subscribe("/update/movimentodois/beta/");
         }
         else if (countReconnect < 20){
             countReconnect = 0;
@@ -376,28 +403,29 @@ void setup() {
 }
 
 void loop() {
-  server.handleClient();
-  contador_ms++;
+  relay_on(33, 24, 26);
+  relay_off(33, 24, 26);
+  // server.handleClient();
+  // contador_ms++;
 
-  if (contador_ms > 6000) {
-    logDiscord.log_vida();
-    if(!mqtt.connected()){
-      String message = "ESP DESCONECTADO DO MQTT";
-      logDiscord.sendLog(message);  
-    }
-    //Serial.println("Programa antes da atualizacao OTA");
-    contador_ms = 0;
-  }
+  // if (contador_ms > 60000) {
+  //   logDiscord.log_vida();
+  //   if(!mqtt.connected()){
+  //     String message = "ESP DESCONECTADO DO MQTT";
+  //     logDiscord.sendLog(message);  
+  //   }
+  //   //Serial.println("Programa antes da atualizacao OTA");
+  //   contador_ms = 0;
+  // }
 
-  Serial.print(contador_ms);
+  //Serial.print(contador_ms);
   
-  
-  // if (!mqtt.connected()) {
-  //      reconnect();
-  //  }
+  //if (!mqtt.connected()) {
+  //     reconnect();
+  //}
   //  delay(1000);
-  // mqtt.loop();
-//
+  //mqtt.loop();
+  //
   //delay(1);
   // controller.environmentVariablesContinuousValidation(); 
 }

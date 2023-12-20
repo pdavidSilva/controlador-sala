@@ -190,8 +190,9 @@ void BLEServerService::scanDevices()
       __filteredDevices.push_back(new BLEAdvertisedDevice(foundDevices.getDevice(i)));
   
     BLEAdvertisedDevice* disp;
-    for (disp : __filteredDevices)
-      Serial.println(disp->toString().c_str());    
+    for (BLEAdvertisedDevice* disp : __filteredDevices){
+      Serial.println(disp->toString().c_str());  
+    }  
 }
 
 void BLEServerService::stopScan() 

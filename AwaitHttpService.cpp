@@ -106,7 +106,7 @@ void AwaitHttpService::executeSolicitation(Solicitacao request)
         std::vector<String> subStrings = __utils.splitPayload(payload, MAX_LENGTH_PACKET);
 
         String packet;
-        for (packet : subStrings)
+        for (String packet : subStrings)
         {
             Serial.println("==================================");         
             Serial.println("[AwaitHttpService] Sendig packet: " + packet);

@@ -11,12 +11,11 @@ String master = "";
 bool SEND_DATA = false;
 String COMMAND;
 const uint16_t kIrLed = 12;
-IRsend irsend(kIrLed); 
+IRsend irsend(kIrLed); */ 
 
-void setup() {
-
+/*void setup() {
 	Serial.begin(115200);
-  pinMode(RELE, OUTPUT);
+    pinMode(RELE, OUTPUT);
 	irsend.begin();
 	bool init = false;
 

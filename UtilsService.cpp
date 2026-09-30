@@ -17,30 +17,32 @@ String UtilsService::mountPayload(String deviceType, String state, String comman
     return payload;
 }
 
-void UtilsService::updateMonitoring(String message)
+void UtilsService::updateMonitoring(String message, String uuid)
 {
     if(message == LZ_ON || message == LZ_OFF)
     {
-        Monitoramento monitoringLight = __environmentVariablesService.getMonitoringLight();
+        Monitoramento monitoringLight = __environmentVariablesService.getMonitoringLightByUuid(uuid);
 
         monitoringLight.estado = (message == LZ_ON);
 
-        __environmentVariablesService.setMonitoringLight(monitoringLight);
-
-        if(monitoringLight.equipamentoId > 0 && monitoringLight.id > 0)
+        if(monitoringLight.equipamentoId > 0 && monitoringLight.id > 0) 
+        {
+           __environmentVariablesService.updateMonitoringLight(monitoringLight);
            __httpUtilService.putMonitoring(monitoringLight);
+        }
     }
 
     if(message == AC_OFF || message == AC_ON)
     {
-       Monitoramento monitoringConditioner = __environmentVariablesService.getMonitoringConditioner();    
+       Monitoramento monitoringConditioner = __environmentVariablesService.getMonitoringConditionerByUuid(uuid);    
 
        monitoringConditioner.estado = (message == AC_ON);
 
-       __environmentVariablesService.setMonitoringConditioner(monitoringConditioner); 
-
        if(monitoringConditioner.equipamentoId > 0 && monitoringConditioner.id > 0)
+       {
+           __environmentVariablesService.updateMonitoringConditioner(monitoringConditioner); 
            __httpUtilService.putMonitoring(monitoringConditioner);
+       }
     }
 
 }

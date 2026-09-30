@@ -2,8 +2,8 @@
 #include "Global.h"
 
 String __currentTime;
-struct Monitoramento EnvironmentVariablesService::__monitoringConditioner;
-struct Monitoramento EnvironmentVariablesService::__monitoringLight;
+vector<struct Monitoramento> EnvironmentVariablesService::__monitoringConditioner;
+vector<struct Monitoramento> EnvironmentVariablesService::__monitoringLight;
 vector<struct Reserva> EnvironmentVariablesService::__reservations; 
 HardwareRecord EnvironmentVariablesService::__hardware; 
 String __startTimeLoadReservations;
@@ -22,15 +22,60 @@ EnvironmentVariablesService::EnvironmentVariablesService()
     __startTimeLoadReservations  = "00:05:00";
     __endTimeLoadReservations    = "00:10:00";
     __hasMovement = false;
+    __lastTimeAttended = millis();
 }
 
 void EnvironmentVariablesService::initEnvironmentVariables() 
 {
     __monitoringConditioner = __httpRequestService.getMonitoringByIdSalaAndEquipamento("CONDICIONADOR");
     __monitoringLight = __httpRequestService.getMonitoringByIdSalaAndEquipamento("LUZES");
-    __reservations = __httpRequestService.getReservationsToday();
+    __reservations = __httpRequestService.getReservationsWeek();
     __lastTimeLoadReservations = millis();
     __lastTimeAttended = millis();
+}
+
+bool EnvironmentVariablesService::hasConditionerTurnOn() 
+{
+  struct Monitoramento monitoring = {0, false, "", 0};
+  for(monitoring : __monitoringConditioner) {
+    if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
+      return true;
+  }
+
+  return false;
+}
+
+bool EnvironmentVariablesService::hasLightTurnOn() 
+{
+  struct Monitoramento monitoring = {0, false, "", 0};
+  for(monitoring : __monitoringLight) {
+    if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
+      return true;
+  }
+
+  return false;
+}
+
+bool EnvironmentVariablesService::hasConditionerTurnOff() 
+{
+  struct Monitoramento monitoring = {0, false, "", 0};
+  for(monitoring : __monitoringConditioner) {
+    if (!monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
+      return true;
+  }
+
+  return false;
+}
+
+bool EnvironmentVariablesService::hasLightTurnOff() 
+{
+  struct Monitoramento monitoring = {0, false, "", 0};
+  for(monitoring : __monitoringLight) {
+    if (!monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
+      return true;
+  }
+
+  return false;
 }
 
 unsigned long EnvironmentVariablesService::getLastTimeAttended() 
@@ -63,22 +108,54 @@ void EnvironmentVariablesService::setHardware(HardwareRecord hardware)
     __hardware = hardware;
 }
 
-struct Monitoramento EnvironmentVariablesService::getMonitoringLight()
+struct Monitoramento EnvironmentVariablesService::getMonitoringLightByUuid(String uuid)
+{
+  struct Monitoramento monitoring = {0, false, "", 0};
+
+  for(monitoring : __monitoringLight) {
+    if (monitoring.uuid.equals(uuid))
+      return monitoring;
+  }
+
+  return {0, false, "", 0};
+}
+
+std::vector<struct Monitoramento> EnvironmentVariablesService::getMonitoringLight()
 {
   return __monitoringLight;
 }
 
-void EnvironmentVariablesService::setMonitoringLight(struct Monitoramento monitoring)
+void EnvironmentVariablesService::setMonitoringLight(std::vector<struct Monitoramento> monitoring)
 {
   __monitoringLight = monitoring;
 }
 
-struct Monitoramento EnvironmentVariablesService::getMonitoringConditioner()
+void EnvironmentVariablesService::updateMonitoringLight(struct Monitoramento monitoring)
+{ 
+  for(int i = 0; i < __monitoringLight.size();i++) {
+    if (__monitoringLight.at(i).id == monitoring.id)
+      __monitoringLight.at(i).estado = monitoring.estado;
+  }
+}
+
+struct Monitoramento EnvironmentVariablesService::getMonitoringConditionerByUuid(String uuid)
+{
+ struct Monitoramento monitoring = {0, false, "", 0};
+
+  for(monitoring : __monitoringConditioner) {
+    if (monitoring.uuid.equals(uuid))
+      return monitoring;
+  }
+
+  return {0, false, "", 0};
+}
+
+std::vector<struct Monitoramento> EnvironmentVariablesService::getMonitoringConditioner()
 {
   return __monitoringConditioner;
 }
 
-void EnvironmentVariablesService::setMonitoringConditioner(struct Monitoramento monitoring)
+void EnvironmentVariablesService::setMonitoringConditioner(std::vector<struct Monitoramento> monitoring)
 {
   __monitoringConditioner = monitoring;
 }
@@ -92,6 +169,14 @@ void EnvironmentVariablesService::setLastTimeLoadReservations(unsigned long time
 {
   __lastTimeLoadReservations = time;
 } 
+
+void EnvironmentVariablesService::updateMonitoringConditioner(struct Monitoramento monitoring)
+{
+  for(int i = 0; i < __monitoringConditioner.size(); i++) {
+    if (__monitoringConditioner.at(i).id == monitoring.id)
+      __monitoringConditioner.at(i).estado = monitoring.estado;
+  }
+}
 
 void EnvironmentVariablesService::sendDataToActuator(String uuid, String message)
 {
@@ -123,16 +208,14 @@ void EnvironmentVariablesService::sendDataToActuator(String uuid, String message
    
   delay(2000);
 
-  __utilsService.updateMonitoring(ENV_MESSAGE);
+  __utilsService.updateMonitoring(ENV_MESSAGE, uuid);
 
   ENV_RECEIVED_DATA = false;
   ENV_MESSAGE = ""; 
 }
 
-void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String message)
+void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String uuid, String message)
 {
-  String uuid = getUuidActuator(typeEquipment);
-
   if(!__bleServerConfig->isSensorListed(uuid, TYPE_ACTUATOR))
   {
     Serial.println("==================================");         
@@ -147,7 +230,11 @@ void EnvironmentVariablesService::sendDataToActuator(int typeEquipment, String m
 
   delay(1000);
   
-  sendDataToActuator(uuid, message);
+  for(struct HardwareRecord r : __bleServerConfig->getActuators())
+  {
+    if(r.uuid.equals(uuid) && typeEquipment == r.typeEquipment)
+      sendDataToActuator(r.uuid, message);
+  }
 
   ENV_REQUEST = false;
 
@@ -164,6 +251,19 @@ String EnvironmentVariablesService::getUuidActuator(int typeEquipment)
   }
 
   return uuid;
+}
+
+
+std::vector<String> EnvironmentVariablesService::getActuatorsByTypeEquipment(int typeEquipment)
+{
+  std::vector<String> uuids;
+  for(struct HardwareRecord r : __bleServerConfig->getActuators())
+  {
+    if(r.typeEquipment == typeEquipment)
+      uuids.push_back(r.uuid);
+  }
+
+  return uuids;
 }
 
 /*
@@ -195,13 +295,26 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
     
     if (IN_CLASS && __hasMovement) 
     {
+      if(hasConditionerTurnOff() || hasLightTurnOff())
+      {
+          //__bleServerConfig->setReceivedRequest(true);
+          //__bleServerConfig->setEnvironmentSolicitation(true);
 
-      if (!__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0)
-        turnOnConditioner();
+          struct Monitoramento monitoring = {0, false, "", 0};
 
-      if (!__monitoringLight.estado && __monitoringLight.id > 0 && __monitoringLight.equipamentoId > 0)
-        turnOnLight();
+          for(monitoring : __monitoringConditioner) {
+            if (!monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
+              turnOnConditioner(monitoring.uuid);
+          }
 
+          for(monitoring : __monitoringLight) {
+            if (!monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0)
+              turnOnLight(monitoring.uuid);
+          }
+          
+          //__bleServerConfig->setReceivedRequest(false);
+          //__bleServerConfig->setEnvironmentSolicitation(false);
+      }
     }  
 }
 
@@ -211,85 +324,97 @@ void EnvironmentVariablesService::turnOnManagedDevices() {
  */
 void EnvironmentVariablesService::turnOffManagedDevices() {
 
-  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > TIME_TO_TURN_OFF;
+  bool longTimeWithoutMovement = (millis() - __lastTimeAttended) > CHECK_TIME_TO_TURN_OFF;
 
   if (!IN_CLASS || (IN_CLASS && longTimeWithoutMovement)) 
   {
-    if (__monitoringConditioner.estado && __monitoringConditioner.id > 0 && __monitoringConditioner.equipamentoId > 0) 
-      turnOfConditioner();
+    if(hasConditionerTurnOn() || hasLightTurnOn())
+    {
+      //__bleServerConfig->setReceivedRequest(true);
+      //__bleServerConfig->setEnvironmentSolicitation(true);
 
-    if (__monitoringLight.estado && __monitoringLight.id > 0 && __monitoringLight.equipamentoId > 0)
-      turnOfLight();
+      struct Monitoramento monitoring = {0, false, "", 0};
+
+      for(monitoring : __monitoringConditioner) {
+        if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0) {
+          turnOffConditioner(monitoring.uuid);
+        }
+      }
+
+      for(monitoring : __monitoringLight) {
+        if (monitoring.estado && monitoring.id > 0 && monitoring.equipamentoId > 0) {
+          turnOffLight(monitoring.uuid);
+        }
+      }
+
+      //__bleServerConfig->setReceivedRequest(false);
+      //__bleServerConfig->setEnvironmentSolicitation(false);
+    }
   }
 }
 
 /*
  * <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::turnOnConditioner(){
+void EnvironmentVariablesService::turnOnConditioner(String uuid) {
 
   __config.lockEnvVariablesMutex();
 
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
-  Serial.println(__monitoringConditioner.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO CONDICIONADOR");
 
   if(WiFi.status() != WL_CONNECTED)
     return;
 
-  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
-
-  //------------------------------------------------------    
+  String codigos = __httpRequestService.getComandosIrByUuidAndOperacao(uuid, TURN_ON);
+  
+  //------------------------------------------------------
   String payload = __utilsService.mountPayload("AC", "ON", codigos);
-  sendDataToActuator(TYPE_CONDITIONER, payload);
+  sendDataToActuator(TYPE_CONDITIONER, uuid, payload);
   //------------------------------------------------------
 
   __config.unlockEnvVariablesMutex();
-
 }
 
 /*
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::turnOfConditioner(){
+void EnvironmentVariablesService::turnOffConditioner(String uuid) {
   
   __config.lockEnvVariablesMutex();
 
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
-  Serial.println(__monitoringConditioner.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO CONDICIONADOR");
 
   if(WiFi.status() != WL_CONNECTED)
     return;
     
-  String codigos = __httpRequestService.getComandosIrByIdSalaAndOperacao(getUuidActuator(TYPE_CONDITIONER));
+  String codigos = __httpRequestService.getComandosIrByUuidAndOperacao(uuid, TURN_OFF);
 
   //------------------------------------------------------    
   String payload = __utilsService.mountPayload("AC", "OFF", codigos);
-  sendDataToActuator(TYPE_CONDITIONER, payload);
+  sendDataToActuator(TYPE_CONDITIONER, uuid, payload);
   //------------------------------------------------------    
 
   __config.unlockEnvVariablesMutex();
-
 }
 
 /*
  * <descricao> Executa o comando de ligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::turnOnLight(){
+void EnvironmentVariablesService::turnOnLight(String uuid){
   
   __config.lockEnvVariablesMutex();
 
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
-  Serial.println(__monitoringLight.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: LIGANDO LUZES");
 
   // ----------------------------------------------------------
   String payload = __utilsService.mountPayload("LZ", "ON", "null");
-  sendDataToActuator(TYPE_LIGHT, payload);  
+  sendDataToActuator(TYPE_LIGHT, uuid, payload);  
   // ----------------------------------------------------------
 
   __config.unlockEnvVariablesMutex();
@@ -298,18 +423,17 @@ void EnvironmentVariablesService::turnOnLight(){
 /*
  * <descricao> Executa o comando de desligar luzes e envia o status do monitoramento pra o servidor além de gravar a operação em log <descricao/>
  */
-void EnvironmentVariablesService::turnOfLight(){
+void EnvironmentVariablesService::turnOffLight(String uuid){
 
   __config.lockEnvVariablesMutex();
 
   Serial.println("==================================");
   Serial.print("[ENVIRONMENT_VARIABLES]: ");
-  Serial.println(__monitoringLight.estado ? "true" : "false");
   Serial.println("[ENVIRONMENT_VARIABLES]: DESLIGANDO LUZES");
   
   // ----------------------------------------------------------
   String payload = __utilsService.mountPayload("LZ", "OFF", "null");
-  sendDataToActuator(TYPE_LIGHT, payload);  
+  sendDataToActuator(TYPE_LIGHT, uuid, payload);  
   // ----------------------------------------------------------
 
   __config.unlockEnvVariablesMutex();
@@ -317,7 +441,7 @@ void EnvironmentVariablesService::turnOfLight(){
 
 void EnvironmentVariablesService::awaitsReturn()
 {
-  unsigned long tempoLimite = millis() + TIME_TO_AWAIT_RETURN;
+  unsigned long tempoLimite = millis() + CHECK_TIME_TO_AWAIT_RETURN;
   while(millis() <= tempoLimite && !ENV_RECEIVED_DATA) {}    
 }
 
@@ -331,11 +455,11 @@ void EnvironmentVariablesService::checkTimeToLoadReservations()
   if(!currentTime.equals(""))
     __currentTime = currentTime;
   
-  bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= TIME_TO_LOAD;
+  bool timeToLoadReservations = (millis() - __lastTimeLoadReservations) >= CHECK_TIME_TO_LOAD;
 
   if (timeToLoadReservations)
   {
-    __reservations = __httpRequestService.getReservationsToday();
+    __reservations = __httpRequestService.getReservationsWeek();
     setLastTimeLoadReservations(millis());
   } 
 }

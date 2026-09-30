@@ -318,7 +318,7 @@ String HTTPService::getTime(String identifier)
 /*
  * <descricao> Realiza requisicao ao servidor para obter as reservas da semana para a sala deste dispositivo <descricao/>   
  */
-std::vector<struct Reserva> HTTPService::getReservationsToday() {
+std::vector<struct Reserva> HTTPService::getReservationsWeek() {
     
     HTTP http;
     String route;
@@ -421,12 +421,12 @@ struct Reserva HTTPService::deserializeReserve(JsonVariant reserve) {
  * <descricao> Obtem o estado atual do monitoramento da sala  <descricao/>
  * <retorno> Struct Monitoramento com os dados do monitoramento de acordo com o banco <retorno/>
  */
-struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tipoEquipamento) {
+std::vector<struct Monitoramento> HTTPService::getMonitoringByIdSalaAndEquipamento(String tipoEquipamento) {
 
     HTTP http;
     String route;
     Config config;
-    struct Monitoramento monitoramento = {0, false, 0};
+    std::vector<struct Monitoramento> monitoramentos;
     EnvironmentVariablesService environment;
         
     if (config.getRoute() == 1)
@@ -447,7 +447,7 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
                 
     if (strstr(response.c_str(), "[ERROR]") == NULL && strstr(response.c_str(), "[NO_CONTENT]") == NULL)
     {
-        DynamicJsonDocument doc(512);
+        DynamicJsonDocument doc(4096);
         DeserializationError error = deserializeJson(doc, response);
         
         if (error)
@@ -463,9 +463,19 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
 
         if (doc["httpCode"].as<int>() == 200)
         {
-            monitoramento.id = doc["result"]["id"].as<int>();
-            monitoramento.estado = doc["result"]["estado"].as<bool>();
-            monitoramento.equipamentoId = doc["result"]["equipamentoId"].as<int>();
+            JsonArray jsonSensors = doc["result"].as<JsonArray>();
+            
+            struct Monitoramento monitoramento;
+
+            for (JsonVariant object : jsonSensors)
+            {
+                monitoramento.id = object["id"].as<int>();
+                monitoramento.estado = object["estado"].as<bool>();
+                monitoramento.uuid = object["uuid"].as<String>();
+                monitoramento.equipamentoId = object["equipamentoId"].as<int>();
+
+                monitoramentos.push_back(monitoramento);
+            }
         }
         else
         {
@@ -480,8 +490,9 @@ struct Monitoramento HTTPService::getMonitoringByIdSalaAndEquipamento(String tip
         }
     }
 
-    return monitoramento;
+    return monitoramentos;
 }
+
 
 
 /*
@@ -548,7 +559,7 @@ bool HTTPService::putMonitoring(struct Monitoramento monitoring) {
  * <parametros> operacao: operacao que deve ser consultados os codigos IR (ligar/desligar) <parametros/>
  * <retorno> lista de inteiros com os codigos IR solicitados <retorno/>
  */
-String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
+String HTTPService::getComandosIrByUuidAndOperacao(String uuid, int operacao) {
 
     Config config;
     HTTP http;
@@ -567,6 +578,8 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
 
     routeService.concat(route);
     routeService.concat(uuid);
+    routeService.concat("/");
+    routeService.concat(operacao);
   
     String response = http.request(routeService, type, params);
 
@@ -588,12 +601,7 @@ String HTTPService::getComandosIrByIdSalaAndOperacao(String uuid) {
 
         if (doc["httpCode"].as<int>() == 200)
         {
-            JsonArray jsonSensors = doc["result"].as<JsonArray>();
-
-            for (JsonVariant object : jsonSensors)
-            {
-                codigo = object["codigo"].as<String>();
-            }
+            codigo = doc["result"]["codigo"].as<String>();
         }
         else
         {
@@ -618,7 +626,7 @@ struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamen
     
     HTTP http;
     Config config;
-    std::vector<Solicitacao> solicitacao;
+    std::vector<Solicitacao> solicitacoes;
     EnvironmentVariablesService environment;
 
     String route = "/Solicitacao";
@@ -649,16 +657,14 @@ struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamen
             }
             delay(5000);
         }
-
-
-
+  
         if (doc["httpCode"].as<int>() == 200)
         {
             JsonArray solicitacoesJson = doc["result"].as<JsonArray>();
 
             for (JsonVariant sol : solicitacoesJson)
             {
-                solicitacao.push_back(deserializeSolicitacao(sol["id"].as<int>(), sol["payload"].as<String>()));
+                solicitacoes.push_back(deserializeSolicitacao(sol["id"].as<int>(), sol["payload"].as<String>()));
             }
         }
         else
@@ -674,7 +680,7 @@ struct std::vector<Solicitacao> HTTPService::getSolicitacao(String tipoEquipamen
         }
     }
 
-    return solicitacao;
+    return solicitacoes;
 }
 
 /**
